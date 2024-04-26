@@ -30,7 +30,7 @@ i {
   place-content: center;
   width: 32px;
   height: 32px;
-  color: var(--color-text);
+  color: var(--bs-gray-800);
 }
 
 h3 {

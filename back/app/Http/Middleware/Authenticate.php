@@ -14,6 +14,7 @@ class Authenticate extends Middleware
     {
         // return $request->expectsJson() ? null : route('login');
         $url = env('FRONTEND_URL').'/login';
+        return $url;
         return Redirect::to($url);
     }
 }

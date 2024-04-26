@@ -1,0 +1,51 @@
+@font-face {
+  font-family: 'Rubik';
+  src: url('assets/fonts/rubik.ttf') format('truetype');
+}
+@import "veriables.scss";
+@import 'input.scss';
+@import 'btn.scss';
+
+
+*, ul {
+  margin: 0;
+  border: 0;
+  padding: 0;
+  list-style: none;
+  text-decoration: none;
+  box-sizing: border-box;
+}
+
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {
+  display: block;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  font-weight: normal;
+}
+
+ol, ul {
+  list-style: none;
+}
+
+body {
+  height: 100%;
+  width: 100%;
+  min-height: 100vh;
+  color: var(--bs-gray-800);
+  background: var(--bs-white);
+  transition: color 0.5s,
+    background-color 0.5s;
+  line-height: 1.6;
+  font-family: Rubik;
+  font-size: 15px;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

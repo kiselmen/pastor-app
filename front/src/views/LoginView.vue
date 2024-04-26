@@ -1,65 +1,104 @@
+<template>
+  <div class="login-container">
+    <h2>Вход</h2>
+    <!-- <div class=""> -->
+      <form @submit.prevent="onLogin" class="login-form">
+        <div class="form-group">
+            <label class="input-label">Email</label>
+            <input 
+                type="email"
+                autocomplete = "off"
+                class="input-box"
+                :class="{ 'is-invalid': userStore.errors?.email }"
+                v-model="form.email" 
+                id="email"
+            >
+            <div class="input-error" v-if="userStore.errors?.email">
+              {{ userStore.errors?.email[0] }}
+            </div>
+        </div>
+        <div class="form-group">
+          <label class="input-label">Пароль</label>
+          <input
+              :type = "showPassword === 1 ? 'text': 'password'"
+              autocomplete = "off"
+              class="input-box"
+              :class="{ 'is-invalid': userStore.errors?.password }"
+              id="password"
+              v-model="form.password"
+            />
+            <div class="input-icon" @click=setShowPassword(1)>
+              <IconClosedEye v-if="showPassword === 1"/>
+              <IconEye v-if="showPassword !== 1"/>
+            </div>
+            <div class="input-error" v-if="userStore.errors?.password">
+              {{ userStore.errors?.password[0] }}
+            </div>
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-blue" :disabled="userStore.loader">{{ userStore.loader ? 'Загрузка...': 'Вход'}}</button>
+        </div>
+      </form>
+    <!-- </div> -->
+    <!-- <p v-if="message" class="error">{{ message }}</p> -->
+  </div>
+</template>
+
 <script setup>
-import { reactive, ref } from 'vue';
-import { useRouter } from 'vue-router';
-const router = useRouter();
-const form = reactive({
-    email: '',
-    password: ''
-});
-const message = ref();
-function submit() {
-    message.value = '';
-    axios.post('login', form)
-    .then(response => {
-        localStorage.setItem('token', response.data.token);
-        axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
-        router.push({ name: 'user' });
-    })
-    .catch(error => {
-        if (error.response.status === 422) {
-            message.value = error.response.data.message;
-        }
-    })
-    .finally(() => form.password = '');
-}
+  import { reactive, ref } from 'vue';
+  import { useUserStore } from "@/stores/userStore";
+  import IconClosedEye from '@/components/icons/IconClosedEye.vue';
+  import IconEye from '@/components/icons/IconEye.vue';
+
+  const userStore = useUserStore();
+  const form = reactive({
+      email: '',
+      password: ''
+  });
+  const showPassword = ref(null);
+
+  const setShowPassword = (field) => {
+    showPassword.value = showPassword.value === field ? null: field;
+  };
+
+  function onLogin() {
+      userStore.loginUser(form);
+  }
 </script>
 
-<template>
-  <div>
-      <p v-if="message" class="error">{{ message }}</p>
-      <form @submit.prevent="submit" class="login">
-          <div class="form-group">
-              <label>Email</label>
-              <input v-model="form.email" type="text" class="form-input">
-          </div>
-          <div class="form-group">
-              <label>Password</label>
-              <input v-model="form.password" type="password" class="form-input">
-          </div>
-          <div class="form-group">
-              <button type="submit" class="form-input">Login</button>
-          </div>
-      </form>
-    </div>
-  </template>
+<style scoped lang="scss">
 
-<style>
-.login {
-    font-size: 1.2em;
-    display: flex;
+  .content {
+    align-items: center;
     flex-direction: column;
-    gap: 1em;
-}
-.form-group {
-    display: flex;
-    flex-direction: column;
-}
-.form-input {
-    padding: 0.5em;
-    font-size: 1em;
-}
-.error {
-    color: red;
-    font-size: 1em;
-}
-</style>
+    justify-content: center;
+  }
+  .login {
+    &-container {
+      font-size: 1.2em;
+      display: flex;
+      flex-direction: column;
+      gap: 1em;
+      width: 350px;
+      margin: 0 auto;
+      margin-top: 150px;
+    }
+    &-form {
+      width: 100%;
+      text-align: center;
+    }
+  }
+
+  .form {
+    &-group{
+      margin-bottom: 25px;
+      position: relative;
+    }
+  }
+
+  .btn {
+    width: 100%;
+  }
+
+
+</style>@/stores/userStore
