@@ -1,6 +1,8 @@
 <template>
-  <div class="people">
-    <form @submit.prevent="onEditPerson" class="section-container people-container">
+  <div class="form">
+    <div class="form-header">Редактирование прихожанина {{ form.second_name }} {{ form.first_name }} {{ form.patronymic }}</div>
+
+    <form @submit.prevent="onEditPerson" class="section-container form-container">
           <div class = "ProfileLogo table2x">
             <div class="form-group">
                 <label class="input-label">EMail</label>

@@ -1,5 +1,6 @@
 <template>
-  <div class="people-container" v-if="!loader">
+  <h2 class="people-name">Прихожане</h2>
+  <div class="people-container" v-if="!peopleStore.loader">
     <div class="form-group">
         <button 
           @click="openActionModal('addPersone')" 
@@ -31,7 +32,7 @@
           @toggle-modal="isModalAction = false"
           :id="activePersone"
       />
-</ModalWrapper>
+  </ModalWrapper>
 </template>
 
 <script setup>
@@ -69,9 +70,8 @@
   }
 
   onBeforeMount(async () => {
-    loader.value = true;
+    console.log(peopleStore.loader);
     await peopleStore.getAllPeople();
-    loader.value = false;
   });
 
 
@@ -80,8 +80,15 @@
 <style lang="scss" scoped>
   .people {
     &-container {
-      padding: 0 10px;
+      padding: 0 10px 10px 10px;
       width: 100%;
+    }
+    &-name {
+      background-color: var(--bs-gray-200);
+      color: var(--bs-primary);
+      margin: 10px;
+      padding: 10px;
+      border-radius: 3px;
     }
     &-items {
       display: flex;

@@ -17,19 +17,74 @@
             </div>
           </RouterLink>
         </li>
+        <li>
+          <RouterLink to="/families">
+            <div class="sidebar-item">
+              <SupportIcon class="sidebar-icon"/>
+              <span class="sidebar-link">Семьи</span>
+            </div>
+          </RouterLink>
+        </li>
+        <li v-if="userStore.isPermition(0)">
+          <a @click.prevent="onToggleMenuItem">
+            <div class="sidebar-item">
+              <ToolingIcon class="sidebar-icon"/>
+              <span class="sidebar-link">НСИ</span>
+              <ChevronDownIcon class="sidebar-chevron"/>
+            </div>
+          </a>
+          <ul class="children">
+            <li>
+              <RouterLink to="/target-groups">
+                <div class="sidebar-subitem">
+                  <span class="sidebar-link">Целевые группы</span>
+                </div>
+              </RouterLink>
+            </li>
+            <li>
+              <RouterLink to="/services">
+                <div class="sidebar-subitem">
+                  <span class="sidebar-link">Виды служения</span>
+                </div>
+              </RouterLink>
+            </li>
+            <li>
+              <RouterLink to="/levels">
+                <div class="sidebar-subitem">
+                  <span class="sidebar-link">Уровни дисциплины</span>
+                </div>
+              </RouterLink>
+            </li>
+          </ul>
+        </li>
     </ul>
   </div>
 </template>
 
 <script setup>
   import { useMenuStore } from '@/stores/menuStore';
-  import CommunityIcon from '@/components/icons/IconCommunity.vue'
-  import EcosystemIcon from '@/components/icons/IconEcosystem.vue'
+  import { useUserStore } from '@/stores/userStore';
+  import CommunityIcon from '@/components/icons/IconCommunity.vue';
+  import EcosystemIcon from '@/components/icons/IconEcosystem.vue';
+  import SupportIcon from '@/components/icons/IconSupport.vue';
+  import ToolingIcon from '@/components/icons/IconTooling.vue';
+  import ChevronDownIcon from '@/components/icons/IconChevronDown.vue';
 
   const menuStore = useMenuStore();
+  const userStore = useUserStore();
+
+  const onToggleMenuItem = (e) => {
+    // console.log(e.currentTarget.parentNode); 
+    e.currentTarget.parentNode.classList.toggle('open');
+  }
+
 </script>
 
 <style lang="scss" scoped>
+  a {
+    cursor: pointer;
+  }
+
   ul {
     list-style: none;
     text-decoration: none;
@@ -62,9 +117,15 @@
       flex-direction: row;
       align-items: center;
     }
+    &-subitem {
+      padding-left: 30px;
+    }
     &-icon {
       margin-left: 5px;
       margin-right: 20px;
+    }
+    &-chevron{
+      margin-left: auto;
     }
     &-link {
       display: inline-block;
@@ -97,4 +158,17 @@
     color: var(--bs-light);
     background-color: var(--bs-gray-800);
   }
+
+  .children {
+    display: none;
+  }
+
+  .open >.children {
+    display: block;
+  }
+
+  .open >a >.sidebar-item >.sidebar-chevron {
+    transform: rotate(180deg);
+  }
+
 </style>

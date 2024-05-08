@@ -38,4 +38,13 @@
       transition: all 0.2s ease-out;
     }
   }
+  &-warning {
+    background: var(--bs-warning);
+    color: var(--bs-white);
+    &:hover {
+      background: var(--bs-success);
+      color: var(--bs-white);
+      transition: all 0.2s ease-out;
+    }
+  }
 }

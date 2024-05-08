@@ -10,7 +10,7 @@ class People extends Model
   ];
 
   protected $fillable = [
-      'id', 'first_name' ,'second_name', 'patronymic', 'birthday_date', 'baptism_date',
+      'user_id' ,'type', 'sourse_id', 'birthday_date', 'baptism_date',
       'death_date', 'image_url', 'live_addres', 'home_phone', 'mobile_phone', 'email', 'created_at', 'updated_at'
   ];
 

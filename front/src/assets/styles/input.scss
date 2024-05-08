@@ -35,6 +35,7 @@
     top: -12px;
     left: 10px;
     padding:0 8px;
+    z-index: 10;
     background: var(--bs-white);
     color: var(--bs-gray-600);
   }
@@ -50,10 +51,15 @@
 }
 
 .form {
+  border: 1px solid var(--bs-primary);
+  border-radius: 0px;
+  padding-bottom: 20px;
+
   &-group {
     margin-top: 20px;
     position: relative;
   }
+
   &-row {
     margin-top: 20px;
     display: flex;
@@ -61,4 +67,37 @@
     gap: 20px;
     justify-content: space-between;
   }
+
+  &-header {
+    padding: 10px;
+    background-color: var(--bs-primary);
+    color: var(--bs-white);
+  }
+
+  &-text {
+    padding: 10px;
+    background-color: inherit;
+    color: var(--bs-gray-600);
+  }
+
+  &-container {
+    max-width: 1440px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    margin: 0 auto;
+    margin-top: 30px;
+  }
 }
+
+.table2x{
+  flex-basis: 50%;
+  padding: 0 20px;
+  max-width: 750px;
+}
+.table1x{
+  padding: 0 20px;
+  // max-width: 750px
+  width: 100%;
+}
+

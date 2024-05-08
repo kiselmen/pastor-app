@@ -34,12 +34,11 @@
         :style = "{backgroundImage : 'url(' + imagePreview + ')'}"
       >
       </div>
-      <button v-if = "showPreview" 
+      <XButton 
+        v-if = "showPreview"
         @click="removePhoto"
         class="photo-uploader__remove" 
-      >         
-      </button>
-
+      />
     </div>
   </div>
 
@@ -48,6 +47,7 @@
 <script setup>
 import { ref } from 'vue';
 import getImgPath from '@/utils/imagePlugin.js';
+import XButton from '@/components/ui/XButton.vue';
 
 const props = defineProps({
   prevImage: { type: String, default: null },
@@ -146,40 +146,8 @@ const removePhoto = () => {
     }
 
     &__remove {
-      cursor: pointer;
-      position: absolute;
-      outline: none;
       top: -15px;
       left: calc(100% - 15px);
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      background-color: var(--bs-primary);
-      border: 0;
-      
-
-      &::before {
-        content: "";
-        position: absolute;
-        z-index: 5;
-        top: calc(50% - 1px);
-        left: calc(50% - 7px);
-        width: 15px;
-        height: 2px;
-        background-color: var(--bs-white);
-        rotate: 45deg;
-      }
-      &::after {
-        content: "";
-        position: absolute;
-        z-index: 5;
-        top: calc(50% - 1px);
-        left: calc(50% - 7px);
-        width: 15px;
-        height: 2px;
-        background-color: var(--bs-white);
-        rotate: -45deg;
-      }
     }
 
     &__icon {

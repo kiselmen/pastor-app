@@ -94,7 +94,20 @@ export const useUserStore = defineStore('userStore', () => {
     menuStore.setContentClasses('content content-off')
     menuStore.authenticated.value = null;
     menuStore.user.value = null;
-  } 
+  }
+  
+  const isPermition = (type) => {
+    if (type === 0) {
+      const permition = user.value.permition.filter(item => item.type === type);
+      return Boolean(permition.length);
+    } else if (type === 1) {
+      return false;
+    } else if (type === 2) {
+      return false;
+    } else {
+      return false;
+    }
+  }
 
   return { 
     user,
@@ -107,5 +120,6 @@ export const useUserStore = defineStore('userStore', () => {
     createNewUser,
     setErrors,
     clearLoginState,
+    isPermition,
   };
 });

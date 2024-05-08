@@ -1,17 +1,17 @@
 <template>
   <Teleport to="body">
     <Transition name="fade">
-      <div v-if="props.isModalActive" class="modal__background" @click="emits('closeModal')" />
+      <div v-if="props.isModalActive" class="modal__background" />
     </Transition>
     <Transition
       :name="props.isSticky?.value && props.isSticky?.position === 'top' ? 'move' : 'fade'"
     >
-      <div v-if="props.isModalActive" class="modal" @click="emits('closeModal')">
+      <div v-if="props.isModalActive" class="modal" ref="modalEl" @click="onCloseModal">
         <div
           class="modal__content"
           :class="{ 'sticky-top' : props.isSticky?.value && props.isSticky?.position === 'top' }"
-          @click.stop
         >
+        <!-- @click.stop -->
           <slot />
         </div>
       </div>
@@ -20,45 +20,56 @@
 </template>
 
 <script setup>
-import scrollbar from '@/utils/scrollbar'
-import { watch, onMounted, onUnmounted } from 'vue';
+  import scrollbar from '@/utils/scrollbar'
+  import { watch, onMounted, onUnmounted, ref } from 'vue';
 
-const emits = defineEmits(['closeModal'])
-const props = defineProps({
-  isModalActive: {
-    type: Boolean,
-    default: false
-  },
-  isSticky: () => {
-    return {
-      value: false,
-      position: null
+  const emits = defineEmits(['closeModal']);
+
+  const props = defineProps({
+    isModalActive: {type: Boolean, default: false},
+    isSticky: () => {
+      return {
+        value: false,
+        position: null
+      }
     }
-  }
-})
-const closeByKey = (event) => {
-  if (props.isModalActive && event.key === 'Escape') {
-    emits('closeModal')
-  }
-}
-watch(() => props.isModalActive, () => {
-  if (props.isModalActive) {
-    scrollbar.removeScrollBar()
-  } else {
-    scrollbar.addScrollBar()
-  }
-})
-onMounted(() => {
-  document.addEventListener('keydown', closeByKey)
-  if (props.isModalActive) {
-    scrollbar.removeScrollBar()
-  } else {
-    scrollbar.addScrollBar()
-  }
-})
-onUnmounted(() => {
-  document.removeEventListener('keydown', closeByKey)
-})
+  });
+
+  const modalEl = ref(null);
+
+  const closeByKey = (event) => {
+    if (props.isModalActive && event.key === 'Escape') {
+      emits('closeModal')
+    }
+  };
+
+  const onCloseModal = (event) => {
+    // console.log(event.target, modalEl.value);
+    if (modalEl.value === event.target) {
+      emits('closeModal')  
+    } 
+  };
+
+  watch(() => props.isModalActive, () => {
+    if (props.isModalActive) {
+      scrollbar.removeScrollBar()
+    } else {
+      scrollbar.addScrollBar()
+    }
+  });
+
+  onMounted(() => {
+    document.addEventListener('keydown', closeByKey)
+    if (props.isModalActive) {
+      scrollbar.removeScrollBar()
+    } else {
+      scrollbar.addScrollBar()
+    }
+  });
+
+  onUnmounted(() => {
+    document.removeEventListener('keydown', closeByKey)
+  });
 </script>
 
 <style scoped lang="scss">

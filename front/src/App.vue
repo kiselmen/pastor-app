@@ -5,7 +5,7 @@
   <TopBar v-if="userStore.authenticated"/>
 
   <div :class="menuStore.contentClasses">
-    <RouterView />
+    <RouterView/>
   </div>
 </template>
 
@@ -18,9 +18,11 @@
   import { RouterView } from 'vue-router';
   import { useUserStore } from '@/stores/userStore';
   import { useMenuStore } from '@/stores/menuStore';
+  import { useNsiStore } from '@/stores/nsiStore';
 
   const menuStore = useMenuStore();
   const userStore = useUserStore();
+  const nsiStore = useNsiStore();
 
   let localStoreWatcher = null;
   const loader = ref(false);
@@ -39,7 +41,8 @@
     if (localStorage.getItem('authToken')) {
       await userStore.signIn();
     }
-    localStoreWatcher = setInterval(() => checkLocalStorage(), 2000);    
+    localStoreWatcher = setInterval(() => checkLocalStorage(), 2000);
+    await nsiStore.getStatuses();
     loader.value = false;
   });
 

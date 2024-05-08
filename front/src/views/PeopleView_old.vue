@@ -133,7 +133,7 @@
       :is-modal-active="isModalAction"
       @close-modal="isModalAction = false"
     >
-      <AddPerson
+      <AddPersone
           @toggle-modal="isModalAction = false"
           :action="action"
       />
@@ -153,7 +153,7 @@
   import Button from '@/components/ui/Button.vue';
   import ModalWrapper from '@/components/ui/ModalWrapper.vue';
   // import QuestionModal from '@/components/people/QuestionModal.vue'
-  import AddPerson from '@/components/people/AddPerson.vue';
+  import AddPersone from '@/components/people/AddPersone.vue';
 
   const peopleStore = usePeopleStore();
   const allApplications = ref([]);
@@ -588,4 +588,4 @@
       }
   }
 
-</style>@/stores/peopleStore
+</style>
