@@ -2,102 +2,161 @@
   <div class = "card">
     <div class="card-title">
       <span>
-        {{ props.persone.second_name }} {{ props.persone.first_name }} {{ props.persone.patronymic }}
+        {{ props.persone.name }} {{ props.persone.first_name }} {{ props.persone.patronymic }}
       </span>
-      <IconEditDuotone class="change_button" @click="onEditClick"/>
+      <div class="change_button">
+        <!-- <EditDuotoneIcon  @click="onEditClick"/> -->
+        <ActionMenu 
+          :actions = "actions"
+          @startAction="onStartAction"
+        >
+          <template #icon>
+            <EditDuotoneIcon/>
+          </template>
+        </ActionMenu>
+      </div>
+
     </div>
-    <!-- <div class="card-row">
-      {{ props.persone.first_name }} {{ props.persone.patronymic }}
-    </div> -->
-    <div class="card-img" :style = "{ backgroundImage : 'url(' + getImgPath(props.persone.image_url) +')' }"></div>
+    <div class="card-box">
+      <div class="card-row">
+        <div class="card-img" :style = "{ backgroundImage : 'url(' + getImgPath(props.persone.image_url) +')' }"></div>
+        <div class="card-column">
+          <PrihodMiniItem
+            :prihod = "props.persone.prihod"
+          />
+          <div class="card-target">{{ props.persone?.TargetName }}</div>
+          <FamilyMiniItem
+            :family = "props.persone.family"
+          />
+        </div>
+      </div>
+    </div>  
+    <div class="card-box">
+      <div class="card-row">
+        <DateItem>
+          <template #icon>
+            <BirthdayIcon />
+          </template>
+          <template #heading>
+            {{ (new Date(props.persone.birthday_date)).toDateString() }}
+          </template>
+        </DateItem>
+        <DateItem>
+          <template #icon>
+            <CrossIcon />
+          </template>
+          <template #heading v-if="props.persone.baptism_date">
+            {{ (new Date(props.persone.baptism_date)).toDateString() }}
+          </template>
+        </DateItem>
+      </div>
+      <div class="card-row">
+        <DateItem>
+          <template #icon>
+            <RIPIcon />
+          </template>
+          <template #heading>
+            {{ props.persone.death_date ? (new Date(props.persone.death_date)).toDateString(): '-' }}
+          </template>
+        </DateItem>
+      </div>
+    </div>
+    <div class="card-box">
+      <div class="card-row">
+        <DateItem>
+          <template #icon>
+            <AdressIcon />
+          </template>
+          <template #heading>
+            {{ props.persone.live_addres }}
+          </template>
+        </DateItem>
+      </div>
+      <div class="card-row">
+        <DateItem>
+          <template #icon>
+            <PhoneIcon />
+          </template>
+          <template #heading>
+            {{ props.persone.mobile_phone }}
+          </template>
+        </DateItem>
+      <!-- </div>
+      <div class="card-row"> -->
+        <DateItem>
+          <template #icon>
+            <PhoneIcon />
+          </template>
+          <template #heading>
+            {{ props.persone.home_phone }}
+          </template>
+        </DateItem>
+      </div>
+    </div>   
     <div class="card-row">
-      ДР: {{ props.persone.birthday_date }} ДК: {{ props.persone.baptism_date }} ДС: {{ props.persone.death_date }}
-    </div>
-    <div class="card-row">
-      Адрес: {{ props.persone.live_addres }}
-    </div>
-    <div class="card-row">
-      ТМ: {{ props.persone.mobile_phone }} ТД: {{ props.persone.home_phone }}
-    </div>
-    <div class="card-row">
-      EMail: {{ props.persone.email }}
-    </div>
+        <ServiceMiniItem
+          :services = "props.persone.pservice"
+          @editServices = "onEditPersonServices"
+        />
+
+      </div> 
   </div>
 </template>
 
 <script setup>
   import getImgPath from '@/utils/imagePlugin.js';
-  import { onBeforeMount } from 'vue';
-  import IconEditDuotone from '@/components/icons/IconEditDuotone.vue';
+  import EditDuotoneIcon from '@/components/icons/IconEditDuotone.vue';
+  import CrossIcon from '@/components/icons/IconCross.vue';
+  import BirthdayIcon from '@/components/icons/IconBirthday.vue';
+  import RIPIcon from '@/components/icons/IconRIP.vue';
+  import AdressIcon from '@/components/icons/IconAdress.vue';
+  import PhoneIcon from '@/components/icons/IconPhone.vue';
+  import DateItem from '@/components/people/DateItem.vue';
+  import PrihodMiniItem from '@/components/prihod/PrihodMiniItem.vue';
+  import ServiceMiniItem from '@/components/nsi/ServiceMiniItem.vue';
+  import FamilyMiniItem from '@/components/family/FamilyMiniItem.vue';
+  import { onBeforeMount, ref } from 'vue';
+  import ActionMenu from '@/components/ui/ActionMenu.vue';
 
   const props = defineProps({
     persone: { type: Object, default: new Object() },
   })
 
-  const emits = defineEmits(['editPeron'])
+  const emits = defineEmits(['editPerson', 'editPersonServices']);
 
-  // onBeforeMount(() => {
-  //   console.log(props.persone);
-  // })
+  const actions = ref([]);
 
-  const onEditClick = () => {
-    console.log('Edit persone ', props.persone.id);
-    emits('editPeron', props.persone.id)
+  // const onEditClick = () => {
+  //   // console.log('Edit persone ', props.persone.id);
+  //   emits('editPerson', props.persone.id)
+  // }
+
+  const onStartAction = (action) => {
+    // console.log('onStartAction ', action);
+    const isAction = actions.value.filter(item => item.id === action);
+    if (isAction.length) {
+      const actionEmit = isAction[0].emit;
+      console.log('action ', actionEmit);
+      emits(actionEmit, props.persone.id);
+    } else {
+      console.log('Нет такой операции');
+    }
+  };
+
+  const onEditPersonServices = () => {
+    emits('editPersonServices', props.persone.id);
   }
+
+  onBeforeMount(async () => {
+    actions.value = [
+      { id: 0, name: 'Изменить', emit: 'editPerson' },
+      { id: 1, name: 'Регистрация', emit: 'registerPerson' },
+    ]
+  })
 </script>
 
 <style lang="scss" scoped>
-  .change_button {
-    position: absolute;
-    top: -10px;
-    right: -10px;
-    width: 32px;
-    height: 32px;
-    background: var(--bs-blue);
-    display: flex;
-    align-items: center;
-    border-radius: 50%;
-    justify-content: center;
-    cursor: pointer;
-    border: 6px solid var(--bs-white);    
-    &:hover{
-      background: var(--bs-gray-200);
-    }
-  }
-  .card {
-    margin-top: 1rem;
-    border-radius: 0;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    min-width: 200px;
-    min-height: 400px;
-    // height: var(--bs-card-height);
-    color: var(--bs-gray-600);
-    word-wrap: break-word;
-    background-color: var(--bs-white);
-    background-clip: border-box;
-    border: 1px solid var(--bs-gray-400);
-    &-title {
-      padding: 10px;
-      background-color: var(--bs-primary);
-      color: var(--bs-white);
-      font-size: 14px;
-      font-weight: bold;
-    }
-    &-row {
-      padding: 10px;
-      // background-color: var(--bs-primary);
-      // color: var(--bs-white);
-      font-size: 14px;
-      font-weight: bold;
-    }
-    &-img {
-      width: 100%;
-      height: 200px;
-      background-repeat: no-repeat;
-      background-size: contain;
-      background-position: center center;
-    }    
+  .action-container {
+    align-items: baseline;
   }
 </style>

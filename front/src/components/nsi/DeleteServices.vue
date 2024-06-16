@@ -1,7 +1,7 @@
 <template>
   <div class="form" ref="formElem">
     <div class="form-header">Удаление вида служения</div>
-    <form class="section-container form-container" >
+    <form class="form-container section-container">
       <div class = "table1x">
           <div class="form-text">Удалить служения {{ service }}?</div>
           <div class="form-row">

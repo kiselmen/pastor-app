@@ -21,10 +21,14 @@
       transition: all 0.2s ease-out;
     }
   }
+  &-mini {
+    padding: 10px 10px;    
+    min-width: 70px;
+  }
   &-green {
     background: var(--bs-teal);
     &:hover {
-      background: var(--bs-success);
+      background: var(--bs-info);
       color: var(--bs-white);
       transition: all 0.2s ease-out;
     }
@@ -33,7 +37,7 @@
     background: var(--bs-primary);
     color: var(--bs-white);
     &:hover {
-      background: var(--bs-success);
+      background: var(--bs-info);
       color: var(--bs-white);
       transition: all 0.2s ease-out;
     }
@@ -42,7 +46,7 @@
     background: var(--bs-warning);
     color: var(--bs-white);
     &:hover {
-      background: var(--bs-success);
+      background: var(--bs-info);
       color: var(--bs-white);
       transition: all 0.2s ease-out;
     }

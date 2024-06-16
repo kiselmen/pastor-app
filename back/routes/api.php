@@ -26,10 +26,18 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/targets', 'App\Http\Controllers\Api\TargetController@store');
     Route::get('/services', 'App\Http\Controllers\Api\ServiceController@index');
     Route::post('/services', 'App\Http\Controllers\Api\ServiceController@store');
-    Route::post('/services/{id}/delete', 'App\Http\Controllers\Api\ServiceController@delete');
+    Route::post('/services/{id}/update', 'App\Http\Controllers\Api\ServiceController@update');
     Route::post('/services/delete', 'App\Http\Controllers\Api\ServiceController@delete');
+    Route::post('/pservices', 'App\Http\Controllers\Api\PserviceController@store');
+    Route::post('/pservices/delete', 'App\Http\Controllers\Api\PserviceController@delete');
     Route::get('/levels', 'App\Http\Controllers\Api\LevelController@index');
     Route::post('/levels', 'App\Http\Controllers\Api\LevelController@store');
+    Route::get('/prihods', 'App\Http\Controllers\Api\PrihodController@index');
+    Route::post('/prihods', 'App\Http\Controllers\Api\PrihodController@store');
+    Route::post('/prihods/{id}/update', 'App\Http\Controllers\Api\PrihodController@update');
+    Route::get('/families', 'App\Http\Controllers\Api\FamilyController@index');
+    Route::post('/families', 'App\Http\Controllers\Api\FamilyController@store');
+    Route::post('/families/{id}/update', 'App\Http\Controllers\Api\FamilyController@update');
 });
 Route::get('/statuses', 'App\Http\Controllers\Api\StatusController@index');
 

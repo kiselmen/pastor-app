@@ -25,6 +25,14 @@
             </div>
           </RouterLink>
         </li>
+        <li>
+          <RouterLink to="/prihods">
+            <div class="sidebar-item">
+              <DocumentationIcon class="sidebar-icon"/>
+              <span class="sidebar-link">Участки</span>
+            </div>
+          </RouterLink>
+        </li>
         <li v-if="userStore.isPermition(0)">
           <a @click.prevent="onToggleMenuItem">
             <div class="sidebar-item">
@@ -67,6 +75,7 @@
   import CommunityIcon from '@/components/icons/IconCommunity.vue';
   import EcosystemIcon from '@/components/icons/IconEcosystem.vue';
   import SupportIcon from '@/components/icons/IconSupport.vue';
+  import DocumentationIcon from '@/components/icons/IconDocumentation.vue';
   import ToolingIcon from '@/components/icons/IconTooling.vue';
   import ChevronDownIcon from '@/components/icons/IconChevronDown.vue';
 

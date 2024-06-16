@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-
+use App\Models\Status;
 
 class Service extends Model
 {
@@ -19,7 +19,7 @@ class Service extends Model
   ];
 
   public function status() {
-		return $this->belongsTo('App\Models\Status');
+		return $this->belongsTo(Status::class);
 	}
 
   public function getStatusNameAttribute()
@@ -30,5 +30,4 @@ class Service extends Model
       return 'Не определен';
     }
   }
-
 }

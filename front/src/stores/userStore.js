@@ -3,11 +3,12 @@ import { useRouter } from 'vue-router';
 import { defineStore } from 'pinia';
 import axios from 'axios';
 import { useMenuStore } from '@/stores/menuStore';
-
+import { useMsgStore } from '@/stores/msgStore';
 
 export const useUserStore = defineStore('userStore', () => {
 
   const menuStore = useMenuStore();
+  const msgStore = useMsgStore();
 
   const user = ref(null);
   const authenticated = ref(false);
@@ -18,13 +19,11 @@ export const useUserStore = defineStore('userStore', () => {
   const signIn = async () => {
     try {
       const sigInResponse = await axios.get('/api/user');
-      // console.log('sigInResponse ', sigInResponse);
       user.value = sigInResponse.data;
       authenticated.value = true;
       localStorage.setItem('authToken', 'authenticated');
       menuStore.setContentClasses('content');
     } catch (error) {
-      // console.log(error);
       user.value = null;
       authenticated.value = false;
       localStorage.removeItem('authToken');
@@ -38,13 +37,13 @@ export const useUserStore = defineStore('userStore', () => {
     try {
       await axios.get('/sanctum/csrf-cookie');
       const loginResponse = await axios.post('login', credintails);
-      // console.log('loginResponse ', loginResponse);
       await signIn();
       router.push('home');
     } catch(error) {
-      // console.log(error);
       if (error.response?.status === 422) {
         errors.value = error.response?.data?.errors;
+      } else {
+        msgStore.addMessage({name: error.message, icon: 'error'});
       }
     }
     loader.value = false;
@@ -71,14 +70,16 @@ export const useUserStore = defineStore('userStore', () => {
     setErrors({});
     try {
       const response = await axios.post('register', credintails);
+      msgStore.addMessage({name: 'Пользователь: "' + credintails.name + '", добавлен.', icon: 'done'});
       localStorage.setItem('token', response.data.token);
       axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
       await signIn();
       router.push('home');
     } catch(error) {
-      // console.log(error);
       if (error.response?.status === 422) {
         errors.value = error.response?.data?.errors;
+      } else {
+        msgStore.addMessage({name: error.message, icon: 'error'});
       }
     }
     loader.value = false;
@@ -91,9 +92,9 @@ export const useUserStore = defineStore('userStore', () => {
   const clearLoginState = () => {
     user.value = null;
     authenticated.value = false;
-    menuStore.setContentClasses('content content-off')
-    menuStore.authenticated.value = null;
-    menuStore.user.value = null;
+    menuStore.setContentClasses('content content-off');
+    // menuStore.authenticated.value = null;
+    // menuStore.user.value = null;
   }
   
   const isPermition = (type) => {

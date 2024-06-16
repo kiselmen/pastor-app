@@ -58,9 +58,9 @@ class ServiceController extends BaseController
     $IDs = $request['ids'];
     foreach ($IDs as $id) {
       $CurrentService = Service::Find($id);
-      $stack = array();
+      // $stack = array();
       if ($CurrentService) {
-        array_push($stack, $CurrentService->id);
+        // array_push($stack, $CurrentService->id);
         $CurrentService->delete();
       }  
     };

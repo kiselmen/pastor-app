@@ -1,27 +1,32 @@
 <template>
-  <h2 class="target-name">Целевый группы</h2>
-  <div class="target-container" v-if="!useNsiStore.loader">
-    <div class="form-group">
-        <button 
-          @click="openActionModal('addTarget')" 
-          type="button" 
-          class="btn btn-blue" 
-        >
-            Создать
-        </button>
+  <h2 class="card-name">Целевый группы</h2>
+  <div class="card-container" v-if="loader">
+    <div class="card-text">Loading...</div>
+  </div>
+  <div class="card-container" v-if="!loader">
+    <div class="card-header">
+      <div class="form-group">
+          <button 
+            @click="openActionModal('addLevel')" 
+            type="button" 
+            class="btn btn-blue" 
+          >
+              Создать
+          </button>
+      </div>
     </div>
-    <div class="target-table">
+    <div class="card-table">
       <Table
         :tableHeadNames = "tableHeadNames"
         :tableHeadID = "tableHeadID"
-        :tableData = "nsiStore.targets"
+        :tableData = "nsiStore.levels"
       />
     </div>
     <ModalWrapper
       :is-modal-active="isModalAction"
       @close-modal="isModalAction = false"
     >
-      <AddTarget v-if="action === 'addTarget'"
+      <AddLevel v-if="action === 'addLevel'"
           @toggle-modal="isModalAction = false"
       />
     </ModalWrapper>
@@ -32,7 +37,7 @@
   import Table from '@/components/ui/Table.vue';
   import { useNsiStore } from '@/stores/nsiStore.js';
   import { ref, onBeforeMount } from 'vue';
-  import AddTarget from '@/components/nsi/AddTarget.vue';
+  import AddLevel from '@/components/nsi/AddLevel.vue';
   import ModalWrapper from '@/components/ui/ModalWrapper.vue';
 
   const nsiStore = useNsiStore();
@@ -41,6 +46,7 @@
   const tableHeadID = ref(['id', 'name', 'discription']);
   const isModalAction = ref(false);
   const action = ref('');
+  const loader = ref(false);
 
   const openActionModal = (actionValue) => {
     action.value = actionValue;
@@ -48,26 +54,12 @@
   };
 
   onBeforeMount(async () => {
-    await nsiStore.getTargets();
+    loader.value = true;
+    await nsiStore.getLevels();
+    loader.value = false;
   })
 
 </script>
 
 <style lang="scss">
-  .target {
-    &-container {
-      padding: 0 10px;
-      width: 100%;
-    }
-    &-name {
-      background-color: var(--bs-gray-200);
-      color: var(--bs-primary);
-      margin: 10px;
-      padding: 10px;
-      border-radius: 3px;
-    }
-    &-table {
-      margin-top: 20px;
-    }
-  }
 </style>

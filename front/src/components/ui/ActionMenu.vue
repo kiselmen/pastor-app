@@ -1,7 +1,7 @@
 <template>
     <div class="action-container" ref="el">
       <div class="action-icon">
-        <MenuKebabIcon/>
+        <slot name="icon"></slot>
       </div>
 
       <div class="action-menu--wrapper" v-if="actions" :class="[checkDirection ? 'down' : 'up']">
@@ -15,7 +15,6 @@
 </template>
 
 <script setup>
-  import MenuKebabIcon from '@/components/icons/IconMenuKebab.vue';
   import { ref, computed } from 'vue';
 
   const props = defineProps({
@@ -70,48 +69,57 @@
 </script>
 
 <style lang="scss" scoped>
-
-  .action-container {
-      align-items: center;
-      display: flex;
-      justify-content: center;
-      padding: 0 5px;
-      width: 20px;
-      height: 15px;
-      position: relative;
-  }
-  .action-menu {
-      background: var(--bs-gray-200);
-      border-radius: 8px;
-      box-shadow: 0 5px 20px 0 rgba(111,117,135,.15);
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      min-width: 140px;
-      padding: 10px 8px;
-      white-space: nowrap;
-      color: var(--bs-black);
-      svg {
-          width: 17px;
-          height: 17px;
-      }
-      &:hover {
-          background-color: var(--bs-gray-200);
-      }
-  }
-  .action-item:hover {
-      color: var(--bs-primary);
-  }
-  .action-menu--wrapper {
-      left: calc(100% - 50px);
-      opacity: 0;
-      padding-bottom: 8px;
-      position: absolute;
-      transform: translate(0%, 100%);
-      transition: all 0.2s ease-in-out;
-      visibility: hidden;
-      z-index: 3;
-      width: 100%;
+  .action {
+    &-container {
+        align-items: center;
+        display: flex;
+        justify-content: center;
+        padding: 0 5px;
+        width: 20px;
+        height: 15px;
+        position: relative;
+    }
+    &-menu {
+        background: var(--bs-gray-200);
+        border-radius: 8px;
+        box-shadow: 0 5px 20px 0 rgba(111,117,135,.15);
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        min-width: 140px;
+        padding: 10px 8px;
+        white-space: nowrap;
+        color: var(--bs-black);
+        svg {
+            width: 17px;
+            height: 17px;
+        }
+        &:hover {
+            background-color: var(--bs-gray-200);
+        }
+        &--wrapper {
+            left: calc(100% - 50px);
+            opacity: 0;
+            padding-bottom: 8px;
+            position: absolute;
+            transform: translate(0%, 100%);
+            transition: all 0.2s ease-in-out;
+            visibility: hidden;
+            z-index: 3;
+            width: 100%;
+        }
+    }
+    &-item:hover {
+        color: var(--bs-primary);
+    }
+    &-column {
+        align-items: center;
+        display: flex;
+        gap: 10px;
+        .btn{
+            height: auto;
+        }
+    }
   }
   .down {
     bottom: 0px;
@@ -122,14 +130,6 @@
   .action-container:hover .action-menu--wrapper {
       opacity: 1;
       visibility: visible;
-  }
-  .action-column {
-      align-items: center;
-      display: flex;
-      gap: 10px;
-      .btn{
-          height: auto;
-      }
   }
 
 </style>

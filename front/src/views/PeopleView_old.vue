@@ -167,7 +167,7 @@
   const tableHead = ref([
     { id: 'id', label: 'ID', type: 'checkbox', filterable: true, sort: 'DESC', sort_value: 0 },
     { id: 'first_name', label: 'Имя', filterable: true, sort: 'DESC', sort_value: 1 },
-    { id: 'second_name', label: 'Фамилия', filterable: true, sort: 'DESC', sort_value: 2 },
+    { id: 'name', label: 'Фамилия', filterable: true, sort: 'DESC', sort_value: 2 },
     { id: 'patronymic', label: 'Отчество', filterable: true, sort: 'DESC', sort_value: 3 },
     { id: 'email', label: 'Почта', filterable: true, sort: 'DESC', sort_value: 4 },
     { id: 'birthday_date', label: 'Дата рождения', filterable: true, sort: 'DESC', sort_value: 5 },

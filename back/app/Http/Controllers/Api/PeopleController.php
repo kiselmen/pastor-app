@@ -21,7 +21,7 @@ class PeopleController extends BaseController
   protected function storeValidator(array $data){
     return Validator::make($data, [
       'first_name' => ['required'],
-      'second_name' => ['required'], 
+      'name' => ['required'], 
       'patronymic' => ['required'], 
       'birthday_date' => ['required'], 
       'baptism_date' => ['required'],
@@ -29,13 +29,15 @@ class PeopleController extends BaseController
       'home_phone' => ['required'], 
       'mobile_phone' => ['required'], 
       'email' => ['required'],
-      // 'email' => ['required', 'unique:People,email'],
+      'prihod_id' => ['required', 'numeric'],
+      'target_id' => ['required', 'numeric'],
+      'family_id' => ['required', 'numeric'],
     ]);
   }
 
 
   public function index(Request $request){
-    $People = People::all();
+    $People = People::all()->load('pservice', 'family');
     return $People;
   }
 
@@ -53,20 +55,25 @@ class PeopleController extends BaseController
     // return response()->json();
 
     $CurrentPersone = People::create([
-      'first_name' 		    => $request['first_name'],
-      'second_name'			=> $request['second_name'],
-      'patronymic'			=> $request['patronymic'],
+      'first_name' 		        => $request['first_name'],
+      'name'		      	      => $request['name'],
+      'patronymic'			      => $request['patronymic'],
       'birthday_date'         => $request['birthday_date'],
-      'baptism_date'		    => $request['baptism_date'],
+      'baptism_date'		      => $request['baptism_date'],
       'death_date'            => $request['death_date'],
       'image_url'             => $request['image_url'],
       'live_addres'           => $request['live_addres'],
       'home_phone'            => $request['home_phone'],
       'mobile_phone'          => $request['mobile_phone'],
       'email'                 => $request['email'],
-      'image_url'               => $filePath,
+      'image_url'             => $filePath,
+      'prihod_id'             => $request['prihod_id'],
+      'target_id'             => $request['target_id'],
+      'family_id'             => $request['family_id'],
     ]);
-    return response()->json($CurrentPersone);
+
+    $Persone = People::find($CurrentPersone->id)->load('pservice', 'family');
+    return response()->json($Persone);
   }
 
   public function update(Request $request, $id){
@@ -85,7 +92,7 @@ class PeopleController extends BaseController
 
     $CurrentPersone = People::find($id);
     $CurrentPersone->first_name 		  = $request['first_name'];
-    $CurrentPersone->second_name 		  = $request['second_name'];
+    $CurrentPersone->name 	      	  = $request['name'];
     $CurrentPersone->patronymic 		  = $request['patronymic'];
     $CurrentPersone->birthday_date 		= $request['birthday_date'];
     $CurrentPersone->baptism_date 		= $request['baptism_date'];
@@ -102,6 +109,9 @@ class PeopleController extends BaseController
       $CurrentPersone->mobile_phone 		= $request['mobile_phone'];
     }
     $CurrentPersone->email 		        = $request['email'];
+    $CurrentPersone->prihod_id        = $request['prihod_id'];
+    $CurrentPersone->target_id        = $request['target_id'];
+    $CurrentPersone->family_id        = $request['family_id'];
     if ($file) {
       if ($CurrentPersone->image_url) {
         Storage::disk('public')->delete($CurrentPersone->image_url);
@@ -109,8 +119,9 @@ class PeopleController extends BaseController
       $CurrentPersone->image_url 		    = $filePath;
     }
     $CurrentPersone->save();
+    $Persone = People::find($CurrentPersone->id)->load('pservice', 'family');
 
-    return $CurrentPersone;
+    return $Persone;
   }
 
 }

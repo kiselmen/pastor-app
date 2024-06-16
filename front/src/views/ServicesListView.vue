@@ -1,7 +1,10 @@
 <template>
-  <h2 class="service-name">Виды служения</h2>
-  <div class="service-container" v-if="!useNsiStore.loader">
-    <div class="service-header">
+  <h2 class="card-name">Виды служения</h2>
+  <div class="card-container" v-if="loader">
+    <div class="card-text">Loading...</div>
+  </div>
+  <div class="card-container" v-if="!loader">
+    <div class="card-header">
       <div class="form-group">
           <button 
             @click="openActionModal('addService')" 
@@ -12,7 +15,7 @@
           </button>
       </div>
     </div>
-    <div class="service-table">
+    <div class="card-table">
       <Table
         :tableHeadNames = "tableHeadNames"
         :tableHeadID = "tableHeadID"
@@ -37,11 +40,7 @@
           :id = "activeID"
           @toggle-modal="isModalAction = false"
       />
-      <!-- <DeleteService v-if="action === 'deleteService'"
-          :id = "activeID"
-          @toggle-modal="isModalAction = false"
-      /> -->
-      <DeleteSelectServices v-if="action === 'deleteServices'"
+      <DeleteServices v-if="action === 'deleteServices'"
           :id = "activeID"
           @toggle-modal="isModalAction = false"
       />
@@ -58,7 +57,7 @@
   import EditService from '@/components/nsi/EditService.vue';
   import DeleteServices from '@/components/nsi/DeleteServices.vue';
   import ModalWrapper from '@/components/ui/ModalWrapper.vue';
-  import EditDuotoneIcon from '@/components/icons/IconEditDuotone.vue';
+  // import EditDuotoneIcon from '@/components/icons/IconEditDuotone.vue';
 
   const nsiStore = useNsiStore();
   const userStore = useUserStore();
@@ -67,9 +66,9 @@
   const tableHeadID = ref(['id', 'name', 'discription', 'StatusName']);
   const isModalAction = ref(false);
   const action = ref('');
-  const selectedItems = ref([]);
   const isAllRowSelected = ref(false);
   const activeID = ref(null);
+  const loader = ref(false);
 
   const onSelectRow = (value, rowID) => {
     nsiStore.updateServiceAttribute(rowID, 'selected', value);
@@ -129,30 +128,12 @@
   })
   
   onBeforeMount(async () => {
+    loader.value = true;
     await nsiStore.getServices();
+    loader.value = false;
   });
 
 </script>
 
 <style lang="scss">
-  .service {
-    &-container {
-      padding: 0 10px;
-      width: 100%;
-      position: relative;
-    }
-    &-header {
-      position: sticky;
-    }
-    &-name {
-      background-color: var(--bs-gray-200);
-      color: var(--bs-primary);
-      margin: 10px;
-      padding: 10px;
-      border-radius: 3px;
-    }
-    &-table {
-      margin-top: 40px;
-    }
-  }
 </style>

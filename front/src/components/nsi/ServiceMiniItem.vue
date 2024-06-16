@@ -1,0 +1,64 @@
+<template>
+  <div class="service-box">
+    <div class="service-title">
+      <!-- <div class="service-name">Служения</div> -->
+      <DateItem>
+        <template #icon>
+          <ServiceIcon class="service-icon"/>
+        </template>
+        <template #heading>
+          Служения
+        </template>
+      </DateItem>
+
+      <div>
+        <EditDuotoneIcon class="change_button" @click="emits('editServices')"/>
+      </div>
+    </div>
+    <div class="service-items">
+      <div class="service-item" v-for="service in props.services">
+        {{ service.ServiceName }}
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+  import EditDuotoneIcon from '@/components/icons/IconEditDuotone.vue';
+  import DateItem from '@/components/people/DateItem.vue';
+  import ServiceIcon from '@/components/icons/IconService.vue';
+
+  const props = defineProps({
+    services: { type: Object, default: new Object() },
+  });
+
+  const emits = defineEmits(['editServices']);
+
+</script>
+
+<style lang="scss" scoped>
+  .service {
+    &-box {
+      border-radius: 5px;
+      padding: 5px;
+      border: 1px solid var(--bs-gray-300);
+      width: 100%;
+      min-height: 100px;      
+      position: relative;
+    }
+    &-title {
+      display: flex;
+    }
+    &-items {
+      min-height: 80px;
+      margin: 10px;
+    }
+    &-item {
+      display: block;
+      font-size: 14px;
+    }
+    &-icon {
+       fill: var(--bs-primary);
+    }
+  }
+</style>

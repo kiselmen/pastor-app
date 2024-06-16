@@ -3,6 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Prihod;
+use App\Models\Target;
+use App\Models\Family;
+use App\Models\Pservice;
 
 class People extends Model
 {
@@ -10,8 +14,12 @@ class People extends Model
   ];
 
   protected $fillable = [
-      'user_id' ,'type', 'sourse_id', 'birthday_date', 'baptism_date',
-      'death_date', 'image_url', 'live_addres', 'home_phone', 'mobile_phone', 'email', 'created_at', 'updated_at'
+      'first_name' ,'name', 'patronymic', 'birthday_date', 'baptism_date', 'death_date', 'image_url', 'live_addres', 'home_phone', 'mobile_phone', 
+      'email', 'prihod_id', 'target_id', 'family_id', 'created_at', 'updated_at'
+  ];
+
+  protected $appends = [
+    'PrihodName', 'TargetName',
   ];
 
   /**
@@ -20,48 +28,41 @@ class People extends Model
    * @var array
    */
 
-  // public function user()
-  // {
-  //    return $this->belongsTo('App\User');
-  // }
+  public function prihod()
+  {
+		return $this->belongsTo(Prihod::class);
+  }
 
-  // public function club()
-  // {
-  //    return $this->belongsTo('App\Club');
-  // }
+  public function target()
+  {
+		return $this->belongsTo(Target::class);
+  }
 
-  // public function winner()
-  // {
-  // 	   return $this->belongsTo('App\Winner');
-  // }
+  public function pservice()
+  {
+		return $this->hasMany(Pservice::class);
+  }
 
-  // public function gameplayer()
-  // {
-  // 	   return $this->hasMany('App\Gameplayer');
-  // }
+  public function family()
+  {
+		return $this->belongsTo(Family::class);
+  }
 
-  // public function gamefases()
-  // {
-  // 	   return $this->hasMany('App\Gamevotes');
-  // }
+  public function getPrihodNameAttribute()
+  {
+    if ($this->prihod){
+      return $this->prihod->name;
+    } else {
+      return '';
+    }
+  }
 
-  // public function gamevotes()
-  // {
-  // 	   return $this->hasMany('App\Gamefases');
-  // }
-
-  // public function gamefirstshot()
-  // {
-  // 	   return $this->hasOne('App\Gamefirstshot');
-  // }
-
-  // public function getWinnerNameAttribute()
-  // {
-  //   if ($this->winner){
-  //     return $this->winner->name;
-  //   } else {
-  //     return '';
-  //   }
-  // }
-
+  public function getTargetNameAttribute()
+  {
+    if ($this->target){
+      return $this->target->name;
+    } else {
+      return '';
+    }
+  }
 }

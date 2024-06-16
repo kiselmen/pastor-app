@@ -1,5 +1,6 @@
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { defineStore } from 'pinia';
+
 
 export const useMenuStore = defineStore('menuStore', () => {
 
@@ -26,6 +27,10 @@ export const useMenuStore = defineStore('menuStore', () => {
     contentClasses.value = newSateContent;
   };
 
+  // const removePaddingAndMargin = () => {
+  //   contentClasses.value = 'content content-off';
+  // }
+
   const setContentClasses = (val) => {
     contentClasses.value = val;
   }
@@ -37,6 +42,7 @@ export const useMenuStore = defineStore('menuStore', () => {
     topBarClasses,
     contentClasses,
     onBurgerClick,
+    // removePaddingAndMargin,
     setContentClasses,
   }
 });

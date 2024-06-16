@@ -1,50 +1,50 @@
 <template>
   <div class="form" ref="formElem">
     <div class="form-header">Изменение вида служения</div>
-    <form @submit.prevent="onEditService" class="section-container form-container" >
+    <form @submit.prevent="onEditService" class="form-container section-container">
       <div class = "table1x">
-          <div class="form-group">
-              <label class="input-label">Вид служения</label>
-              <input 
-                  type="text"
-                  autocomplete = "off"
-                  class="input-box"
-                  :class="{ 'is-invalid': nsiStore.errors?.name }"
-                  v-model="form.name" 
-                  id="name"
-              >
-              <div class="input-error" v-if="nsiStore.errors?.name">
-                {{ nsiStore.errors?.name[0] }}
-              </div>
+        <div class="form-group">
+          <label class="input-label">Вид служения</label>
+          <input 
+              type="text"
+              autocomplete = "off"
+              class="input-box"
+              :class="{ 'is-invalid': nsiStore.errors?.name }"
+              v-model="form.name" 
+              id="name"
+          >
+          <div class="input-error" v-if="nsiStore.errors?.name">
+            {{ nsiStore.errors?.name[0] }}
           </div>
-          <div class="form-group">
-              <label class="input-label">Описание</label>
-              <input 
-                  type="text"
-                  autocomplete = "off"
-                  class="input-box"
-                  :class="{ 'is-invalid': nsiStore.errors?.discription }"
-                  v-model="form.discription" 
-                  id="first_name"
-              >
-              <div class="input-error" v-if="nsiStore.errors?.discription">
-                {{ nsiStore.errors?.discription[0] }}
-              </div>
+        </div>
+        <div class="form-group">
+          <label class="input-label">Описание</label>
+          <input 
+              type="text"
+              autocomplete = "off"
+              class="input-box"
+              :class="{ 'is-invalid': nsiStore.errors?.discription }"
+              v-model="form.discription" 
+              id="first_name"
+          >
+          <div class="input-error" v-if="nsiStore.errors?.discription">
+            {{ nsiStore.errors?.discription[0] }}
           </div>
-          <div class="form-group">
-              <label class="input-label">Статус</label>
-              <InputSelector
-                :text ="form.statusName"
-                :id   ="form.status_id"
-                :data ="nsiStore.statuses"
-                :parentElem = "formElem"
-                @selectItem="onStatusSelect"
-              />
-          </div>
-          
-          <div class="form-group">
-            <button type="submit" class="btn btn-blue" :disabled="nsiStore.loader">{{ nsiStore.loader ? 'Сохранение...': 'Сохранить'}}</button>
-          </div>
+        </div>
+        <div class="form-group">
+          <label class="input-label">Статус</label>
+          <InputSelector
+            :text ="form.statusName"
+            :id   ="form.status_id"
+            :data ="nsiStore.statuses"
+            :parentElem = "formElem"
+            @selectItem="onStatusSelect"
+          />
+        </div>
+      </div>
+      <div class="form-buttons">
+        <button type="submit" class="btn btn-blue" :disabled="nsiStore.loader">{{ nsiStore.loader ? 'Сохранение...': 'Сохранить'}}</button>
+        <button @click.prevent="emits('toggleModal')" class="btn btn-gray">Отмена</button>
       </div>
     </form>
   </div>

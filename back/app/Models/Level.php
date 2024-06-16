@@ -14,7 +14,4 @@ class Level extends Model
       'name' ,'discription',
   ];
 
-  // public function users(){
-	// 	return $this->belogsTo(User::class);
-	// }
 }

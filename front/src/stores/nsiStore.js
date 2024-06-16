@@ -1,14 +1,17 @@
 import { ref, computed } from 'vue';
 import { defineStore } from 'pinia';
+import { useMsgStore } from '@/stores/msgStore';
 import axios from 'axios';
 
 export const useNsiStore = defineStore('nsiStore', () => {
+
+  const msgStore = useMsgStore();
   const statuses = ref([]);
   const targets = ref([]);
   const services = ref([]);
   const levels = ref([]);
   const loader = ref(false);
-  const errors = ref({})
+  const errors = ref({});
 
   const totalCountErrors = computed(() => Object.keys(errors.value).length);
 
@@ -19,6 +22,7 @@ export const useNsiStore = defineStore('nsiStore', () => {
       statuses.value = response.data.sort((a ,b) => a.id - b.id);
     } catch (error) {
       console.log(error);
+      msgStore.addMessage({name: error.message, icon: 'error'});
     }
     loader.value = false;
   };
@@ -30,6 +34,7 @@ export const useNsiStore = defineStore('nsiStore', () => {
       targets.value = response.data.sort((a ,b) => a.id - b.id);
     } catch (error) {
       console.log(error);
+      msgStore.addMessage({name: error.message, icon: 'error'});
     }
     loader.value = false;
   };
@@ -40,9 +45,12 @@ export const useNsiStore = defineStore('nsiStore', () => {
       errors.value = {};
       const response = await axios.post('/api/targets', data);
       targets.value = [...targets.value, response.data].sort((a ,b) => a.id - b.id);
+      msgStore.addMessage({name: 'Целевая группа: "' + response.data.name + '", добавлена.', icon: 'done'});
     } catch (error) {
       if (error.response?.status === 422) {
         errors.value = error.response?.data?.errors;
+      } else {
+        msgStore.addMessage({name: error.message, icon: 'error'});
       }
     }
     loader.value = false;
@@ -58,6 +66,7 @@ export const useNsiStore = defineStore('nsiStore', () => {
       });
     } catch (error) {
       console.log(error);
+      msgStore.addMessage({name: error.message, icon: 'error'});
     }
     loader.value = false;
   };
@@ -68,9 +77,12 @@ export const useNsiStore = defineStore('nsiStore', () => {
       errors.value = {};
       const response = await axios.post('/api/services', data);
       services.value = [...services.value, {...response.data, selected: false}].sort((a ,b) => a.id - b.id);
+      msgStore.addMessage({name: 'Вид служения: "' + response.data.name + '", добавлен.', icon: 'done'});
     } catch (error) {
       if (error.response?.status === 422) {
         errors.value = error.response?.data?.errors;
+      } else {
+        msgStore.addMessage({name: error.message, icon: 'error'});
       }
     }
     loader.value = false;
@@ -83,9 +95,12 @@ export const useNsiStore = defineStore('nsiStore', () => {
       const response = await axios.post('/api/services/' + id + '/update', data);
       const newServices = services.value.filter(item => item.id !== id);
       services.value = [...newServices, {...response.data, selected: false}].sort((a ,b) => a.id - b.id);
+      msgStore.addMessage({name: 'Вид служения: "' + response.data.name + '", обновлен.', icon: 'done'});
     } catch (error) {
       if (error.response?.status === 422) {
         errors.value = error.response?.data?.errors;
+      } else {
+        msgStore.addMessage({name: error.message, icon: 'error'});
       }
     }
     loader.value = false;
@@ -100,10 +115,13 @@ export const useNsiStore = defineStore('nsiStore', () => {
       services.value.forEach( item => {
         item.selected = false;
       });
+      msgStore.addMessage({name: 'Виды служения удалены.', icon: 'done'});
     } catch (error) {
       console.log('error ', error);
       if (error.response?.status === 422) {
         errors.value = error.response?.data?.errors;
+      } else {
+        msgStore.addMessage({name: error.message, icon: 'error'});
       }
     }
     loader.value = false;
@@ -125,6 +143,7 @@ export const useNsiStore = defineStore('nsiStore', () => {
       levels.value = response.data.sort((a ,b) => a.id - b.id);
     } catch (error) {
       console.log(error);
+      msgStore.addMessage({name: error.message, icon: 'error'});
     }
     loader.value = false;
   };
@@ -135,9 +154,12 @@ export const useNsiStore = defineStore('nsiStore', () => {
       errors.value = {};
       const response = await axios.post('/api/levels', data);
       levels.value = [...levels.value, response.data].sort((a ,b) => a.id - b.id);
+      msgStore.addMessage({name: 'Уровень дисциплины: "' + response.data.name + '", добавлен.', icon: 'done'});
     } catch (error) {
       if (error.response?.status === 422) {
         errors.value = error.response?.data?.errors;
+      } else {
+        msgStore.addMessage({name: error.message, icon: 'error'});
       }
     }
     loader.value = false;
@@ -149,6 +171,7 @@ export const useNsiStore = defineStore('nsiStore', () => {
 
   return {
     totalCountErrors,
+    errors,
     statuses,
     targets,
     services,

@@ -1,8 +1,11 @@
 <template>
-  <div class="form">
+  <div class="form" ref="formElem">
     <div class="form-header">Добавление прихожанина</div>
-    <form @submit.prevent="onCreatePerson" class="section-container form-container">
-      <div class = "ProfileLogo table2x">
+    <div v-if="loader" class="form-text">Loading...</div>
+    <div v-if="!loader&&formStep === 0" class="card-name">Общая информация</div>
+    <div v-if="!loader&&formStep === 1" class="card-name">Семья</div>
+    <div v-if="!loader" class="form-container section-container">
+      <div v-if="formStep === 0" class = "table2x">
         <div class="form-group">
             <label class="input-label">EMail</label>
             <input 
@@ -18,6 +21,32 @@
             </div>
         </div>
         <div class="form-group">
+            <label class="input-label">Приход</label>
+            <InputSelector
+                :text ="form.prihod"
+                :id   = null
+                :data ="prihodStore.prihods"
+                :parentElem = "formElem"
+                @selectItem="onPrihodSelect"
+              />
+            <div class="input-error" v-if="peopleStore.errors?.prihod_id">
+              {{ peopleStore.errors?.prihod_id[0] }}
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="input-label">Целевая группа</label>
+            <InputSelector
+                :text ="form.target"
+                :id   = null
+                :data ="nsiStore.targets"
+                :parentElem = "formElem"
+                @selectItem="onTargetSelect"
+              />
+            <div class="input-error" v-if="peopleStore.errors?.target_id">
+              {{ peopleStore.errors?.target_id[0] }}
+            </div>
+        </div>
+        <div class="form-group">
             <FileUpload
               v-model="image"
               @uploadImage="onImageUploaded"
@@ -25,7 +54,7 @@
             />
         </div>
       </div>
-      <div class="table2x">
+      <div v-if="formStep === 0" class="table2x">
 
         <div class="form-group">
             <label class="input-label">Имя</label>
@@ -47,12 +76,12 @@
                 type="text"
                 autocomplete = "off"
                 class="input-box"
-                :class="{ 'is-invalid': peopleStore.errors?.second_name }"
-                v-model="form.second_name" 
-                id="first_name"
+                :class="{ 'is-invalid': peopleStore.errors?.name }"
+                v-model="form.name" 
+                id="name"
             >
-            <div class="input-error" v-if="peopleStore.errors?.second_name">
-              {{ peopleStore.errors?.second_name[0] }}
+            <div class="input-error" v-if="peopleStore.errors?.name">
+              {{ peopleStore.errors?.name[0] }}
             </div>
         </div>
         <div class="form-group">
@@ -157,24 +186,89 @@
             </div>
           </div>
         </div>
-        <div class="form-group">
-          <button type="submit" class="btn btn-blue" :disabled="loader">{{ loader ? 'Сохранение...': 'Сохранить'}}</button>
-        </div>
       </div>
-    </form>
+      <div v-if="formStep === 1" class="table1x">
+          <div>
+            <label class="checkbox-control">
+              <input type="checkbox" id="isLocalGame" v-model="isOpenNewFamily"/>
+              Новая семья
+            </label>
+          </div>
+
+          <div class="form-group" v-if="familyStore.families?.length && !isOpenNewFamily">
+            <label class="input-label">Семья</label>
+            <InputSelector
+                text ="Выберите семью"
+                :id   = form.family_id
+                :data ="familyStore.families"
+                :parentElem = "formElem"
+                @selectItem="onFamilySelect"
+              />
+            <div class="input-error" v-if="familyStore.errors?.family_id">
+              {{ peopleStore.errors?.family_id[0] }}
+            </div>
+          </div>
+          <div v-if="isOpenNewFamily" class="form-group">
+              <label class="input-label">Название</label>
+              <input 
+                  type="text" 
+                  autocomplete="off" 
+                  class="input-box" 
+                  :class="{ 'is-invalid': familyStore.errors?.name }"
+                  v-model="familyForm.name" id="name">
+              <div class="input-error" v-if="familyStore.errors?.name">
+                  {{ familyStore.errors?.name[0] }}
+              </div>
+          </div>
+          <div v-if="isOpenNewFamily" class="form-group">
+              <label class="input-label">Описание</label>
+              <input 
+                  type="text" 
+                  autocomplete="off" 
+                  class="input-box"
+                  :class="{ 'is-invalid': 
+                  familyStore.errors?.discription }" 
+                  v-model="familyForm.discription" 
+                  id="first_name">
+              <div class="input-error" v-if="familyStore.errors?.discription">
+                  {{ familyStore.errors?.discription[0] }}
+              </div>
+          </div>
+          <div v-if="isOpenNewFamily" class="form-buttons">
+            <button @click.prevent="onCreateFamily" class="btn btn-blue" :disabled="loader">{{ loader ? 'Сохранение...': 'Создать семью'}}</button>
+          </div>
+      </div>
+      <div class="form-buttons" v-if="formStep === maxFormSteps">
+        <button @click.prevent="onMoveToStep('-')" class="btn btn-blue" :disabled="formStep <= 0">Назад</button>
+        <button @click.prevent="onCreatePerson" class="btn btn-blue" :disabled="loader">{{ loader ? 'Сохранение...': 'Сохранить'}}</button>
+        <button @click.prevent="emits('toggleModal')" class="btn btn-gray">Отмена</button>
+      </div>
+      <div class="form-buttons" v-if="formStep !== maxFormSteps">
+        <button @click.prevent="onMoveToStep('-')" class="btn btn-blue" :disabled="formStep <= 0">Назад</button>
+        <button @click.prevent="onMoveToStep('+')" class="btn btn-blue" :disabled="formStep >= maxFormSteps">Вперед</button>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
   import { usePeopleStore } from '@/stores/peopleStore';
+  import { useFamilyStore } from '@/stores/familyStore';
+  import { usePrihodStore } from '@/stores/prihodStore';
+  import { useNsiStore } from '@/stores/nsiStore';
   import { reactive, ref, onBeforeMount } from 'vue';
   import FileUpload from '@/components/ui/FileUpload.vue';
+  import InputSelector from '@/components/ui/InputSelector.vue';
 
   const peopleStore = usePeopleStore();
+  const prihodStore = usePrihodStore();
+  const nsiStore = useNsiStore();
+  const familyStore = useFamilyStore();
+
   const form = reactive({
     email: '',
     first_name: '',
-    second_name: '',
+    name: '',
     patronymic: '',
     birthday_date: '',
     baptism_date: '',
@@ -182,19 +276,63 @@
     live_addres: '',
     home_phone: '',
     mobile_phone: '',
+    prihod: '',
+    prihod_id: null,
+    family_id: null,
+    target: '',
+    target_id: null,
   });
+
+  const familyForm = reactive({
+    name: '',
+    discription: '',
+    head_id: null,
+    candidates: [],
+  });
+
+  const formElem = ref(null);
   const image = ref();
   const emits = defineEmits(['toggleModal']);
   const loader = ref(false);
+  const family = ref(null);
+  const formStep = ref(0);
+  const maxFormSteps = 1;
+  const isOpenNewFamily = ref(false);
 
   const onImageUploaded = (data) => {
-    // console.log('onImageUploaded ', data);
     image.value = data;
   };
 
   const onImageCleared = () => {
     image.value = null;
-    // console.log('onImageCleared ');
+  };
+
+  const onPrihodSelect = (id) => {
+    form.prihod_id = id;
+  };
+
+  const onTargetSelect = (id) => {
+    form.target_id = id;
+  }
+
+  const onMoveToStep = (type) => {
+    if (type === "-") {
+      formStep.value--;
+    } else if (type === '+') {
+      formStep.value++;
+    }
+  };
+
+  const onFamilySelect = (id) => {
+    family.value = familyStore.families.filter(item => item.id === id)[0];
+    form.family_id = id;
+  };
+
+  const onCreateFamily = async () => {
+    loader.value = true;
+    await familyStore.addNewFamily(familyForm);
+    isOpenNewFamily.value = false;
+    loader.value = false;
   };
 
   const onCreatePerson = async () => {
@@ -202,7 +340,7 @@
     let formData = new FormData();
     formData.append('email', form.email);
     formData.append('first_name', form.first_name);
-    formData.append('second_name', form.second_name);
+    formData.append('name', form.name);
     formData.append('patronymic', form.patronymic);
     formData.append('birthday_date', form.birthday_date);
     formData.append('baptism_date', form.baptism_date);
@@ -210,6 +348,9 @@
     formData.append('live_addres', form.live_addres);
     formData.append('home_phone', form.home_phone);
     formData.append('mobile_phone', form.mobile_phone);
+    formData.append('prihod_id', form.prihod_id);
+    formData.append('target_id', form.target_id);
+    formData.append('family_id', form.family_id);
     if (image.value) {
       const fileName = image.value.name;
       const fileData = image.value;
@@ -223,8 +364,13 @@
     loader.value = false;
   };
 
-  onBeforeMount(() => {
+  onBeforeMount(async () => {
+    loader.value = true;
     peopleStore.clearErrorsState();
+    await prihodStore.getPrihods();
+    await nsiStore.getTargets();
+    await familyStore.getAllFamilies();
+    loader.value = false;
   })
 
 </script>
@@ -258,4 +404,4 @@
     max-width: 750px;
   }
 
-</style>@/stores/peopleStore
+</style>

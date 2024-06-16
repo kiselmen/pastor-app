@@ -9,12 +9,12 @@
                 type="email"
                 autocomplete = "off"
                 class="input-box"
-                :class="{ 'is-invalid': userDataStore.errors?.email }"
+                :class="{ 'is-invalid': userStore.errors?.email }"
                 v-model="form.email" 
                 id="email"
             >
-            <div class="input-error" v-if="userDataStore.errors?.email">
-              {{ userDataStore.errors?.email[0] }}
+            <div class="input-error" v-if="userStore.errors?.email">
+              {{ userStore.errors?.email[0] }}
             </div>
         </div>
         <div class="form-group">
@@ -23,12 +23,12 @@
                 type="text"
                 autocomplete = "off"
                 class="input-box"
-                :class="{ 'is-invalid': userDataStore.errors?.name }"
+                :class="{ 'is-invalid': userStore.errors?.name }"
                 v-model="form.name" 
                 id="name"
             >
-            <div class="input-error" v-if="userDataStore.errors?.name">
-              {{ userDataStore.errors?.name[0] }}
+            <div class="input-error" v-if="userStore.errors?.name">
+              {{ userStore.errors?.name[0] }}
             </div>
         </div>
         <div class="form-group">
@@ -37,7 +37,7 @@
               :type = "showPassword === 1 ? 'text': 'password'"
               autocomplete = "off"
               class="input-box"
-              :class="{ 'is-invalid': userDataStore.errors?.password }"
+              :class="{ 'is-invalid': userStore.errors?.password }"
               id="password"
               v-model="form.password"
             />
@@ -45,8 +45,8 @@
               <IconClosedEye v-if="showPassword === 1"/>
               <IconEye v-if="showPassword !== 1"/>
             </div>
-            <div class="input-error" v-if="userDataStore.errors?.password">
-              {{ userDataStore.errors?.password[0] }}
+            <div class="input-error" v-if="userStore.errors?.password">
+              {{ userStore.errors?.password[0] }}
             </div>
         </div>
         <div class="form-group">
@@ -55,7 +55,7 @@
               :type = "showConfirm === 1 ? 'text': 'password'"
               autocomplete = "off"
               class="input-box"
-              :class="{ 'is-invalid': userDataStore.errors?.password_confirmation }"
+              :class="{ 'is-invalid': userStore.errors?.password_confirmation }"
               id="confirm"
               v-model="form.password_confirmation"
             />
@@ -63,12 +63,12 @@
               <IconClosedEye v-if="showConfirm === 1"/>
               <IconEye v-if="showConfirm !== 1"/>
             </div>
-            <div class="input-error" v-if="userDataStore.errors?.password_confirmation">
-              {{ userDataStore.errors?.password_confirmation[0] }}
+            <div class="input-error" v-if="userStore.errors?.password_confirmation">
+              {{ userStore.errors?.password_confirmation[0] }}
             </div>
         </div>
         <div class="form-group">
-            <button type="submit" class="btn btn-blue" :disabled="userDataStore.loader">{{ userDataStore.loader ? 'Загрузка...': 'Регистрация'}}</button>
+            <button type="submit" class="btn btn-blue" :disabled="userStore.loader">{{ userStore.loader ? 'Загрузка...': 'Регистрация'}}</button>
         </div>
       </form>
     </div>
@@ -78,11 +78,11 @@
 
 <script setup>
 import { reactive, ref } from 'vue';
-import { useUserDataStore } from "@/stores/userDataStore";
+import { useUserStore } from "@/stores/userStore";
 import IconClosedEye from '@/components/icons/IconClosedEye.vue';
 import IconEye from '@/components/icons/IconEye.vue';
 
-const userDataStore = useUserDataStore();
+const userStore = useUserStore();
 const form = reactive({
     email: '',
     name: '',
@@ -100,7 +100,7 @@ const setShowConfirm = (field) => {
 };
 
 function submit() {
-    userDataStore.createNewUser(form);
+    userStore.createNewUser(form);
 }
 </script>
 

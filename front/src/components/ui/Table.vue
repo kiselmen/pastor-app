@@ -12,7 +12,11 @@
               <ActionMenu
                 :actions = "props.actions.filter(item => item.type > 0)"
                 @startAction="onAllRowsAction"
-              />
+              >
+                <template #icon>
+                  <MenuKebabIcon/>
+                </template>
+              </ActionMenu>
             </div>
           </th>
           <th v-for="name in props.tableHeadNames">
@@ -34,7 +38,11 @@
                 :boxID = "row.id"
                 :parentElem = "tableElem"
                 @startAction="onRowAction"
-              />
+              >
+                <template #icon>
+                  <MenuKebabIcon/>
+                </template>
+              </ActionMenu>
             </div>  
           </td>
           <td v-for="elemen_id in props.tableHeadID">
@@ -49,6 +57,7 @@
 <script setup>
   import CheckBox from '@/components/ui/CheckBox.vue';
   import ActionMenu from '@/components/ui/ActionMenu.vue';
+  import MenuKebabIcon from '@/components/icons/IconMenuKebab.vue';
   import { ref } from 'vue';
 
   const props = defineProps({

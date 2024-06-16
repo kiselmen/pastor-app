@@ -4,6 +4,7 @@ import { useUserStore } from '@/stores/userStore.js';
 
 const guest = (to, from, next) => {
   if (!localStorage.getItem("authToken")) {
+    console.log('No token');
     return next();
   } else {
     return next("/");
@@ -67,31 +68,58 @@ const router = createRouter({
       path: '/peoples',
       name: 'peoples',
       beforeEnter: auth,
-      component: () => import('@/views/PeopleView.vue') 
+      component: () => import('@/views/PeoplesListView.vue') 
+    },
+    {
+      path: '/people/:id',
+      name: 'people',
+      props: true,
+      beforeEnter: auth,
+      component: () => import('@/views/PeopleItemView.vue') 
     },
     {
       path: '/families',
       name: 'families',
       beforeEnter: auth,
-      component: () => import('@/views/FamilyView.vue') 
+      component: () => import('@/views/FamiliesListView.vue') 
+    },
+    {
+      path: '/family/:id',
+      name: 'family',
+      props: true,
+      beforeEnter: auth,
+      component: () => import('@/views/FamilyItemView.vue') 
+    },
+    {
+      path: '/prihods',
+      name: 'prihods',
+      beforeEnter: auth,
+      component: () => import('@/views/PrihodsListView.vue') 
+    },
+    {
+      path: '/prihod/:id',
+      name: 'prihod',
+      props: true,
+      beforeEnter: auth,
+      component: () => import('@/views/PrihodItemView.vue') 
     },
     {
       path: '/target-groups',
       name: 'target-groups',
       beforeEnter: permition,
-      component: () => import('@/views/TargetGroupsView.vue') 
+      component: () => import('@/views/TargetGroupsListView.vue') 
     },
     {
       path: '/services',
       name: 'services',
       beforeEnter: permition,
-      component: () => import('@/views/ServicesView.vue') 
+      component: () => import('@/views/ServicesListView.vue') 
     },
     {
       path: '/levels',
       name: 'levels',
       beforeEnter: permition,
-      component: () => import('@/views/LevelsView.vue') 
+      component: () => import('@/views/LevelsListView.vue') 
     },
     
   ]

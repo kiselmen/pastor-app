@@ -1,8 +1,12 @@
 <template>
   <div v-click-outside="onCloseDropDown" :class="[selectorOpen ? 'select__open selector' : 'selector']" ref="el">
     <div class="selector-box selector-box__active">
+      <div v-if="activeItem && isImgPresent" 
+          class = "item-img"
+          :style = "{ backgroundImage : 'url(' + getImgPath(activeItem.image_url) +')' }"
+      ></div>
       <input 
-        v-if="props.data&&!props.init"
+        v-if="props.data"
         v-model = "selectorInput"
         type="text"
         @click="onStartInput()"
@@ -22,28 +26,35 @@
         <ChrvronDownIcon/>
       </div>
     </div>
-    <ul v-if="props.data&&selectorOpen&&!props.init" :class="{ 'dropdown-menu' : selectorOpen&&checkDirection, 'dropup-menu' : selectorOpen&&!checkDirection }">
+    <ul v-if="props.data&&selectorOpen" :class="{ 'dropdown-menu' : selectorOpen&&checkDirection, 'dropup-menu' : selectorOpen&&!checkDirection }">
       <li class="dropdown-item"
         v-if="selectorOpen"
-        v-for="ietm in filteredItems"
-        @click="onSeectItem(ietm)"
-        :id = "ietm.id"
-      >{{ietm.name}}</li>
+        v-for="item in filteredItems"
+        @click="onSeectItem(item)"
+        :id = "item.id"
+      >
+          <div v-if="isImgPresent" 
+              class = "item-img"
+              :style = "{ backgroundImage : 'url(' + getImgPath(item.image_url) +')' }"
+          ></div>
+          <div>{{item.name}}</div>
+      </li>
     </ul>
   </div>
 </template>
 
 <script setup>
 
+  import getImgPath from '@/utils/imagePlugin.js';
   import ChrvronDownIcon from '@/components/icons/IconChevronDown.vue'
-  import { ref, computed, onBeforeUpdate, onBeforeMount } from 'vue';
+  import { ref, computed, onBeforeMount } from 'vue';
 
   const props = defineProps({
     text        : "",
     id          : "",
     data        : "",
     limit       : {type: Number, default : 10},
-    init        : {type: Number, default: 0},
+    // init        : {type: Number, default: 0},
     parentElem  : null,
   });
 
@@ -56,6 +67,7 @@
   const limit = ref(10);
   const prevValue = ref("");
   const el = ref(null);
+  const isImgPresent = ref(false);
 
   const filteredItems = computed(() =>{
     let InputText = selectorInput.value;
@@ -78,9 +90,14 @@
         Limited[i] = NotLimited[i];
     }
     return Limited;
+  });
+
+  const activeItem = computed(() => {
+    if (!props.id) return null
+    return props.data.filter(item => item.id == props.id)[0];
   })
 
-  const checkDirection = computed (() => {
+  const checkDirection = computed(() => {
     // console.log(props.parentElem);
     if (!props.parentElem) {
       return true
@@ -110,7 +127,7 @@
       }
       return (totalBottom - input) > limited * 30 ? true : false;
     }
-  })
+  });
 
   const onSeectItem = (elem) => {
     selectedItem.value = elem.id;
@@ -144,10 +161,12 @@
   };
 
   const onKeyPress = (event) => {
+    // console.log('InputSelector onKewyPress ', filteredItems.value);
+    // event.stopPropogation();
     if (event.keyCode === 13) {
-      // console.log(event.keyCode);
-      selectedItem.value = SelectorFiltered[0].id;
-      selectorInput.value = SelectorFiltered[0].name;
+      // console.log(' filteredItems: ', filteredItems);
+      selectedItem.value = filteredItems.value[0].id;
+      selectorInput.value = filteredItems.value[0].name;
       selectorOpen.value = false;
       selectorActive.value = false;
       emits('selectItem', selectedItem.value);
@@ -157,23 +176,11 @@
   onBeforeMount (() => {
     limit.value = props.limit;
     selectorInput.value = props.text;
+    const dataObj = props.data[0];
+    if (dataObj) {
+      if (Object.keys(dataObj).includes('image_url')) isImgPresent.value = true;
+    }
   })
-
-  onBeforeUpdate (() => {
-    if (props.init === 1) {
-      selectorOpen.value    = false;
-      selectorInput.value   = props.text;
-      selectedItem.value    = props.id;
-      selectorActive.value  = false;
-      emits('selectItem');
-    } else if (props.init === 2){
-      selectorOpen.value    = false;
-      selectorInput.value   = "";
-      selectedItem.value    = null;
-      selectorActive.value  = false;
-      emits('selectItem');
-    } 
-  });
 
 </script>
 
@@ -203,7 +210,7 @@
         transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
         width: 100%;
         font-size: 16px;
-        padding: 14px 20px;
+        padding: 10px 10px;
         text-align: left;
         outline: none;
       }
@@ -219,7 +226,7 @@
   .dropup-menu {
     position: absolute;
     z-index: 20;
-    bottom: 53px;
+    bottom: 46px;
     left: 0;
     background: var(--bs-white);
     width: 100%;
@@ -229,7 +236,7 @@
   .dropdown-menu {
     position: absolute;
     z-index: 20;
-    top: 54px;
+    top: 46px;
     left: 0;
     background: var(--bs-white);
     width: 100%;
@@ -238,7 +245,10 @@
   }
 
   .dropdown-item {
-    display: block;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    // gap: 10px;
     width: 100%;
     padding: .2rem 1.6rem;
     clear: both;
@@ -248,6 +258,17 @@
     border: 0;
     &:hover{
       color:var(--bs-primary);
+    }
+  }
+
+  .item {
+    &-img {
+      width: 30px;
+      height: 30px;
+      margin: 0 10px;
+      border-radius: 50%;
+      background-size: contain;
+      background-repeat: no-repeat;
     }
   }
 
