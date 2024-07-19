@@ -18,7 +18,7 @@ export const useNsiStore = defineStore('nsiStore', () => {
   const getStatuses = async () => {
     loader.value = true;
     try {
-      const response = await axios.get('/api/statuses');
+      const response = await axios.get('api/statuses');
       statuses.value = response.data.sort((a ,b) => a.id - b.id);
     } catch (error) {
       console.log(error);
@@ -30,7 +30,7 @@ export const useNsiStore = defineStore('nsiStore', () => {
   const getTargets = async () => {
     loader.value = true;
     try {
-      const response = await axios.get('/api/targets');
+      const response = await axios.get('api/targets');
       targets.value = response.data.sort((a ,b) => a.id - b.id);
     } catch (error) {
       console.log(error);
@@ -43,7 +43,7 @@ export const useNsiStore = defineStore('nsiStore', () => {
     loader.value = true;
     try {
       errors.value = {};
-      const response = await axios.post('/api/targets', data);
+      const response = await axios.post('api/targets', data);
       targets.value = [...targets.value, response.data].sort((a ,b) => a.id - b.id);
       msgStore.addMessage({name: 'Целевая группа: "' + response.data.name + '", добавлена.', icon: 'done'});
     } catch (error) {
@@ -59,7 +59,7 @@ export const useNsiStore = defineStore('nsiStore', () => {
   const getServices = async () => {
     loader.value = true;
     try {
-      const response = await axios.get('/api/services');
+      const response = await axios.get('api/services');
       services.value = response.data.sort((a ,b) => a.id - b.id);
       services.value.forEach( item => {
         item.selected = false;
@@ -75,7 +75,7 @@ export const useNsiStore = defineStore('nsiStore', () => {
     loader.value = true;
     try {
       errors.value = {};
-      const response = await axios.post('/api/services', data);
+      const response = await axios.post('api/services', data);
       services.value = [...services.value, {...response.data, selected: false}].sort((a ,b) => a.id - b.id);
       msgStore.addMessage({name: 'Вид служения: "' + response.data.name + '", добавлен.', icon: 'done'});
     } catch (error) {
@@ -92,7 +92,7 @@ export const useNsiStore = defineStore('nsiStore', () => {
     loader.value = true;
     try {
       errors.value = {};
-      const response = await axios.post('/api/services/' + id + '/update', data);
+      const response = await axios.post('api/services/' + id + '/update', data);
       const newServices = services.value.filter(item => item.id !== id);
       services.value = [...newServices, {...response.data, selected: false}].sort((a ,b) => a.id - b.id);
       msgStore.addMessage({name: 'Вид служения: "' + response.data.name + '", обновлен.', icon: 'done'});
@@ -110,7 +110,7 @@ export const useNsiStore = defineStore('nsiStore', () => {
     loader.value = true;
     try {
       errors.value = {};
-      const response = await axios.post('/api/services/delete', {ids: data});
+      const response = await axios.post('api/services/delete', {ids: data});
       services.value = response.data.sort((a ,b) => a.id - b.id);
       services.value.forEach( item => {
         item.selected = false;
@@ -134,12 +134,12 @@ export const useNsiStore = defineStore('nsiStore', () => {
 
   const updateServiceAttributeAllRows = (attrName, attrValue) => {
     services.value.forEach( item => item[attrName] = attrValue);
-  }
+  };
 
   const getLevels = async () => {
     loader.value = true;
     try {
-      const response = await axios.get('/api/levels');
+      const response = await axios.get('api/levels');
       levels.value = response.data.sort((a ,b) => a.id - b.id);
     } catch (error) {
       console.log(error);
@@ -152,7 +152,7 @@ export const useNsiStore = defineStore('nsiStore', () => {
     loader.value = true;
     try {
       errors.value = {};
-      const response = await axios.post('/api/levels', data);
+      const response = await axios.post('api/levels', data);
       levels.value = [...levels.value, response.data].sort((a ,b) => a.id - b.id);
       msgStore.addMessage({name: 'Уровень дисциплины: "' + response.data.name + '", добавлен.', icon: 'done'});
     } catch (error) {
@@ -163,7 +163,26 @@ export const useNsiStore = defineStore('nsiStore', () => {
       }
     }
     loader.value = false;
-  }
+  };
+
+  const editLevel = async (data, id) => {
+    loader.value = true;
+    try {
+      errors.value = {};
+      const response = await axios.post('api/levels/' + id + '/update', data);
+
+      const newLevels = levels.value.filter(item => item.id !== id);
+      levels.value = [...newLevels, response.data].sort((a ,b) => a.id - b.id);
+      msgStore.addMessage({name: 'Уровень дисциплины: "' + response.data.name + '", обновлен.', icon: 'done'});
+    } catch (error) {
+      if (error.response?.status === 422) {
+        errors.value = error.response?.data?.errors;
+      } else {
+        msgStore.addMessage({name: error.message, icon: 'error'});
+      }
+    }
+    loader.value = false;
+  };
 
   const clearErrorsState = () => {
     errors.value = {}
@@ -189,6 +208,7 @@ export const useNsiStore = defineStore('nsiStore', () => {
     updateServiceAttributeAllRows,
     getLevels,
     addNewLevel,
+    editLevel,
     clearErrorsState,
   }
 });

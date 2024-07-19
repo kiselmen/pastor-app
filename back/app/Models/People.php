@@ -7,6 +7,7 @@ use App\Models\Prihod;
 use App\Models\Target;
 use App\Models\Family;
 use App\Models\Pservice;
+use App\Models\Plevel;
 
 class People extends Model
 {
@@ -41,6 +42,11 @@ class People extends Model
   public function pservice()
   {
 		return $this->hasMany(Pservice::class);
+  }
+
+  public function plevel()
+  {
+		return $this->hasMany(Plevel::class);
   }
 
   public function family()

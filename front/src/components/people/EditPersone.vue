@@ -2,9 +2,9 @@
   <div class="form">
     <div class="form-header">Редактирование прихожанина {{ form.name }} {{ form.first_name }} {{ form.patronymic }}</div>
     <div v-if="loader" class="form-text">Loading...</div>
-    <div v-if="!loader&&formStep === 0" class="card-name">Общая информация</div>
-    <div v-if="!loader&&formStep === 1" class="card-name">Семья</div>
-    <div class="form-container section-container" ref="formElem"  v-if="!loader">
+    <div v-if="!loader&&!confirmWindow&&formStep === 0" class="card-name">Общая информация</div>
+    <div v-if="!loader&&!confirmWindow&&formStep === 1" class="card-name">Семья</div>
+    <div  v-if="!loader&&!confirmWindow" class="form-container section-container" ref="formElem">
       <div v-if="formStep === 0" class = "table2x">
         <!-- <div class="card-box"> -->
           <div class="form-group">
@@ -22,11 +22,11 @@
               </div>
           </div>
           <div class="form-group" >
-            <label class="input-label">Приход</label>
+            <label class="input-label">Участок</label>
             <InputSelector
                 :text ="form.prihod"
                 :id   = form.prihod_id
-                :data ="prihodStore.prihods"
+                :data ="avalablePrihods"
                 :parentElem = "formElem"
                 @selectItem="onPrihodSelect"
               />
@@ -198,14 +198,14 @@
                 <SupportIcon />
               </template>
               <template #heading>
-                {{ family.name }}
+                {{ family?.name }}
               </template>
             </DateItem>
           </div>
           <div class="form-group" v-if="familyStore.families?.length">
             <label class="input-label">Семья</label>
             <InputSelector
-                :text ="family.name"
+                :text ="family?.name"
                 :id   = form.family_id
                 :data ="familyStore.families"
                 :parentElem = "formElem"
@@ -267,15 +267,26 @@
         <button @click.prevent="onMoveToStep('+')" class="btn btn-blue" :disabled="formStep >= maxFormSteps">Вперед</button>
       </div>
     </div>
+    <div v-if="!loader&&confirmWindow" class="form-container section-container">
+      <div class = "table1x">
+        <div class="form-text">Создать прихожанина?</div>
+        <div class="form-buttons">
+          <button @click.prevent="onConfirmAction" class="btn btn-blue" :disabled="loader">{{ loader ? 'Обработка...': 'Да'}}</button>
+          <button @click.prevent="onCancelAction" class="btn btn-gray">Отмена</button>
+        </div>
+      </div>
+    </div>
+
   </div>
 </template>
 
 <script setup>
+  import { reactive, ref, onBeforeMount, computed } from 'vue';
   import { usePeopleStore } from '@/stores/peopleStore';
   import { useFamilyStore } from '@/stores/familyStore';
   import { usePrihodStore } from '@/stores/prihodStore';
   import { useNsiStore } from '@/stores/nsiStore';
-  import { reactive, ref, onBeforeMount } from 'vue';
+  import { useUserStore } from '@/stores/userStore';
   import FileUpload from '@/components/ui/FileUpload.vue';
   import InputSelector from '@/components/ui/InputSelector.vue';
   import SupportIcon from '@/components/icons/IconSupport.vue';
@@ -288,6 +299,7 @@
   const peopleStore = usePeopleStore();
   const prihodStore = usePrihodStore();
   const nsiStore = useNsiStore();
+  const userStore = useUserStore();
   const familyStore = useFamilyStore();
 
   const form = reactive({
@@ -311,11 +323,26 @@
   const image = ref();
   const emits = defineEmits(['toggleModal']);
   const loader = ref(true);
+  const confirmWindow = ref(false);
   const persone = ref(null);
   const formElem = ref(null);
   const family = ref(null);
   const formStep = ref(0);
   const maxFormSteps = 1;
+
+  const avalablePrihods = computed(() => {
+    let isAdmin = false;
+    const prihodsIDs = [];
+    userStore.user?.permition?.forEach(permition => {
+      if (permition.type == 0) isAdmin = true;
+      if (permition.type == 1) prihodsIDs.push(permition.source_id);
+    });
+    if (isAdmin) {
+      return prihodStore.prihods
+    } else {
+      return prihodStore.prihods.filter(item => prihodsIDs.filter(id => id == item.id).length);
+    }
+  });
 
   const onImageUploaded = (data) => {
     image.value = data;
@@ -346,7 +373,15 @@
     form.family_id = id;
   };
 
-  const onEditPerson = async () => {
+  const onEditPerson = () => {
+    confirmWindow.value = true;
+  };
+
+  const onCancelAction = () => {
+    confirmWindow.value = false;
+  };
+  
+  const onConfirmAction = async () => {
     loader.value = true;
     let formData = new FormData();
     formData.append('email', form.email);

@@ -1,7 +1,8 @@
 <template>
   <div class="form">
     <div class="form-header">Добавление целевой группы</div>
-    <form @submit.prevent="onCreateTarget" class="form-container section-container">
+    <div v-if="loader" class="form-text">Loading...</div>
+    <div v-if="!loader&&!confirmWindow" class="form-container section-container">
       <div class = "table1x">
         <div class="form-group">
             <label class="input-label">Целевая группа</label>
@@ -33,16 +34,25 @@
         </div>
       </div>
       <div class="form-buttons">
-        <button type="submit" class="btn btn-blue" :disabled="nsiStore.loader">{{ nsiStore.loader ? 'Сохранение...': 'Сохранить'}}</button>
+        <button @click.prevent="onCreateTarget" class="btn btn-blue" :disabled="nsiStore.loader">{{ nsiStore.loader ? 'Сохранение...': 'Сохранить'}}</button>
         <button @click.prevent="emits('toggleModal')" class="btn btn-gray">Отмена</button>
       </div>
-    </form>
+    </div>
+    <div v-if="!loader&&confirmWindow" class="form-container section-container">
+      <div class = "table1x">
+        <div class="form-text">Сохранить запись?</div>
+        <div class="form-buttons">
+          <button @click.prevent="onConfirmAction" class="btn btn-blue" :disabled="loader">{{ loader ? 'Обработка...': 'Да'}}</button>
+          <button @click.prevent="onCancelAction" class="btn btn-gray">Отмена</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
   import { useNsiStore } from '@/stores/nsiStore';
-  import { reactive, onBeforeMount } from 'vue';
+  import { ref, reactive, onBeforeMount } from 'vue';
 
   const nsiStore = useNsiStore();
   const form = reactive({
@@ -50,13 +60,26 @@
     discription: '',
   });
   const emits = defineEmits(['toggleModal']);
+  const loader = ref(false);
+  const confirmWindow = ref(false);
 
-  const onCreateTarget = async () => {
+  const onCreateTarget = () => {
+    confirmWindow.value = true;
+  };
+
+  const onCancelAction = () => {
+    confirmWindow.value = false;
+  };
+  
+  const onConfirmAction = async () => {
+    loader.value = true;
     await nsiStore.addNewTarget(form);
     console.log('errors', nsiStore.totalCountErrors);
     if (!nsiStore.totalCountErrors) {
       emits('toggleModal');
     }
+    loader.value = false;
+    confirmWindow.value = false;
   };
 
   onBeforeMount(() => {

@@ -74,7 +74,7 @@
 
 <style scoped lang="scss">
 .modal {
-    z-index: 999;
+    z-index: 99;
     position: fixed;
     top: 0;
     left: 0;
@@ -93,7 +93,7 @@
         height: 100%;
         background: var(--bs-gray-700);
         opacity: 0.6;
-        z-index: 999;
+        z-index: 99;
     }
 
     &__content {

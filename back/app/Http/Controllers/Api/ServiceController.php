@@ -31,6 +31,15 @@ class ServiceController extends BaseController
   public function store(Request $request) {
     $this->storeValidator($request->all())->validate();
 
+    $User = auth()->user()->load('permition');
+    $Permitions = $User->permition;
+    $isAdmin = false;
+    foreach ($Permitions as $permition) {
+      if ($permition->type == 0) $isAdmin = true;
+    }
+
+    if (!$isAdmin) return response()->json(['message' => 'Do not have permitions'], 403);
+    
     $CurrentService = Service::create([
       'name' 		        => $request['name'],
       'discription'			=> $request['discription'],
@@ -40,6 +49,17 @@ class ServiceController extends BaseController
   }
 
   public function update(Request $request, $id) {
+    $this->storeValidator($request->all())->validate();
+
+    $User = auth()->user()->load('permition');
+    $Permitions = $User->permition;
+    $isAdmin = false;
+    foreach ($Permitions as $permition) {
+      if ($permition->type == 0) $isAdmin = true;
+    }
+
+    if (!$isAdmin) return response()->json(['message' => 'Do not have permitions'], 403);
+    
     $CurrentService = Service::Find($id);
     if ($CurrentService) {
       $CurrentService->name         = $request->input('name');
@@ -55,6 +75,15 @@ class ServiceController extends BaseController
   }
 
   public function delete(Request $request) {
+    $User = auth()->user()->load('permition');
+    $Permitions = $User->permition;
+    $isAdmin = false;
+    foreach ($Permitions as $permition) {
+      if ($permition->type == 0) $isAdmin = true;
+    }
+
+    if (!$isAdmin) return response()->json(['message' => 'Do not have permitions'], 403);
+    
     $IDs = $request['ids'];
     foreach ($IDs as $id) {
       $CurrentService = Service::Find($id);

@@ -11,7 +11,7 @@ class Permition extends Model
   ];
 
   protected $fillable = [
-      'user_id' ,'type', 'sourse_id',
+      'user_id' ,'type', 'source_id', 'created_at', 'updated_at',
   ];
 
   public function users(){

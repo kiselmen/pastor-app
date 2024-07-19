@@ -25,12 +25,37 @@ class PrihodController extends BaseController
 
 
   public function index(Request $request){
-    $Prihod = Prihod::all();
-    return $Prihod;
+    $User = auth()->user()->load('permition');
+    $Permitions = $User->permition;
+    $isAdmin = false;
+    $prihodIDs = [];
+    foreach ($Permitions as $permition) {
+      if ($permition->type == 0) $isAdmin = true;
+      if ($permition->type == 1) {
+        array_push($prihodIDs, $permition->source_id);
+      }
+    }
+
+    if ($isAdmin) {
+      $Prihod = Prihod::all();
+      return $Prihod;
+    } else {
+      $Prihod = Prihod::whereIn('id', $prihodIDs)->get();
+      return $Prihod;
+    }
   }
 
   public function store(Request $request){
     $this->storeValidator($request->all())->validate();
+
+    $User = auth()->user()->load('permition');
+    $Permitions = $User->permition;
+    $isAdmin = false;
+    foreach ($Permitions as $permition) {
+      if ($permition->type == 0) $isAdmin = true;
+    }
+
+    if (!$isAdmin) return response()->json(['message' => 'Do not have permitions'], 403);
 
     $CurrentPrihod = Prihod::create([
       'name' 		        => $request['name'],
@@ -42,6 +67,19 @@ class PrihodController extends BaseController
 
   public function update(Request $request, $id){
     $this->storeValidator($request->all())->validate();
+
+    $User = auth()->user()->load('permition');
+    $Permitions = $User->permition;
+    $isAdmin = false;
+    foreach ($Permitions as $permition) {
+      if ($permition->type == 0) $isAdmin = true;
+      if ($permition->type == 1) {
+        if ($permition->source_id == $id) $isAdmin = true;
+      }
+    }
+
+    if (!$isAdmin) return response()->json(['message' => 'Do not have permitions'], 403);
+
     $CurrentPrihod = Prihod::find($id);
     $CurrentPrihod->name 		      = $request['name'];
     $CurrentPrihod->number 		    = $request['number'];

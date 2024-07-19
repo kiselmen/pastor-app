@@ -2,9 +2,9 @@
   <div class="form" ref="formElem">
     <div class="form-header">Добавление прихожанина</div>
     <div v-if="loader" class="form-text">Loading...</div>
-    <div v-if="!loader&&formStep === 0" class="card-name">Общая информация</div>
-    <div v-if="!loader&&formStep === 1" class="card-name">Семья</div>
-    <div v-if="!loader" class="form-container section-container">
+    <div v-if="!loader&&!confirmWindow&&formStep === 0" class="card-name">Общая информация</div>
+    <div v-if="!loader&&!confirmWindow&&formStep === 1" class="card-name">Семья</div>
+    <div v-if="!loader&&!confirmWindow" class="form-container section-container">
       <div v-if="formStep === 0" class = "table2x">
         <div class="form-group">
             <label class="input-label">EMail</label>
@@ -21,11 +21,11 @@
             </div>
         </div>
         <div class="form-group">
-            <label class="input-label">Приход</label>
+            <label class="input-label">Участок</label>
             <InputSelector
                 :text ="form.prihod"
                 :id   = null
-                :data ="prihodStore.prihods"
+                :data ="avalablePrihods"
                 :parentElem = "formElem"
                 @selectItem="onPrihodSelect"
               />
@@ -190,7 +190,7 @@
       <div v-if="formStep === 1" class="table1x">
           <div>
             <label class="checkbox-control">
-              <input type="checkbox" id="isLocalGame" v-model="isOpenNewFamily"/>
+              <input type="checkbox" id="isLocalGame" v-model="isOpenNewFamily" @change="onClearFamilyData"/>
               Новая семья
             </label>
           </div>
@@ -204,7 +204,7 @@
                 :parentElem = "formElem"
                 @selectItem="onFamilySelect"
               />
-            <div class="input-error" v-if="familyStore.errors?.family_id">
+            <div class="input-error" v-if="peopleStore.errors?.family_id">
               {{ peopleStore.errors?.family_id[0] }}
             </div>
           </div>
@@ -214,10 +214,10 @@
                   type="text" 
                   autocomplete="off" 
                   class="input-box" 
-                  :class="{ 'is-invalid': familyStore.errors?.name }"
-                  v-model="familyForm.name" id="name">
-              <div class="input-error" v-if="familyStore.errors?.name">
-                  {{ familyStore.errors?.name[0] }}
+                  :class="{ 'is-invalid': peopleStore.errors?.family_name }"
+                  v-model="form.family_name" id="name">
+              <div class="input-error" v-if="peopleStore.errors?.family_name">
+                  {{ peopleStore.errors?.family_name[0] }}
               </div>
           </div>
           <div v-if="isOpenNewFamily" class="form-group">
@@ -227,16 +227,16 @@
                   autocomplete="off" 
                   class="input-box"
                   :class="{ 'is-invalid': 
-                  familyStore.errors?.discription }" 
-                  v-model="familyForm.discription" 
+                  peopleStore.errors?.family_discription }" 
+                  v-model="form.family_discription" 
                   id="first_name">
-              <div class="input-error" v-if="familyStore.errors?.discription">
-                  {{ familyStore.errors?.discription[0] }}
+              <div class="input-error" v-if="peopleStore.errors?.family_discription">
+                  {{ peopleStore.errors?.family_discription[0] }}
               </div>
           </div>
-          <div v-if="isOpenNewFamily" class="form-buttons">
+          <!-- <div v-if="isOpenNewFamily" class="form-buttons">
             <button @click.prevent="onCreateFamily" class="btn btn-blue" :disabled="loader">{{ loader ? 'Сохранение...': 'Создать семью'}}</button>
-          </div>
+          </div> -->
       </div>
       <div class="form-buttons" v-if="formStep === maxFormSteps">
         <button @click.prevent="onMoveToStep('-')" class="btn btn-blue" :disabled="formStep <= 0">Назад</button>
@@ -248,6 +248,15 @@
         <button @click.prevent="onMoveToStep('+')" class="btn btn-blue" :disabled="formStep >= maxFormSteps">Вперед</button>
       </div>
     </div>
+    <div v-if="!loader&&confirmWindow" class="form-container section-container">
+      <div class = "table1x">
+        <div class="form-text">Создать прихожанина?</div>
+        <div class="form-buttons">
+          <button @click.prevent="onConfirmAction" class="btn btn-blue" :disabled="loader">{{ loader ? 'Обработка...': 'Да'}}</button>
+          <button @click.prevent="onCancelAction" class="btn btn-gray">Отмена</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -256,7 +265,8 @@
   import { useFamilyStore } from '@/stores/familyStore';
   import { usePrihodStore } from '@/stores/prihodStore';
   import { useNsiStore } from '@/stores/nsiStore';
-  import { reactive, ref, onBeforeMount } from 'vue';
+  import { useUserStore } from '@/stores/userStore';
+  import { reactive, ref, onBeforeMount, computed } from 'vue';
   import FileUpload from '@/components/ui/FileUpload.vue';
   import InputSelector from '@/components/ui/InputSelector.vue';
 
@@ -264,6 +274,7 @@
   const prihodStore = usePrihodStore();
   const nsiStore = useNsiStore();
   const familyStore = useFamilyStore();
+  const userStore = useUserStore();
 
   const form = reactive({
     email: '',
@@ -281,23 +292,35 @@
     family_id: null,
     target: '',
     target_id: null,
-  });
-
-  const familyForm = reactive({
-    name: '',
-    discription: '',
-    head_id: null,
-    candidates: [],
+    family_name: '',
+    family_discription: '',
+    family_head_id: null,
+    family_candidates: [],
   });
 
   const formElem = ref(null);
   const image = ref();
   const emits = defineEmits(['toggleModal']);
   const loader = ref(false);
+  const confirmWindow = ref(false);
   const family = ref(null);
   const formStep = ref(0);
   const maxFormSteps = 1;
   const isOpenNewFamily = ref(false);
+
+  const avalablePrihods = computed(() => {
+    let isAdmin = false;
+    const prihodsIDs = [];
+    userStore.user?.permition?.forEach(permition => {
+      if (permition.type == 0) isAdmin = true;
+      if (permition.type == 1) prihodsIDs.push(permition.source_id);
+    });
+    if (isAdmin) {
+      return prihodStore.prihods
+    } else {
+      return prihodStore.prihods.filter(item => prihodsIDs.filter(id => id == item.id).length);
+    }
+  });
 
   const onImageUploaded = (data) => {
     image.value = data;
@@ -328,14 +351,20 @@
     form.family_id = id;
   };
 
-  const onCreateFamily = async () => {
-    loader.value = true;
-    await familyStore.addNewFamily(familyForm);
-    isOpenNewFamily.value = false;
-    loader.value = false;
+  const onClearFamilyData = () => {
+    console.log('isOpenNewFamily ', isOpenNewFamily.value);
+    if (isOpenNewFamily.value) form.family_id = null;
   };
 
-  const onCreatePerson = async () => {
+  const onCreatePerson = () => {
+    confirmWindow.value = true;
+  };
+
+  const onCancelAction = () => {
+    confirmWindow.value = false;
+  };
+  
+  const onConfirmAction = async () => {
     loader.value = true;
     let formData = new FormData();
     formData.append('email', form.email);
@@ -355,12 +384,18 @@
       const fileName = image.value.name;
       const fileData = image.value;
       formData.append('image', fileData, fileName);
-    } 
+    }
+    formData.append('family_name', form.family_name);
+    formData.append('family_discription', form.family_discription);
+    formData.append('family_head_id', form.family_head_id);
+    formData.append('family_candidates', form.family_candidates);
+
     await peopleStore.addNewPersone(formData);
     console.log('errors', peopleStore.totalCountErrors);
     if (!peopleStore.totalCountErrors) {
       emits('toggleModal');
     }
+    confirmWindow.value = false;
     loader.value = false;
   };
 

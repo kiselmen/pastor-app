@@ -121,7 +121,6 @@ const router = createRouter({
       beforeEnter: permition,
       component: () => import('@/views/LevelsListView.vue') 
     },
-    
   ]
 })
 

@@ -1,8 +1,8 @@
 <template>
   <div class="form">
-    <div class="form-header">Добавление церковная дисциплины (уровни)</div>
-    <!-- <div v-if="loader" class="form-text">Loading...</div> -->
-    <div v-if="!loader&&!confirmWindow" class="form-container section-container">
+    <div class="form-header">Изменение церковной дисциплины (уровня)</div>
+    <div v-if="loader" class="form-text">Loading...</div>
+    <div v-if="!loader&&!confirmWindow"class="form-container section-container">
       <div class = "table1x">
         <div class="form-group">
             <label class="input-label">Церковная дисциплина</label>
@@ -48,13 +48,13 @@
         </div>
       </div>
       <div class="form-buttons">
-        <button @click.prevent="onCreateLevel" class="btn btn-blue" :disabled="nsiStore.loader">{{ nsiStore.loader ? 'Сохранение...': 'Сохранить'}}</button>
+        <button @click.prevent="onEditLevel" class="btn btn-blue" :disabled="nsiStore.loader">{{ nsiStore.loader ? 'Сохранение...': 'Изменить'}}</button>
         <button @click.prevent="emits('toggleModal')" class="btn btn-gray">Отмена</button>
       </div>
     </div>
     <div v-if="!loader&&confirmWindow" class="form-container section-container">
       <div class = "table1x">
-        <div class="form-text">Изменить запись?</div>
+        <div class="form-text">Изменить запись ?</div>
         <div class="form-buttons">
         <button @click.prevent="onConfirmAction" class="btn btn-blue" :disabled="loader">{{ loader ? 'Обработка...': 'Да'}}</button>
         <button @click.prevent="onCancelAction" class="btn btn-gray">Отмена</button>
@@ -66,9 +66,14 @@
 
 <script setup>
   import { useNsiStore } from '@/stores/nsiStore';
-  import { reactive, onBeforeMount } from 'vue';
+  import { ref, reactive, onBeforeMount } from 'vue';
+
+  const props = defineProps({
+    id: {type: Number, default: null},
+  });
 
   const nsiStore = useNsiStore();
+
   const form = reactive({
     name: '',
     discription: '',
@@ -78,7 +83,7 @@
   const loader = ref(false);
   const confirmWindow = ref(false);
 
-  const onCreateLevel = async () => {
+  const onEditLevel = async () => {
     confirmWindow.value = true;
   };
 
@@ -88,16 +93,23 @@
 
   const onConfirmAction = async () => {
     loader.value = true;
-    await nsiStore.addNewLevel(form);
+    await nsiStore.editLevel(form, props.id);
     if (!nsiStore.totalCountErrors) {
       emits('toggleModal');
     }
     loader.value = false;
     confirmWindow.value = false;
-  };
+  }
 
   onBeforeMount(() => {
+    loader.value = true;
     nsiStore.clearErrorsState();
+    const filtered = nsiStore.levels.filter( item => item.id === props.id)[0];
+    form.id = filtered.id;
+    form.name = filtered.name;
+    form.discription = filtered.discription;
+    form.color = filtered.color;
+    loader.value = false;
   })
 
 </script>

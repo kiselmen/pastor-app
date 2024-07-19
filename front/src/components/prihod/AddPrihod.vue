@@ -1,11 +1,11 @@
 <template>
   <div class="form" ref="formElem">
-    <div class="form-header">Добавление прихода</div>
-    <div class="form-text" v-if="prihodStore.loader">Loading...</div>
-    <form @submit.prevent="onCreatePrihod" class="form-container section-container" v-if="!prihodStore.loader">
+    <div class="form-header">Добавление участка</div>
+    <div v-if="loader" class="form-text">Loading...</div>
+    <div v-if="!loader&&!confirmWindow" class="form-container section-container">
       <div class = "table1x">
         <div class="form-group">
-          <label class="input-label">Имя прихода</label>
+          <label class="input-label">Имя участка</label>
           <input 
               type="text"
               autocomplete = "off"
@@ -33,7 +33,7 @@
           </div>
         </div>
         <div class="form-group">
-          <label class="input-label">Номер прихода</label>
+          <label class="input-label">Номер участка</label>
           <input 
               type="number"
               autocomplete = "off"
@@ -48,10 +48,19 @@
         </div>
       </div>
       <div class="form-buttons">
-        <button type="submit" class="btn btn-blue" :disabled="prihodStore.loader">{{ prihodStore.loader ? 'Сохранение...': 'Сохранить'}}</button>
+        <button @click.prevent="onCreatePrihod" class="btn btn-blue" :disabled="loader">{{ loader ? 'Добавление...' : 'Добавить'}}</button>
         <button @click.prevent="emits('toggleModal')" class="btn btn-gray">Отмена</button>
       </div>
-    </form>
+    </div>
+    <div v-if="!loader&&confirmWindow" class="form-container section-container">
+      <div class = "table1x">
+        <div class="form-text">Создать участок?</div>
+        <div class="form-buttons">
+          <button @click.prevent="onConfirmAction" class="btn btn-blue" :disabled="loader">{{ loader ? 'Обработка...': 'Да'}}</button>
+          <button @click.prevent="onCancelAction" class="btn btn-gray">Отмена</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -69,14 +78,26 @@
 
   const emits = defineEmits(['toggleModal']);
 
+  const loader = ref(false);
+  const confirmWindow = ref(false);
   const formElem = ref(null);
 
-  const onCreatePrihod = async () => {
+  const onCreatePrihod = () => {
+    confirmWindow.value = true;
+  };
+
+  const onCancelAction = () => {
+    confirmWindow.value = false;
+  };
+  
+  const onConfirmAction = async () => {
+    loader.value = true;
     await prihodStore.addNewPrihod(form);
-    // console.log('errors', nsiStore.totalCountErrors);
     if (!prihodStore.totalCountErrors) {
       emits('toggleModal');
     }
+    confirmWindow.value = false;
+    loader.value = false;
   };
 
   onBeforeMount(() => {

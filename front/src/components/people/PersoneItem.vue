@@ -1,17 +1,20 @@
 <template>
   <div class = "card">
     <div class="card-title">
-      <span>
+      <div :class="personeStatusStyle" :style = "{background: personeStatusColor }">
+        {{ personeStatusLength ? personeStatusLength: ''}}
+      </div> 
+      <div :class = "personeTitleStyle">
         {{ props.persone.name }} {{ props.persone.first_name }} {{ props.persone.patronymic }}
-      </span>
+      </div>
       <div class="change_button">
         <!-- <EditDuotoneIcon  @click="onEditClick"/> -->
         <ActionMenu 
           :actions = "actions"
           @startAction="onStartAction"
         >
-          <template #icon>
-            <EditDuotoneIcon/>
+          <template #icon >
+            <EditDuotoneIcon v-if="isAvailableActions"/>
           </template>
         </ActionMenu>
       </div>
@@ -96,7 +99,7 @@
     <div class="card-row">
         <ServiceMiniItem
           :services = "props.persone.pservice"
-          @editServices = "onEditPersonServices"
+          @editServices = "onEditPersoneServices"
         />
 
       </div> 
@@ -105,6 +108,9 @@
 
 <script setup>
   import getImgPath from '@/utils/imagePlugin.js';
+  import { onBeforeMount, ref, computed } from 'vue';
+  import { useUserStore } from '@/stores/userStore';
+  import { usePeopleStore } from '@/stores/peopleStore' ;
   import EditDuotoneIcon from '@/components/icons/IconEditDuotone.vue';
   import CrossIcon from '@/components/icons/IconCross.vue';
   import BirthdayIcon from '@/components/icons/IconBirthday.vue';
@@ -115,48 +121,125 @@
   import PrihodMiniItem from '@/components/prihod/PrihodMiniItem.vue';
   import ServiceMiniItem from '@/components/nsi/ServiceMiniItem.vue';
   import FamilyMiniItem from '@/components/family/FamilyMiniItem.vue';
-  import { onBeforeMount, ref } from 'vue';
   import ActionMenu from '@/components/ui/ActionMenu.vue';
 
   const props = defineProps({
     persone: { type: Object, default: new Object() },
-  })
+  });
 
-  const emits = defineEmits(['editPerson', 'editPersonServices']);
+  const userStore = useUserStore();
+  const peopleStore = usePeopleStore();
+
+  const emits = defineEmits(['editPersone', 'editPersoneLevels', 'editPersoneServices', 'registerNewUser', 'changeUserPass', 'changeUserPermitions']);
 
   const actions = ref([]);
 
-  // const onEditClick = () => {
-  //   // console.log('Edit persone ', props.persone.id);
-  //   emits('editPerson', props.persone.id)
-  // }
+  const isAvailableActions = computed(() => {
+    return actions.value.length;
+  });
+
+  const personeStatusColor = computed(() => {
+    const isStatus = props.persone.plevel.length;
+    const totalRecords = props.persone.plevel.length;
+    let levelSyle = '';
+    if (isStatus) {
+      const lastStatus = props.persone.plevel[totalRecords-1];
+      levelSyle = lastStatus.level.color;
+    }  
+    return levelSyle;
+  })
+
+  const personeStatusStyle = computed(() => {
+    const isStatus = props.persone.plevel.length;
+    return isStatus ? 'colored': '';
+  });
+
+  const personeTitleStyle = computed(() => {
+    return personeStatusStyle.value ? 'space': '';
+  })
+
+  const personeStatusLength = computed(() => {
+    return props.persone.plevel.length;
+  });
 
   const onStartAction = (action) => {
-    // console.log('onStartAction ', action);
     const isAction = actions.value.filter(item => item.id === action);
     if (isAction.length) {
       const actionEmit = isAction[0].emit;
-      console.log('action ', actionEmit);
+      console.log('actionEmit ', actionEmit);
       emits(actionEmit, props.persone.id);
     } else {
       console.log('Нет такой операции');
     }
   };
 
-  const onEditPersonServices = () => {
-    emits('editPersonServices', props.persone.id);
+  const onEditPersoneServices = () => {
+    emits('editPersoneServices', props.persone.id);
   }
 
   onBeforeMount(async () => {
-    actions.value = [
-      { id: 0, name: 'Изменить', emit: 'editPerson' },
-      { id: 1, name: 'Регистрация', emit: 'registerPerson' },
-    ]
+    let isAdmin = false;
+    const prihodIDs = [];
+    const serviceIDs = [];
+    userStore.user.permition.forEach(permition => {
+      if (permition.type == 0) isAdmin = true;
+      if (permition.type == 1) prihodIDs.push(permition.source_id);
+      if (permition.type == 2) serviceIDs.push(permition.source_id);
+    });
+    if (isAdmin) {
+      const isUserPresent = peopleStore.peoples.filter(item => item.id == props.persone.id)[0].user_id;
+      if (isUserPresent) {
+        actions.value = [
+          { id: 0, name: 'Изменить', emit: 'editPersone' },
+          { id: 1, name: 'Дисциплина', emit: 'editPersoneLevels' },
+          { id: 3, name: 'Сменить пароль', emit: 'changeUserPass' },
+          { id: 4, name: 'Права доступа', emit: 'changeUserPermitions' },
+        ]
+      } else {
+        actions.value = [
+          { id: 0, name: 'Изменить', emit: 'editPersone' },
+          { id: 1, name: 'Дисциплина', emit: 'editPersoneLevels' },
+          { id: 2, name: 'Регистрация', emit: 'registerNewUser' },
+        ]
+      }
+    } else {
+      const isPrihodAdmin = prihodIDs.filter(item => item == props.persone.prihod_id).length;
+      if (isPrihodAdmin) {
+        actions.value = [
+          { id: 0, name: 'Изменить', emit: 'editPersone' },
+          { id: 1, name: 'Дисциплина', emit: 'editPersoneLevels' },
+        ]
+      } else {
+        const isServiceAdmin = serviceIDs.filter(item => props.persone.pservice.filter(service => service.service_id == item).length).length;
+        if (isServiceAdmin) {
+          actions.value = [
+            { id: 1, name: 'Дисциплина', emit: 'editPersoneLevels' },
+          ]
+        } else {
+          actions.value = [];
+        }
+      }
+    }
   })
 </script>
 
 <style lang="scss" scoped>
   .action-container {
     align-items: baseline;
+  }
+  .colored {
+    display: flex;
+    left: 0px;
+    top: 0px;
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    justify-content: center;
+    align-items: center;
+    color: var(--bs-black);
+    font-size: 14px;    
+  }
+  .space {
+    margin-left: 40px;
   }
 </style>

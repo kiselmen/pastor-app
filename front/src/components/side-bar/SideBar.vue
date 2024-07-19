@@ -17,7 +17,7 @@
             </div>
           </RouterLink>
         </li>
-        <li>
+        <li v-if="userStore.isPermition(1)">
           <RouterLink to="/families">
             <div class="sidebar-item">
               <SupportIcon class="sidebar-icon"/>
@@ -25,7 +25,7 @@
             </div>
           </RouterLink>
         </li>
-        <li>
+        <li v-if="userStore.isPermition(1)">
           <RouterLink to="/prihods">
             <div class="sidebar-item">
               <DocumentationIcon class="sidebar-icon"/>

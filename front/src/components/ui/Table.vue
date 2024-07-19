@@ -4,13 +4,13 @@
       <thead class="table-head">
         <tr>
           <th v-if="hasActiveBtn">
-            <div class="table-actions">
+            <div class="table-actions" v-if = multiRowActions.length>
               <CheckBox
                 @toggleCheckBox="onSelectAllRows"
                 :modelValue = "isAllRowSelected"
               />
               <ActionMenu
-                :actions = "props.actions.filter(item => item.type > 0)"
+                :actions = "multiRowActions"
                 @startAction="onAllRowsAction"
               >
                 <template #icon>
@@ -28,7 +28,7 @@
         <tr v-for="row in props.tableData" :key = row.id>
           <td v-if="hasActiveBtn">
             <div class="table-actions">
-              <CheckBox
+              <CheckBox v-if = multiRowActions.length
                 :modelValue = "row.selected"
                 :boxID = "row.id"
                 @toggleCheckBox="onSelectRow"
@@ -45,8 +45,8 @@
               </ActionMenu>
             </div>  
           </td>
-          <td v-for="elemen_id in props.tableHeadID">
-            {{ row[elemen_id] }}
+          <td v-for="element_id in props.tableHeadID" :style = "{color: isColorRow(element_id, row[element_id]) }">
+            {{ row[element_id] }}
           </td>
         </tr>
       </tbody>
@@ -58,7 +58,7 @@
   import CheckBox from '@/components/ui/CheckBox.vue';
   import ActionMenu from '@/components/ui/ActionMenu.vue';
   import MenuKebabIcon from '@/components/icons/IconMenuKebab.vue';
-  import { ref } from 'vue';
+  import { ref, computed } from 'vue';
 
   const props = defineProps({
     tableHeadNames: { type: Array, default: new Array() },
@@ -73,6 +73,10 @@
 
   const tableElem = ref(null);
 
+  const multiRowActions = computed( () => {
+    return props.actions.filter(item => item.type > 0);
+  });
+
   const onSelectRow = (value, rowID) => {
     emits('selectRow', value, rowID);
   }
@@ -85,8 +89,16 @@
     emits('allRowAction', actionID);
   }
 
-  const onRowAction = (actionID, rowID) => {
+  const onRowAction = (actionID, rowID) => {  
     emits('rowAction', actionID, rowID);
+  }
+
+  const isColorRow = (name, color) => {
+    if (name == 'color') {
+      return color ? color : '';
+    } else {
+      return '';
+    }
   }
 
 </script>

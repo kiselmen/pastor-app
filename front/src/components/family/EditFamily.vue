@@ -2,7 +2,7 @@
   <div class="form" ref="formElem">
     <div class="form-header">Изменение семьи</div>
     <div v-if="loader" class="form-text">Loading...</div>
-    <div v-if="!loader" class="form-container section-container">
+    <div v-if="!loader&&!confirmWindow" class="form-container section-container">
       <div class = "table1x">
         <div class="form-group">
             <label class="input-label">Название</label>
@@ -74,8 +74,17 @@
         </div>
       </div>
       <div class="form-buttons">
-        <button @click="onEditFamily" class="btn btn-blue" :disabled="familyStore.loader">{{ familyStore.loader ? 'Сохранение...': 'Сохранить'}}</button>
+        <button @click="onEditFamily" class="btn btn-blue" :disabled="familyStore.loader">{{ familyStore.loader ? 'Изменение...': 'Изменить'}}</button>
         <button @click.prevent="emits('toggleModal')" class="btn btn-gray">Отмена</button>
+      </div>
+    </div>
+    <div v-if="!loader&&confirmWindow" class="form-container section-container">
+      <div class = "table1x">
+        <div class="form-text">Сохранить изменения?</div>
+        <div class="form-buttons">
+          <button @click.prevent="onConfirmAction" class="btn btn-blue" :disabled="loader">{{ loader ? 'Обработка...': 'Да'}}</button>
+          <button @click.prevent="onCancelAction" class="btn btn-gray">Отмена</button>
+        </div>
       </div>
     </div>
   </div>
@@ -100,6 +109,7 @@
   const peopleStore = usePeopleStore();
 
   const loader = ref(true);
+  const confirmWindow = ref(false);
   const form = reactive({
     name: '',
     discription: '',
@@ -154,12 +164,21 @@
     form.head_id = id;
   };
 
-  const onEditFamily = async () => {
+  const onEditFamily = () => {
+    confirmWindow.value = true;
+  };
+
+  const onCancelAction = () => {
+    confirmWindow.value = false;
+  };
+  
+  const onConfirmAction = async () => {
     loader.value = true;
     await familyStore.editFamily(form);
     if (!familyStore.totalCountErrors) {
       emits('toggleModal');
     }
+    confirmWindow.value = false;
     loader.value = false;
   };
 

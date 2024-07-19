@@ -1,11 +1,11 @@
 <template>
   <div class="form" ref="formElem">
-    <div class="form-header">Редактирование прихода</div>
-    <div class="form-text" v-if="prihodStore.loader">Loading...</div>
-    <form @submit.prevent="onEditPrihod" class="form-container section-container" v-if="!prihodStore.loader">
+    <div class="form-header">Редактирование участка</div>
+    <div v-if="loader" class="form-text">Loading...</div>
+    <div v-if="!loader&&!confirmWindow" class="form-container section-container">
       <div class = "table1x">
         <div class="form-group">
-            <label class="input-label">Имя прихода</label>
+            <label class="input-label">Имя участка</label>
             <input 
                 type="text"
                 autocomplete = "off"
@@ -33,7 +33,7 @@
             </div>
         </div>
         <div class="form-group">
-            <label class="input-label">Номер прихода</label>
+            <label class="input-label">Номер участка</label>
             <input 
                 type="number"
                 autocomplete = "off"
@@ -48,10 +48,19 @@
         </div>
       </div>
       <div class="form-buttons">
-        <button type="submit" class="btn btn-blue" :disabled="prihodStore.loader">{{ prihodStore.loader ? 'Сохранение...': 'Сохранить'}}</button>
+        <button @click.prevent="onEditPrihod" class="btn btn-blue" :disabled="prihodStore.loader">{{ prihodStore.loader ? 'Изменение...': 'Изменить'}}</button>
         <button @click.prevent="emits('toggleModal')" class="btn btn-gray">Отмена</button>
       </div>
-    </form>
+    </div>
+    <div v-if="!loader&&confirmWindow" class="form-container section-container">
+      <div class = "table1x">
+        <div class="form-text">Сохранить изменения?</div>
+        <div class="form-buttons">
+          <button @click.prevent="onConfirmAction" class="btn btn-blue" :disabled="loader">{{ loader ? 'Обработка...': 'Да'}}</button>
+          <button @click.prevent="onCancelAction" class="btn btn-gray">Отмена</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -75,26 +84,34 @@
 
   const prihod = ref(null);
   const loader = ref(false);
+  const confirmWindow = ref(false);
   const formElem = ref(null);
 
-  const onEditPrihod = async () => {
-    console.log('1');
+  const onEditPrihod = () => {
+    confirmWindow.value = true;
+  };
+
+  const onCancelAction = () => {
+    confirmWindow.value = false;
+  };
+  
+  const onConfirmAction = async () => {
     loader.value = true;
     let formData = new FormData();
     formData.append('name', form.name);
     formData.append('number', form.number);
     formData.append('discription', form.discription);
     formData.append('id', props.id);
-    console.log('2');
     await prihodStore.editPrihod(formData);
-    console.log('3');
     if (!prihodStore.totalCountErrors) {
       emits('toggleModal');
     }
+    confirmWindow.value = false;
     loader.value = false;
   };
 
   onBeforeMount(() => {
+    loader.value = true;
     prihodStore.clearErrorsState();
     // prihodStore.getPrihods();
     prihod.value = prihodStore.prihods.filter(item => item.id === props.id)[0];
@@ -102,6 +119,7 @@
     form.name = prihod.value.name;
     form.number = prihod.value.number;
     form.discription = prihod.value.discription;
+    loader.value = false;
   })
 
 </script>

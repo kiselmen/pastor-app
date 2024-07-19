@@ -1,7 +1,8 @@
 <template>
   <div class="form" ref="formElem">
     <div class="form-header">Изменение вида служения</div>
-    <form @submit.prevent="onEditService" class="form-container section-container">
+    <div v-if="loader" class="form-text">Loading...</div>
+    <div v-if="!loader&&!confirmWindow" class="form-container section-container">
       <div class = "table1x">
         <div class="form-group">
           <label class="input-label">Вид служения</label>
@@ -43,10 +44,19 @@
         </div>
       </div>
       <div class="form-buttons">
-        <button type="submit" class="btn btn-blue" :disabled="nsiStore.loader">{{ nsiStore.loader ? 'Сохранение...': 'Сохранить'}}</button>
+        <button @click.prevent="onEditService" class="btn btn-blue" :disabled="loader">{{ loader ? 'Сохранение...': 'Сохранить'}}</button>
         <button @click.prevent="emits('toggleModal')" class="btn btn-gray">Отмена</button>
       </div>
-    </form>
+    </div>
+    <div v-if="!loader&&confirmWindow" class="form-container section-container">
+      <div class = "table1x">
+        <div class="form-text">Изменить запись?</div>
+        <div class="form-buttons">
+          <button @click.prevent="onConfirmAction" class="btn btn-blue" :disabled="loader">{{ loader ? 'Обработка...': 'Да'}}</button>
+          <button @click.prevent="onCancelAction" class="btn btn-gray">Отмена</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -69,13 +79,25 @@
   const emits = defineEmits(['toggleModal']);
 
   const formElem = ref(null);
+  const loader = ref(false);
+  const confirmWindow = ref(false);
 
-  const onEditService = async () => {
+  const onEditService = () => {
+    confirmWindow.value = true;
+  };
+
+  const onCancelAction = () => {
+    confirmWindow.value = false;
+  };
+  
+  const onConfirmAction = async () => {
+    loader.value = true;
     await nsiStore.editService(form, props.id);
-    // console.log('errors', nsiStore.totalCountErrors);
     if (!nsiStore.totalCountErrors) {
       emits('toggleModal');
     }
+    loader.value = false;
+    confirmWindow.value = false;
   };
 
   const onStatusSelect = (id) => {
@@ -83,6 +105,7 @@
   }
 
   onBeforeMount(() => {
+    loader.value = true;
     nsiStore.clearErrorsState();
     const filtered = nsiStore.services.filter( item => item.id === props.id)[0];
     form.id = filtered.id;
@@ -91,6 +114,7 @@
     form.status_id = filtered.status_id;
     const isStatus = nsiStore.statuses.filter(item => item.id === form.status_id);
     form.statusName = isStatus.length ? isStatus[0].name : 'Не определено'; 
+    loader.value = false;
   })
 
 </script>

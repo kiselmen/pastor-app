@@ -98,7 +98,7 @@
             background-color: var(--bs-gray-200);
         }
         &--wrapper {
-            left: calc(100% - 50px);
+            left: calc(100% - 80px);
             opacity: 0;
             padding-bottom: 8px;
             position: absolute;

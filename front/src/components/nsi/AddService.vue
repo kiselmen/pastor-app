@@ -1,7 +1,8 @@
 <template>
   <div class="form" ref="formElem">
     <div class="form-header">Добавление вид служения</div>
-    <form @submit.prevent="onCreateService" class="form-container section-container">
+    <div v-if="loader" class="form-text">Loading...</div>
+    <div v-if="!loader&&!confirmWindow" class="form-container section-container">
       <div class = "table1x">
         <div class="form-group">
             <label class="input-label">Вид служения</label>
@@ -43,10 +44,19 @@
         </div>
       </div>
       <div class="form-buttons">
-        <button type="submit" class="btn btn-blue" :disabled="nsiStore.loader">{{ nsiStore.loader ? 'Сохранение...': 'Сохранить'}}</button>
+        <button @click.prevent="onCreateService" class="btn btn-blue" :disabled="nsiStore.loader">{{ nsiStore.loader ? 'Сохранение...': 'Сохранить'}}</button>
         <button @click.prevent="emits('toggleModal')" class="btn btn-gray">Отмена</button>
       </div>
-    </form>
+    </div>
+    <div v-if="!loader&&confirmWindow" class="form-container section-container">
+      <div class = "table1x">
+        <div class="form-text">Сохранить запись?</div>
+        <div class="form-buttons">
+          <button @click.prevent="onConfirmAction" class="btn btn-blue" :disabled="loader">{{ loader ? 'Обработка...': 'Да'}}</button>
+          <button @click.prevent="onCancelAction" class="btn btn-gray">Отмена</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -65,12 +75,26 @@
   const emits = defineEmits(['toggleModal']);
 
   const formElem = ref(null);
+  const loader = ref(false);
+  const confirmWindow = ref(false);
 
-  const onCreateService = async () => {
+  const onCreateService = () => {
+    confirmWindow.value = true;
+  };
+
+  const onCancelAction = () => {
+    confirmWindow.value = false;
+  };
+  
+  const onConfirmAction = async () => {
+    loader.value = true;
+    confirmWindow.value = true;
     await nsiStore.addNewService(form);
     if (!nsiStore.totalCountErrors) {
       emits('toggleModal');
     }
+    loader.value = false;
+    confirmWindow.value = false;
   };
 
   const onStatusSelect = (id) => {

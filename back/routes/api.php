@@ -19,25 +19,43 @@ Route::middleware('auth:sanctum')->group(function () {
     //     return $request->user();
     // });
     Route::get('/user', 'App\Http\Controllers\Api\UserController@index');
-    Route::get('/peoples', 'App\Http\Controllers\Api\PeopleController@index');
-    Route::post('/peoples', 'App\Http\Controllers\Api\PeopleController@store');
-    Route::post('/peoples/{id}/update', 'App\Http\Controllers\Api\PeopleController@update');
-    Route::get('/targets', 'App\Http\Controllers\Api\TargetController@index');
-    Route::post('/targets', 'App\Http\Controllers\Api\TargetController@store');
-    Route::get('/services', 'App\Http\Controllers\Api\ServiceController@index');
-    Route::post('/services', 'App\Http\Controllers\Api\ServiceController@store');
-    Route::post('/services/{id}/update', 'App\Http\Controllers\Api\ServiceController@update');
-    Route::post('/services/delete', 'App\Http\Controllers\Api\ServiceController@delete');
-    Route::post('/pservices', 'App\Http\Controllers\Api\PserviceController@store');
-    Route::post('/pservices/delete', 'App\Http\Controllers\Api\PserviceController@delete');
-    Route::get('/levels', 'App\Http\Controllers\Api\LevelController@index');
-    Route::post('/levels', 'App\Http\Controllers\Api\LevelController@store');
-    Route::get('/prihods', 'App\Http\Controllers\Api\PrihodController@index');
-    Route::post('/prihods', 'App\Http\Controllers\Api\PrihodController@store');
-    Route::post('/prihods/{id}/update', 'App\Http\Controllers\Api\PrihodController@update');
-    Route::get('/families', 'App\Http\Controllers\Api\FamilyController@index');
-    Route::post('/families', 'App\Http\Controllers\Api\FamilyController@store');
-    Route::post('/families/{id}/update', 'App\Http\Controllers\Api\FamilyController@update');
+    Route::post('/user', 'App\Http\Controllers\Api\UserController@store'); // с правами доступа
+    Route::post('/user/change', 'App\Http\Controllers\Api\UserController@change'); // с правами доступа
+    Route::get('/user/{id}/permitions', 'App\Http\Controllers\Api\UserController@permitions'); // с правами доступа
+        
+    Route::post('/permition', 'App\Http\Controllers\Api\PermitionController@store'); // с правами доступа
+    Route::post('/permition/delete', 'App\Http\Controllers\Api\PermitionController@delete'); // с правами доступа
+
+    Route::get('/peoples', 'App\Http\Controllers\Api\PeopleController@index'); // с правами доступа
+    Route::post('/peoples', 'App\Http\Controllers\Api\PeopleController@store'); // с правами доступа
+    Route::post('/peoples/{id}/update', 'App\Http\Controllers\Api\PeopleController@update'); // с правами доступа
+
+    Route::get('/targets', 'App\Http\Controllers\Api\TargetController@index'); // с правами доступа
+    Route::post('/targets', 'App\Http\Controllers\Api\TargetController@store'); // с правами доступа
+
+    Route::get('/services', 'App\Http\Controllers\Api\ServiceController@index'); // с правами доступа
+    Route::post('/services', 'App\Http\Controllers\Api\ServiceController@store'); // с правами доступа
+    Route::post('/services/{id}/update', 'App\Http\Controllers\Api\ServiceController@update'); // с правами доступа
+    Route::post('/services/delete', 'App\Http\Controllers\Api\ServiceController@delete'); // с правами доступа
+
+    Route::post('/pservices', 'App\Http\Controllers\Api\PserviceController@store');  // с правами доступа
+    Route::post('/pservices/delete', 'App\Http\Controllers\Api\PserviceController@delete'); // с правами доступа
+
+    Route::get('/levels', 'App\Http\Controllers\Api\LevelController@index'); // с правами доступа
+    Route::post('/levels', 'App\Http\Controllers\Api\LevelController@store'); // с правами доступа
+    Route::post('/levels/{id}/update', 'App\Http\Controllers\Api\LevelController@update'); // с правами доступа
+
+    Route::post('/plevels', 'App\Http\Controllers\Api\PlevelController@store'); // с правами доступа
+    Route::post('/plevels/delete', 'App\Http\Controllers\Api\PlevelController@delete'); // с правами доступа
+    Route::post('/plevels/{id}/update', 'App\Http\Controllers\Api\PlevelController@update'); // с правами доступа
+
+    Route::get('/prihods', 'App\Http\Controllers\Api\PrihodController@index'); // с правами доступа
+    Route::post('/prihods', 'App\Http\Controllers\Api\PrihodController@store'); // с правами доступа
+    Route::post('/prihods/{id}/update', 'App\Http\Controllers\Api\PrihodController@update'); // с правами доступа
+
+    Route::get('/families', 'App\Http\Controllers\Api\FamilyController@index'); // с правами доступа
+    Route::post('/families', 'App\Http\Controllers\Api\FamilyController@store'); // с правами доступа
+    Route::post('/families/{id}/update', 'App\Http\Controllers\Api\FamilyController@update'); // с правами доступа
 });
 Route::get('/statuses', 'App\Http\Controllers\Api\StatusController@index');
 

@@ -22,7 +22,6 @@ class TargetController extends BaseController
     ]);
   }
 
-
   public function index(Request $request){
     $Target = Target::all();
     return $Target;
@@ -31,6 +30,15 @@ class TargetController extends BaseController
   public function store(Request $request){
     $this->storeValidator($request->all())->validate();
 
+    $User = auth()->user()->load('permition');
+    $Permitions = $User->permition;
+    $isAdmin = false;
+    foreach ($Permitions as $permition) {
+      if ($permition->type == 0) $isAdmin = true;
+    }
+
+    if (!$isAdmin) return response()->json(['message' => 'Do not have permitions'], 403);
+    
     $CurrentTarget = Target::create([
       'name' 		        => $request['name'],
       'discription'			=> $request['discription'],

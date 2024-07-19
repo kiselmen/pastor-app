@@ -1,7 +1,8 @@
 <template>
   <div class="form" ref="formElem">
     <div class="form-header">Добавление семьи</div>
-    <form @submit.prevent="onCreateFamily" class="form-container section-container">
+    <div v-if="loader" class="form-text">Loading...</div>
+    <div v-if="!loader&&!confirmWindow" class="form-container section-container">
       <div class="table1x">
         <div class="form-group">
             <label class="input-label">Название</label>
@@ -71,10 +72,19 @@
         </div>
       </div>
       <div class="form-buttons">
-        <button type="submit" class="btn btn-blue" :disabled="familyStore.loader">{{ familyStore.loader ? 'Сохранение...' : 'Сохранить' }}</button>
+        <button @click.prevent="onCreateFamily" class="btn btn-blue" :disabled="familyStore.loader">{{ familyStore.loader ? 'Добавление...' : 'Добавить' }}</button>
         <button @click.prevent="emits('toggleModal')" class="btn btn-gray">Отмена</button>
       </div>
-    </form>
+    </div>
+    <div v-if="!loader&&confirmWindow" class="form-container section-container">
+      <div class = "table1x">
+        <div class="form-text">Создать семью?</div>
+        <div class="form-buttons">
+          <button @click.prevent="onConfirmAction" class="btn btn-blue" :disabled="loader">{{ loader ? 'Обработка...': 'Да'}}</button>
+          <button @click.prevent="onCancelAction" class="btn btn-gray">Отмена</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -93,6 +103,7 @@
   const peopleStore = usePeopleStore();
 
   const loader = ref(false);
+  const confirmWindow = ref(false);
   const form = reactive({
     name: '',
     discription: '',
@@ -147,19 +158,30 @@
     form.head_id = id;
   };
 
-  const onCreateFamily = async () => {
+  const onCreateFamily = () => {
+    confirmWindow.value = true;
+  };
+
+  const onCancelAction = () => {
+    confirmWindow.value = false;
+  };
+  
+  const onConfirmAction = async () => {
     loader.value = true;
     await familyStore.addNewFamily(form);
     console.log('errors', familyStore.totalCountErrors);
     if (!familyStore.totalCountErrors) {
       emits('toggleModal');
     }
+    confirmWindow.value = false;
     loader.value = false;
   };
 
   onBeforeMount(() => {
+    loader.value = true;
     familyStore.clearErrorsState();
     peopleStore.getAllPeople();
+    loader.value = false;
   })
 
 </script>

@@ -12,7 +12,7 @@
       </DateItem>
 
       <div>
-        <EditDuotoneIcon class="change_button" @click="emits('editServices')"/>
+        <EditDuotoneIcon v-if="isAvailableEdit" class="change_button" @click="emits('editServices')"/>
       </div>
     </div>
     <div class="service-items">
@@ -24,6 +24,8 @@
 </template>
 
 <script setup>
+  import { computed } from 'vue';
+  import { useUserStore } from '@/stores/userStore';
   import EditDuotoneIcon from '@/components/icons/IconEditDuotone.vue';
   import DateItem from '@/components/people/DateItem.vue';
   import ServiceIcon from '@/components/icons/IconService.vue';
@@ -33,6 +35,16 @@
   });
 
   const emits = defineEmits(['editServices']);
+
+  const userStore = useUserStore();
+
+  const isAvailableEdit = computed(() => {
+    let isAdmin = false;
+    userStore.user?.permition?.forEach(permition => {
+      if (permition.type == 0 || permition.type == 1) isAdmin = true;
+    });
+    return isAdmin;
+  })
 
 </script>
 

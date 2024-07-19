@@ -1,6 +1,6 @@
 <template>
   <div>
-    Карточка прихода {{ props.id }}
+    Карточка участка {{ props.id }}
   </div>
 </template>
 

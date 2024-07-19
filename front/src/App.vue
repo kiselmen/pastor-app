@@ -45,7 +45,7 @@
     if (localStorage.getItem('authToken')) {
       await userStore.signIn();
     }
-    localStoreWatcher = setInterval(() => checkLocalStorage(), 2000);
+    localStoreWatcher = setInterval(() => checkLocalStorage(), 500);
     loader.value = false;
     await nsiStore.getStatuses();
   });

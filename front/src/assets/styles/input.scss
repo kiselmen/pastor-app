@@ -41,13 +41,18 @@
   }
   &-error {
     position: absolute;
-    font-size: 14px;
+    font-size: 10px;
     bottom: -7px;
     left: 10px;
     padding:0 8px;
     background: var(--bs-white);
     color:  var(--bs-danger);
   }
+}
+
+input[type="color"]{
+  padding: 0;
+  height: 40px;
 }
 
 .form {
@@ -120,6 +125,11 @@
     justify-content: flex-start;
     margin: 0 auto;
     margin-top: 30px;
+  }
+
+  &-line {
+    border-top: 0.25px solid var(--bs-gray-600);
+    margin: 0 20px;
   }
 }
 

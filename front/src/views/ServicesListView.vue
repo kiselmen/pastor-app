@@ -120,7 +120,7 @@
     if (isPermition.length) {
       return   [
         {id: 0, name: "Изменить", type: 0},
-        {id: 1, name: "Удалить", type: 1},
+        // {id: 1, name: "Удалить", type: 1},
       ];
     } else {
       return [];

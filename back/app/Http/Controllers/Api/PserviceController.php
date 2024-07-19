@@ -8,6 +8,7 @@ use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Validator;
 
 use App\Models\Pservice;
+use App\Models\People;
 
 class PserviceController extends BaseController
 {
@@ -23,13 +24,26 @@ class PserviceController extends BaseController
   }
 
 
-  public function index(Request $request) {
-    $Pservice = Pservice::all();
-    return $Pservice;
-  }
+  // public function index(Request $request) {
+  //   $Pservice = Pservice::all();
+  //   return $Pservice;
+  // }
 
   public function store(Request $request) {
     $this->storeValidator($request->all())->validate();
+
+    $User = auth()->user()->load('permition');
+    $Permitions = $User->permition;
+    $isAdmin = false;
+    $Persone = People::find($request['people_id']);
+    foreach ($Permitions as $permition) {
+      if ($permition->type == 0) $isAdmin = true;
+      if ($permition->type == 1) {
+        if ($permition->source_id == $Persone->prihod_id) $isAdmin = true;
+      }
+    }
+
+    if (!$isAdmin) return response()->json(['message' => 'Do not have permitions'], 403);
 
     $CurrentPservice = Pservice::create([
       'people_id' 		  => $request['people_id'],
@@ -39,16 +53,28 @@ class PserviceController extends BaseController
   }
 
   public function delete(Request $request) {
+    $User = auth()->user()->load('permition');
+    $Permitions = $User->permition;
+
     $IDs = $request['ids'];
     foreach ($IDs as $id) {
       $CurrentPservice = Pservice::Find($id);
-      // $stack = array();
+
       if ($CurrentPservice) {
-        // array_push($stack, $CurrentPservice);
+        $isAdmin = false;
+        $Persone = People::find($CurrentPservice->people_id);
+        foreach ($Permitions as $permition) {
+          if ($permition->type == 0) $isAdmin = true;
+          if ($permition->type == 1) {
+            if ($permition->source_id == $Persone->prihod_id) $isAdmin = true;
+          }
+        }
+    
+        if (!$isAdmin) return response()->json(['message' => 'Do not have permitions'], 403);
+
         $CurrentPservice->delete();
       }  
     };
-    // $Service = Service::all();
     return response()->json('done');
   }
 }

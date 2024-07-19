@@ -109,7 +109,7 @@
 
   onBeforeMount(async () => {
     loader.value = true;
-    console.log(familyStore);
+    // console.log(familyStore);
     await familyStore.getAllFamilies();
     await router.isReady();
     search.value = route.query.search;

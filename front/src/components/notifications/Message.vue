@@ -75,7 +75,7 @@
     top: 80px;
     right: 16px;
     width: 30%;
-    z-index: 99;
+    z-index: 100;
     @media (max-width: 768px) {
       max-width: 60%;
       width: 100%;

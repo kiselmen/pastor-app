@@ -1,8 +1,8 @@
 <template>
   <div class="form">
     <div class="form-header">Служения</div>
-    <div class="form-text" v-if="nsiStore.loader">Loading...</div>
-    <div class="form-container section-container" ref="formElem" v-if="!nsiStore.loader">
+    <div v-if="loader" class="form-text">Loading...</div>
+    <div v-if="!loader&&!confirmWindow" class="form-container section-container" ref="formElem">
       <div class="table2x">
         <div class="form-group">
           <label class="input-label">Список служений</label>
@@ -33,6 +33,15 @@
         <button @click.prevent="emits('toggleModal')" class="btn btn-gray">Отмена</button>
       </div>
     </div>
+    <div v-if="!loader&&confirmWindow" class="form-container section-container">
+      <div class = "table1x">
+        <div class="form-text">Сохранить изменения?</div>
+        <div class="form-buttons">
+          <button @click.prevent="onConfirmAction" class="btn btn-blue" :disabled="loader">{{ loader ? 'Обработка...': 'Да'}}</button>
+          <button @click.prevent="onCancelAction" class="btn btn-gray">Отмена</button>
+        </div>
+      </div>
+    </div>
   </div>  
 </template>
 
@@ -53,6 +62,7 @@
   const peopleStore = usePeopleStore();
 
   const loader = ref(false);
+  const confirmWindow = ref(false);
   const formElem = ref(null);
   const persone = ref({});
   const pservices = ref([]); 
@@ -71,17 +81,25 @@
   };
 
   const onDeleteService = (id) => {
-    // console.log('Delete id', id);
     const isNotPresent = pservices.value.filter(item => item.service_id !== id);
     pservices.value = [...isNotPresent];
   };
 
-  const onSaveServices = async () => {
+  const onSaveServices = () => {
+    confirmWindow.value = true;
+  };
+
+  const onCancelAction = () => {
+    confirmWindow.value = false;
+  };
+  
+  const onConfirmAction = async () => {
     loader.value = true;
-    await peopleStore.updateServices(props.id, pservices.value);
+    await peopleStore.updatePersoneServices(props.id, pservices.value);
     loader.value = false;
+    confirmWindow.value = false;
     emits('toggleModal');
-  }
+  };
 
   onBeforeMount( async () => {
     loader.value = true;

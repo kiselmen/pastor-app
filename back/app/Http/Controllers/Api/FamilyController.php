@@ -25,12 +25,52 @@ class FamilyController extends BaseController
 
 
   public function index(Request $request){
-    $Family = Family::all();
-    return $Family;
+    $User = auth()->user()->load('permition');
+    $Permitions = $User->permition;
+    $isAdmin = false;
+    $prihodIDs = [];
+    foreach ($Permitions as $permition) {
+      if ($permition->type == 0) $isAdmin = true;
+      if ($permition->type == 1) {
+        array_push($prihodIDs, $permition->source_id);
+      }
+    }
+
+    if ($isAdmin) {
+      $Family = Family::all();
+      return $Family;
+    } else {
+      $Family = Family::
+        whereHas('head', function ($query) use ($prihodIDs) {
+          return $query->whereIn('prihod_id', $prihodIDs);
+        })
+        ->get();
+      return $Family;
+    }
+
   }
 
   public function store(Request $request){
     $this->storeValidator($request->all())->validate();
+
+    $User = auth()->user()->load('permition');
+    $Permitions = $User->permition;
+    $isAdmin = false;
+    $prihodIDs = [];
+    
+    $RequestMainPersone = $request['head_id'];
+    $FamilyHead = People::find($RequestMainPersone);
+
+    foreach ($Permitions as $permition) {
+      if ($permition->type == 0) $isAdmin = true;
+      if ($permition->type == 1) {
+        if ($FamilyHead) {
+          if ($permition->source_id == $FamilyHead->prihod_id) $isAdmin = true;
+        }
+      }
+    }
+
+    if (!$isAdmin) return response()->json(['message' => 'Do not have permitions'], 403);
 
     $CurrentFamily = Family::create([
       'name' 		        => $request['name'],
@@ -38,7 +78,6 @@ class FamilyController extends BaseController
       'head_id'       => $request['head_id'],
     ]);
 
-    $RequestMainPersone = $request['head_id'];
     if (!is_null($RequestMainPersone)) {
       $MainPersone = People::find($RequestMainPersone);
       if ($MainPersone) {
@@ -62,6 +101,25 @@ class FamilyController extends BaseController
   public function update(Request $request, $id){
     $this->storeValidator($request->all())->validate();
 
+    $User = auth()->user()->load('permition');
+    $Permitions = $User->permition;
+    $isAdmin = false;
+    $prihodIDs = [];
+    
+    $RequestMainPersone = $request['head_id'];
+    $FamilyHead = People::find($RequestMainPersone);
+
+    foreach ($Permitions as $permition) {
+      if ($permition->type == 0) $isAdmin = true;
+      if ($permition->type == 1) {
+        if ($FamilyHead) {
+          if ($permition->source_id == $FamilyHead->prihod_id) $isAdmin = true;
+        }
+      }
+    }
+
+    if (!$isAdmin) return response()->json(['message' => 'Do not have permitions'], 403);
+
     $CurrentFamily = Family::find($id);
 
     if (!is_null($CurrentFamily->head_id)) {
@@ -78,7 +136,7 @@ class FamilyController extends BaseController
 
     $CurrentFamily->save();
 
-    $RequestMainPersone = $request['head_id'];
+    // $RequestMainPersone = $request['head_id'];
     if (!is_null($RequestMainPersone)) {
       $MainPersone = People::find($RequestMainPersone);
       if ($MainPersone) {
