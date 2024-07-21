@@ -41,8 +41,8 @@
 
 <script setup>
   import { ref, computed, watch, onBeforeMount } from 'vue';
-  import { useUserStore } from "@/stores/userStore";
-  import { usePrihodStore } from "@/stores/prihodStore";
+  import { useUserStore } from '@/stores/userStore';
+  import { usePrihodStore } from '@/stores/prihodStore';
   import ModalWrapper from '@/components/ui/ModalWrapper.vue';
   import PrihodItem from '@/components/prihod/PrihodItem.vue';
   import AddPrihod from '@/components/prihod/AddPrihod.vue';

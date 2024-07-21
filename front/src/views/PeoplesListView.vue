@@ -16,6 +16,12 @@
       <PrihodFilter 
         @changeFilter="onChangePrihodFilterMask"
       />
+      <TargetFilter 
+        @changeFilter="onChangeTargetFilterMask"
+      />
+      <ServiceFilter 
+        @changeFilter="onChangeServiceFilterMask"
+      />
       <div class="form-search">
         <input 
           type="text"
@@ -24,21 +30,26 @@
         />
         <div class="form-icons">
           <div class="form-icon-delete">
-            <RouterLink :to="'/peoples'">
-              <DismissIcon v-if = "search" @click="search=''"/>
-            </RouterLink>  
+            <!-- <RouterLink :to="'/peoples'"> -->
+              <DismissIcon 
+                  v-if = "search"
+                  @click="onClearSearchFilterMask"
+              />
+            <!-- </RouterLink>   -->
           </div>  
           <div class="form-icon-search">
-            <RouterLink :to="'/peoples?search=' + search">
-              <SearchLupaIcon />
-            </RouterLink>  
+            <!-- <RouterLink :to="'/peoples?search=' + search"> -->
+              <SearchLupaIcon 
+                  @click="onChangeSearchFilterMask"
+              />
+            <!-- </RouterLink>   -->
           </div>  
         </div>
       </div>
     </div>  
     <div class="card-items">
       <PersoneItem 
-        v-for="persone in filteredPeoples"
+        v-for="persone in peopleStore.peoples"
         class="card-item"
         @editPersone = "onEditPersone"
         @editPersoneServices = "onEditPersonServices"
@@ -87,10 +98,13 @@
 
 <script setup>
   import { ref, watch, onBeforeMount, computed, onUpdated } from 'vue';
-  import { useRoute, useRouter } from 'vue-router'
-  import { usePeopleStore } from "@/stores/peopleStore";
-  import { useUserStore } from "@/stores/userStore";
-  import { useViewStore } from "@/stores/viewStore";  
+  import { useRoute, useRouter } from 'vue-router';
+  import { usePeopleStore } from '@/stores/peopleStore';
+  import { useUserStore } from '@/stores/userStore';
+  import { useViewStore } from '@/stores/viewStore';  
+  import { usePrihodStore } from '@/stores/prihodStore';
+  import { useNsiStore } from '@/stores/nsiStore';
+
   import ModalWrapper from '@/components/ui/ModalWrapper.vue';
   import AddPersone  from '@/components/people/AddPersone.vue';
   import EditPersone  from '@/components/people/EditPersone.vue';
@@ -103,19 +117,22 @@
   import DismissIcon from '@/components/icons/IconDismiss.vue';
   import SearchLupaIcon from '@/components/icons/IconSearchLupa.vue';
   import PrihodFilter from '@/components/prihod/PrihodFilter.vue';
+  import TargetFilter from '@/components/nsi/TargetFilter.vue';
+  import ServiceFilter from '@/components/nsi/ServiceFilter.vue';
 
   const route = useRoute();
   const router = useRouter();
   const peopleStore = usePeopleStore();
   const userStore = useUserStore();
   const viewStore = useViewStore();
+  const prihodStore = usePrihodStore();
+  const nsiStore = useNsiStore();
 
   const loader = ref(false);
   const isModalAction = ref(false);
   const action = ref('');
   const activePersone = ref(null);
   const search = ref('');
-  const filteredPeoples = ref([]);
 
   const isAvailableAdd = computed(()=> {
     let isAdmin = false;
@@ -126,13 +143,9 @@
   });
 
   watch( () => route.query, () => {
-    search.value = route.query.search;
-    console.log('watch query');
-    onFilterPeoples();
-  }, { deep: true });
-
-  watch(() => peopleStore.peoples, () => {
-    onFilterPeoples();
+    // console.log('watch query');
+    setQueryParameters();
+    getPeoplesFromAPI();
   }, { deep: true });
 
   const activeUser = computed(() => {
@@ -143,17 +156,90 @@
     }
   });
 
-  const onChangePrihodFilterMask = (mask) => {
-    console.log('onChangePrihodFilterMask ', mask);
-    router.push('peoples?_prihod=' + mask);
+  const createURL = (key, value) => {
+    let url = '';
+    viewStore.allowFilterData.forEach(item => {
+      if (item.name === key) {
+        if (value) url = url + '&_' + key + '=' + value;
+      } else {
+        const storeKey = item.name + 'FilterMask';
+        console.log('storeKey ', viewStore[storeKey]);
+        const storeValue = viewStore[storeKey];
+        if (storeValue) url = url + '&_' + item.name + '=' + storeValue;
+      }
+    });
+    if (url) url = '?' + url.substring(1);
+    console.log('url ', url);
+    return url;
   };
 
-  const onFilterPeoples = () => {
-    if (search.value) {
-      filteredPeoples.value =  peopleStore.peoples.filter(item => item.name.toLowerCase().indexOf(search.value.toLowerCase()) >= 0 ? true: false)
+  const onChangePrihodFilterMask = (mask) => {
+    const URL = createURL('prihod', mask);
+    router.push(URL);
+  };
+
+  const onChangeTargetFilterMask = (mask) => {
+    const URL = createURL('target', mask);
+    router.push(URL);
+  };
+
+  const onChangeServiceFilterMask = (mask) => {
+    const URL = createURL('service', mask);
+    router.push(URL);
+  }
+
+  const onChangeSearchFilterMask = () => {
+    const URL = createURL('search', search.value);
+    router.push(URL);
+  };
+
+  const onClearSearchFilterMask = () => {
+    search.value = ''
+    const URL = createURL('search', search.value);
+    router.push(URL);
+  };
+
+  const setQueryParameters = () => {
+    const query = route.query;
+
+    const prihodID = query._prihod;
+    const isPrihodFilterPresent = prihodStore.prihods.filter(item => item.id == prihodID).length;
+    if (isPrihodFilterPresent) {
+      viewStore.setPrihodFilterMask(prihodID);
     } else {
-      filteredPeoples.value = [...peopleStore.peoples];
+      viewStore.setPrihodFilterMask(null);
     }
+
+    const targetID = query._target;
+    const isTargetFilterPresent = nsiStore.targets.filter(item => item.id == targetID).length;
+    if (isTargetFilterPresent) {
+      viewStore.setTargetFilterMask(targetID);
+    } else {
+      viewStore.setTargetFilterMask(null);
+    }
+
+    const serviceID = query._service;
+    const isServiceFilterPresent = nsiStore.services.filter(item => item.id == serviceID).length;
+    if (isServiceFilterPresent) {
+      viewStore.setServiceFilterMask(serviceID);
+    } else {
+      viewStore.setServiceFilterMask(null);
+    }
+    const searchStr = query._search;
+    if (searchStr) {
+      search.value = searchStr;
+      viewStore.setSearchFilterMask(searchStr);
+    } else {
+      search.value = '';
+      viewStore.setSearchFilterMask(null);
+    }
+  };
+
+  const getPeoplesFromAPI = async () => {
+    loader.value = true;
+    // console.log('getPeoplesFromAPI');
+    await peopleStore.getAllPeople();
+    loader.value = false;
   };
 
   const openActionModal = (actionValue) => {
@@ -197,21 +283,15 @@
     isModalAction.value = true;
   };
 
-  // onUpdated(() => {
-  //   console.log('on change', route.query);
-  //   const query = route.query;
-  //   if (query._prihod) viewStore.setPrihodFilerMask(query._prihod);
-  // });
-
   onBeforeMount(async () => {
+    // console.log('PeopleListView mount');
     loader.value = true;
     await router.isReady();
-    const query = route.query;
-    search.value = query.search;
-    console.log('onBeforeMount ', query._prihod);
-    if (query._prihod) viewStore.setPrihodFilerMask(query._prihod);
-    await peopleStore.getAllPeople();
-    onFilterPeoples();
+    await prihodStore.getPrihods();
+    await nsiStore.getTargets();
+    await nsiStore.getServices();
+    setQueryParameters();
+    await getPeoplesFromAPI();
     loader.value = false;
   });
 
@@ -227,5 +307,9 @@
     width: 100%;
     height: 100%;
     padding: 5px 5px 0 5px;
+    cursor: pointer;
+  }
+  .form-icon-delete {
+    cursor: pointer;
   }
 </style>

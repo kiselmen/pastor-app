@@ -46,7 +46,7 @@
 
 <script setup>
   import { reactive, ref } from 'vue';
-  import { useUserStore } from "@/stores/userStore";
+  import { useUserStore } from '@/stores/userStore';
   import IconClosedEye from '@/components/icons/IconClosedEye.vue';
   import IconEye from '@/components/icons/IconEye.vue';
 

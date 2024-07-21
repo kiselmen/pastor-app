@@ -25,12 +25,17 @@
       >
         <ChrvronDownIcon/>
       </div>
+      <div v-if="activeItem||selectedItem"
+        @click="onClearChoise"
+      >
+        <TrashIcon/>
+      </div>
     </div>
     <ul v-if="props.data&&selectorOpen" :class="{ 'dropdown-menu' : selectorOpen&&checkDirection, 'dropup-menu' : selectorOpen&&!checkDirection }">
       <li class="dropdown-item"
         v-if="selectorOpen"
         v-for="item in filteredItems"
-        @click="onSeectItem(item)"
+        @click="onSelectItem(item)"
         :id = "item.id"
       >
           <div v-if="isImgPresent" 
@@ -46,16 +51,17 @@
 <script setup>
 
   import getImgPath from '@/utils/imagePlugin.js';
-  import ChrvronDownIcon from '@/components/icons/IconChevronDown.vue'
-  import { ref, computed, onBeforeMount } from 'vue';
+  import ChrvronDownIcon from '@/components/icons/IconChevronDown.vue';
+  import TrashIcon from '@/components/icons/IconTrash.vue';
+  import { ref, computed, onBeforeMount, watch } from 'vue';
 
   const props = defineProps({
     text        : "",
     id          : "",
     data        : "",
     limit       : {type: Number, default : 10},
-    // init        : {type: Number, default: 0},
     parentElem  : null,
+    message     : {type: String, default : ''},
   });
 
   const emits = defineEmits(['selectItem']);
@@ -129,13 +135,21 @@
     }
   });
 
-  const onSeectItem = (elem) => {
+  const onSelectItem = (elem) => {
     selectedItem.value = elem.id;
     selectorInput.value = elem.name;
     selectorOpen.value = false;
     selectorActive.value = false;
     emits('selectItem', selectedItem.value);
   };
+
+  const onClearChoise = () => {
+    selectedItem.value = null;
+    selectorInput.value = props.message;
+    selectorOpen.value = false;
+    selectorActive.value = false;
+    emits('selectItem', null);
+  }
 
   const onStartInput = () => {
     selectorOpen.value = true;
@@ -175,7 +189,11 @@
 
   onBeforeMount (() => {
     limit.value = props.limit;
-    selectorInput.value = props.text;
+    if (props.id) {
+      selectorInput.value = props.text;
+    } else {
+      selectorInput.value = props.message;
+    }
     const dataObj = props.data[0];
     if (dataObj) {
       if (Object.keys(dataObj).includes('image_url')) isImgPresent.value = true;

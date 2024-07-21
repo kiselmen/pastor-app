@@ -17,9 +17,20 @@ export const usePeopleStore = defineStore('peopleStore', () => {
 
   const getAllPeople = async () => {
     loader.value = true;
-    console.log('store prihodFilerMask ', viewStore.prihodFilerMask);
+    // console.log('viewStore.searchFilterMask ', viewStore.searchFilterMask);
     try {
-      const response = await axios.get('api/peoples?_prihod=' + viewStore.prihodFilerMask);
+      let mask = '';
+      viewStore.allowFilterData.forEach(item => {
+          const storeKey = item.name + 'FilterMask';
+          const storeValue = viewStore[storeKey];
+          // console.log('storeKey ', storeKey, ' storeValue ', storeValue);
+          if (storeValue) mask = mask + '&_' + item.name + '=' + storeValue;
+      });
+      if (mask) mask = '?' + mask.substring(1);
+
+      // console.log('mask ', mask);
+
+      const response = await axios.get('api/peoples' + mask);
       peoples.value = response.data.sort((a ,b) => a.id - b.id).map(item => {
         item.plevel.sort((a, b) => new Date(a.date) - new Date(b.date));
         return item;

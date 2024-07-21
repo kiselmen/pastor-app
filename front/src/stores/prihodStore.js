@@ -69,6 +69,11 @@ export const usePrihodStore = defineStore('prihodStore', () => {
     errors.value = {}
   };
 
+  // const checkIsPresentPrihod = (prihodID) => {
+  //   console.log('prihods.value ', prihods.value);
+  //   return prihods.value.filter(item => item.id == prihodID).length;
+  // }
+
   return { 
     prihods,
     errors,
@@ -77,5 +82,6 @@ export const usePrihodStore = defineStore('prihodStore', () => {
     addNewPrihod,
     editPrihod,
     clearErrorsState,
+    // checkIsPresentPrihod,
   };
 })

@@ -24,7 +24,8 @@
           <div class="form-group" >
             <label class="input-label">Участок</label>
             <InputSelector
-                :text ="form.prihod"
+                :text = "form.prihod"
+                message = "Участок"
                 :id   = form.prihod_id
                 :data ="avalablePrihods"
                 :parentElem = "formElem"
@@ -37,8 +38,9 @@
           <div class="form-group">
             <label class="input-label">Целевая группа</label>
             <InputSelector
-                :text ="form.target"
-                :id   = null
+                :text = "form.target"
+                message = "Целевая группа"
+                :id   = form.target_id
                 :data ="nsiStore.targets"
                 :parentElem = "formElem"
                 @selectItem="onTargetSelect"
@@ -211,7 +213,7 @@
                 :parentElem = "formElem"
                 @selectItem="onFamilySelect"
               />
-            <div class="input-error" v-if="familyStore.errors?.family_id">
+            <div class="input-error" v-if="peopleStore.errors?.family_id">
               {{ peopleStore.errors?.family_id[0] }}
             </div>
           </div>
@@ -269,7 +271,7 @@
     </div>
     <div v-if="!loader&&confirmWindow" class="form-container section-container">
       <div class = "table1x">
-        <div class="form-text">Создать прихожанина?</div>
+        <div class="form-text">Сохранить изменения?</div>
         <div class="form-buttons">
           <button @click.prevent="onConfirmAction" class="btn btn-blue" :disabled="loader">{{ loader ? 'Обработка...': 'Да'}}</button>
           <button @click.prevent="onCancelAction" class="btn btn-gray">Отмена</button>
@@ -354,10 +356,16 @@
 
   const onPrihodSelect = (id) => {
     form.prihod_id = id;
+    if (!id) {
+      form.PrihodName = '';
+    }
   };
 
   const onTargetSelect = (id) => {
     form.target_id = id;
+    if (!id) {
+      form.TargetName = '';
+    }
   };
 
   const onMoveToStep = (type) => {
@@ -408,6 +416,7 @@
     if (!peopleStore.totalCountErrors) {
       emits('toggleModal');
     }
+    confirmWindow.value = false;
     loader.value = false;
   };
 

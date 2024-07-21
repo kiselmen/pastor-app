@@ -1,28 +1,29 @@
 <template>
   <div class = "card">
     <div class="card-title">
-      <div :class="personeStatusStyle" :style = "{background: personeStatusColor }">
-        {{ personeStatusLength ? personeStatusLength: ''}}
-      </div> 
-      <div :class = "personeTitleStyle">
-        {{ props.persone.name }} {{ props.persone.first_name }} {{ props.persone.patronymic }}
-      </div>
-      <div class="change_button">
-        <!-- <EditDuotoneIcon  @click="onEditClick"/> -->
-        <ActionMenu 
-          :actions = "actions"
-          @startAction="onStartAction"
-        >
-          <template #icon >
-            <EditDuotoneIcon v-if="isAvailableActions"/>
-          </template>
-        </ActionMenu>
-      </div>
-
+        <div :class="personeStatusStyle" :style = "{background: personeStatusColor }">
+          {{ personeStatusLength ? personeStatusLength: ''}}
+        </div> 
+        <div :class = "personeTitleStyle">
+          <RouterLink :to="'/people/' + props.persone?.id">
+            {{ props.persone.name }} {{ props.persone.first_name }} {{ props.persone.patronymic }}
+          </RouterLink>  
+        </div>
+        <div class="change_button">
+          <!-- <EditDuotoneIcon  @click="onEditClick"/> -->
+          <ActionMenu 
+            :actions = "actions"
+            @startAction="onStartAction"
+          >
+            <template #icon >
+              <EditDuotoneIcon v-if="isAvailableActions"/>
+            </template>
+          </ActionMenu>
+        </div>
     </div>
     <div class="card-box">
       <div class="card-row">
-        <div class="card-img" :style = "{ backgroundImage : 'url(' + getImgPath(props.persone.image_url) +')' }"></div>
+          <div class="card-img" :style = "{ backgroundImage : 'url(' + getImgPath(props.persone.image_url) +')' }"></div>
         <div class="card-column">
           <PrihodMiniItem
             :prihod = "props.persone.prihod"
@@ -84,8 +85,6 @@
             {{ props.persone.mobile_phone }}
           </template>
         </DateItem>
-      <!-- </div>
-      <div class="card-row"> -->
         <DateItem>
           <template #icon>
             <PhoneIcon />
@@ -166,7 +165,7 @@
     const isAction = actions.value.filter(item => item.id === action);
     if (isAction.length) {
       const actionEmit = isAction[0].emit;
-      console.log('actionEmit ', actionEmit);
+      // console.log('actionEmit ', actionEmit);
       emits(actionEmit, props.persone.id);
     } else {
       console.log('Нет такой операции');
@@ -241,5 +240,9 @@
   }
   .space {
     margin-left: 40px;
+  }
+  a {
+    text-decoration: none;
+    color: var(--bs-white);
   }
 </style>

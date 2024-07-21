@@ -43,6 +43,23 @@ class PeopleController extends BaseController
     ]);
   }
 
+  protected function updateValidator(array $data){
+    return Validator::make($data, [
+      'first_name' => ['required'],
+      'name' => ['required'], 
+      'patronymic' => ['required'], 
+      'birthday_date' => ['required'], 
+      'baptism_date' => ['required'],
+      'live_addres' => ['required'], 
+      'home_phone' => ['required'], 
+      'mobile_phone' => ['required'], 
+      'email' => ['required'],
+      'prihod_id' => ['required', 'numeric'],
+      'target_id' => ['required', 'numeric'],
+      'family_id' => ['required', 'numeric'],
+    ]);
+  }
+
   public function index(Request $request){
     $User = auth()->user()->load('permition');
     $Permitions = $User->permition;
@@ -58,20 +75,49 @@ class PeopleController extends BaseController
         array_push($serviceIDs, $permition->source_id);
       }
     }
+    $serviceFilter = $request->query('_service');
+
     if ($isAdmin) {
-      $People = People::all()->load('pservice', 'plevel', 'family');
-      return $People;
+      if ($serviceFilter) {
+        $collection = People::whereHas('pservice', function ($query) use ($serviceFilter) {
+            return $query->whereIn('service_id', [intval($serviceFilter)]);
+          });
+      } else {
+        $collection = People::query();
+      }
     } else {
-      $People = People::
-        whereIn('prihod_id', $prihodIDs)
-        ->orWhereHas('pservice', function ($query) use ($serviceIDs) {
-          return $query->whereIn('service_id', $serviceIDs);
-        })
-        ->get()
-        ->load('pservice', 'plevel', 'family');
-      return $People;
+      if ($serviceFilter) {
+        $serviceIDs = [intval($serviceFilter)];
+        $collection = People::
+          whereHas('pservice', function ($query) use ($serviceIDs) {
+            return $query->whereIn('service_id', $serviceIDs);
+          });
+      } else {
+        $collection = People::
+          whereIn('prihod_id', $prihodIDs)
+          ->orWhereHas('pservice', function ($query) use ($serviceIDs) {
+            return $query->whereIn('service_id', $serviceIDs);
+          });
+      }
     }
-    // return $People;
+    $prihodFilter = $request->query('_prihod');
+    if ($prihodFilter) {
+      $collection->where('prihod_id', $prihodFilter);
+    }
+
+    $targetFilter = $request->query('_target');
+    if ($targetFilter) {
+      $collection->where('target_id', $targetFilter);
+    }
+
+    $searchFilter = $request->query('_search');
+    if ($searchFilter) {
+      $searchFilter = strtolower($searchFilter);
+      $searchFilter = preg_replace("#([%_?+])#", "\\$1", $searchFilter);
+      $collection->where('name', 'LIKE', '%'.$searchFilter.'%');
+    }
+
+    return $collection->get()->load('pservice', 'plevel', 'family');
   }
 
   public function store(Request $request){
@@ -149,7 +195,7 @@ class PeopleController extends BaseController
   }
 
   public function update(Request $request, $id){
-    $this->storeValidator($request->all())->validate();
+    $this->updateValidator($request->all())->validate();
 
     $User = auth()->user()->load('permition');
     $Permitions = $User->permition;

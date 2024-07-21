@@ -7,7 +7,7 @@
 </template>
 
 <script setup>
-  import { useMenuStore } from "@/stores/menuStore";
+  import { useMenuStore } from '@/stores/menuStore';
 
   const menuStore = useMenuStore();
 

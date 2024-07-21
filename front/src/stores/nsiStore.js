@@ -1,11 +1,13 @@
 import { ref, computed } from 'vue';
 import { defineStore } from 'pinia';
 import { useMsgStore } from '@/stores/msgStore';
+import { useUserStore } from '@/stores/userStore';
 import axios from 'axios';
 
 export const useNsiStore = defineStore('nsiStore', () => {
 
   const msgStore = useMsgStore();
+  const userStore = useUserStore();
   const statuses = ref([]);
   const targets = ref([]);
   const services = ref([]);
@@ -14,6 +16,21 @@ export const useNsiStore = defineStore('nsiStore', () => {
   const errors = ref({});
 
   const totalCountErrors = computed(() => Object.keys(errors.value).length);
+
+  const availableServices = computed(() => {
+    const isSuperAdmin = userStore.user.permition.filter(item => item.type === 0).length;
+    if (isSuperAdmin) return services.value;
+    const adminServices = services.value.filter(service => {
+      let isPresentInPermitions = false;
+      userStore.user.permition.forEach(item => {
+        if (item.type === 2) {
+          if (item.source_id == service.id) isPresentInPermitions = true
+        }
+      });
+      return isPresentInPermitions;
+    });
+    return adminServices;
+  });
 
   const getStatuses = async () => {
     loader.value = true;
@@ -190,6 +207,7 @@ export const useNsiStore = defineStore('nsiStore', () => {
 
   return {
     totalCountErrors,
+    availableServices,
     errors,
     statuses,
     targets,

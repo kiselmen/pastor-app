@@ -3,15 +3,41 @@ import { defineStore } from 'pinia';
 
 export const useViewStore = defineStore('viewStore', () => {
 
-  const prihodFilerMask = ref(null);
+  const prihodFilterMask = ref(null);
+  const targetFilterMask = ref(null);
+  const searchFilterMask = ref(null);
+  const serviceFilterMask = ref(null);
 
-  const setPrihodFilerMask = (mask) => {
-    prihodFilerMask.value = mask;
+  const allowFilterData = [
+    {name: 'prihod'}, {name: 'target'}, {name: 'service'}, {name: 'search'},
+  ];
+
+  const setPrihodFilterMask = (mask) => {
+    prihodFilterMask.value = mask;
+  };
+
+  const setTargetFilterMask = (mask) => {
+    targetFilterMask.value = mask;
+  };
+
+  const setSearchFilterMask = (mask) => {
+    searchFilterMask.value = mask;
+  };
+
+  const setServiceFilterMask = (mask) => {
+    serviceFilterMask.value = mask;
   };
 
   return {
-    prihodFilerMask,
-    setPrihodFilerMask,
+    prihodFilterMask,
+    targetFilterMask,
+    searchFilterMask,
+    serviceFilterMask,
+    allowFilterData,
+    setPrihodFilterMask,
+    setTargetFilterMask,
+    setSearchFilterMask,
+    setServiceFilterMask,
   };
 
 });

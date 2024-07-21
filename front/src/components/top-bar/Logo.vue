@@ -10,7 +10,7 @@
 <script setup>
   import Burger from '@/components/top-bar/Burger.vue'
   import { useMenuStore } from '@/stores/menuStore';
-  // import { useUserStore } from "@/stores/userStore";
+  // import { useUserStore } from '@/stores/userStore';
 
   const isLogin = localStorage.getItem('authToken');
   const menuStore = useMenuStore();

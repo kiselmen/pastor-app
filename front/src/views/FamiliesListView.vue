@@ -60,7 +60,7 @@
 <script setup>
   import { ref, watch, onBeforeMount } from 'vue';
   import { useRoute, useRouter } from 'vue-router'
-  import { useFamilyStore } from "@/stores/familyStore.js";
+  import { useFamilyStore } from '@/stores/familyStore.js';
   import ModalWrapper from '@/components/ui/ModalWrapper.vue';
   import AddFamily  from '@/components/family/AddFamily.vue';
   import EditFamily  from '@/components/family/EditFamily.vue';

@@ -56,7 +56,7 @@ const router = createRouter({
       path: "/register",
       name: "Register",
       beforeEnter: guest,
-      component: () => import("@/views/RegisterView.vue")
+      component: () => import('@/views/RegisterView.vue')
     },
     {
       path: '/home',

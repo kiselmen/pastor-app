@@ -9,7 +9,7 @@
 
 <script setup>
   import TheWelcome from '@/components/TheWelcome.vue'
-  import { useUserStore } from "@/stores/userStore";
+  import { useUserStore } from '@/stores/userStore';
 
   const userStore = useUserStore();
   
