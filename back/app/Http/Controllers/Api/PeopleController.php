@@ -75,49 +75,95 @@ class PeopleController extends BaseController
         array_push($serviceIDs, $permition->source_id);
       }
     }
-    $serviceFilter = $request->query('_service');
 
     if ($isAdmin) {
-      if ($serviceFilter) {
-        $collection = People::whereHas('pservice', function ($query) use ($serviceFilter) {
-            return $query->whereIn('service_id', [intval($serviceFilter)]);
-          });
-      } else {
         $collection = People::query();
-      }
+        $collectionService = null;
     } else {
-      if ($serviceFilter) {
-        $serviceIDs = [intval($serviceFilter)];
-        $collection = People::
-          whereHas('pservice', function ($query) use ($serviceIDs) {
+        $collection = People::whereIn('prihod_id', $prihodIDs);
+        $collectionService = People::WhereHas('pservice', function ($query) use ($serviceIDs) {
             return $query->whereIn('service_id', $serviceIDs);
           });
-      } else {
-        $collection = People::
-          whereIn('prihod_id', $prihodIDs)
-          ->orWhereHas('pservice', function ($query) use ($serviceIDs) {
-            return $query->whereIn('service_id', $serviceIDs);
-          });
-      }
-    }
-    $prihodFilter = $request->query('_prihod');
-    if ($prihodFilter) {
-      $collection->where('prihod_id', $prihodFilter);
     }
 
     $targetFilter = $request->query('_target');
     if ($targetFilter) {
-      $collection->where('target_id', $targetFilter);
+      $collection = $collection->where('target_id', '=', $targetFilter);
+      if ($collectionService) $collectionService = $collectionService->where('target_id', '=', $targetFilter);
+    }
+
+    $prihodFilter = $request->query('_prihod');
+    if ($prihodFilter) {
+      $collection = $collection->where('prihod_id', $prihodFilter);
+      if ($collectionService) $collectionService = $collectionService->where('prihod_id', $prihodFilter);
+    }
+
+    $serviceFilter = $request->query('_service');
+    if ($serviceFilter) {
+      $collection = $collection->   
+        whereHas('pservice', function ($query) use ($serviceFilter) {
+          return $query->whereIn('service_id', [intval($serviceFilter)]);
+        });
+  
+      if ($collectionService) {
+        $collectionService = $collectionService->   
+          whereHas('pservice', function ($query) use ($serviceFilter) {
+            return $query->whereIn('service_id', [intval($serviceFilter)]);
+          });
+      } 
     }
 
     $searchFilter = $request->query('_search');
     if ($searchFilter) {
       $searchFilter = strtolower($searchFilter);
       $searchFilter = preg_replace("#([%_?+])#", "\\$1", $searchFilter);
-      $collection->where('name', 'LIKE', '%'.$searchFilter.'%');
+      $collection = $collection->where('name', 'LIKE', '%'.$searchFilter.'%');
+      if ($collectionService) {
+        $collectionService = $collectionService->where('name', 'LIKE', '%'.$searchFilter.'%');
+      }
     }
 
-    return $collection->get()->load('pservice', 'plevel', 'family');
+    $collection = $collection->get()->load('pservice', 'plevel', 'family');
+    if ($collectionService) {
+      $collectionService = $collectionService->get()->load('pservice', 'plevel', 'family');
+      $collection = $collection->merge($collectionService);
+    }
+    return $collection;
+  }
+
+  public function show($id){
+    $findPersone = People::find($id);
+    if ($findPersone) {
+      $findPersone = $findPersone->load('pservice', 'plevel', 'family');;
+    } else {
+      return response()->json(['message' => 'Persone not found'], 404);
+    }
+
+    $User = auth()->user()->load('permition');
+    $Permitions = $User->permition;
+    $isAdmin = false;
+
+    foreach ($Permitions as $permition) {
+      if ($permition->type == 0) $isAdmin = true;
+      if ($permition->type == 1) {
+        if ($permition->source_id == $findPersone->prihod_id) $isAdmin = true;
+      }
+      if ($permition->type == 2) {
+        $PServices = $findPersone->pservice;
+        foreach ($PServices as $Pservice) {
+          if ($permition->source_id == $Pservice->service_id) $isAdmin = true;
+        }
+        // array_push($serviceIDs, $permition->source_id);
+      }
+    }
+
+    if ($isAdmin) {
+      // $findPersone->pservice = $PersoneServices;
+      return $findPersone;
+    } else {
+      return response()->json(['message' => 'Do not have permitions'], 403);
+    }
+
   }
 
   public function store(Request $request){

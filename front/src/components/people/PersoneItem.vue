@@ -23,7 +23,7 @@
     </div>
     <div class="card-box">
       <div class="card-row">
-          <div class="card-img" :style = "{ backgroundImage : 'url(' + getImgPath(props.persone.image_url) +')' }"></div>
+        <div class="card-img" :style = "{ backgroundImage : 'url(' + getImgPath(props.persone.image_url) +')' }"></div>
         <div class="card-column">
           <PrihodMiniItem
             :prihod = "props.persone.prihod"

@@ -25,7 +25,7 @@
         </tr>
       </thead>
       <tbody class="table-body">
-        <tr v-for="row in props.tableData" :key = row.id>
+        <tr v-for="row in props.tableData" :key = row.id :class = "createRowColorClass(row.id)">
           <td v-if="hasActiveBtn">
             <div class="table-actions">
               <CheckBox v-if = multiRowActions.length
@@ -67,6 +67,7 @@
     hasActiveBtn: {type: Boolean, default: false },
     isAllRowSelected: {type: Boolean, default: false },
     actions: {type: Array, default: new Array() },
+    activeRows: {type: Array, default: new Array() },
   })
 
   const emits = defineEmits(['rowAction', 'allRowAction', 'selectRow', 'selectAllRows']);
@@ -79,19 +80,19 @@
 
   const onSelectRow = (value, rowID) => {
     emits('selectRow', value, rowID);
-  }
+  };
 
   const onSelectAllRows = (value) => {
     emits('selectAllRows', value);
-  }
+  };
 
   const onAllRowsAction = (actionID) => {
     emits('allRowAction', actionID);
-  }
+  };
 
   const onRowAction = (actionID, rowID) => {  
     emits('rowAction', actionID, rowID);
-  }
+  };
 
   const isColorRow = (name, color) => {
     if (name == 'color') {
@@ -99,7 +100,15 @@
     } else {
       return '';
     }
-  }
+  };
+
+  const createRowColorClass = (id) => {
+    const isPresent = props.activeRows.filter(item => {
+      console.log(item);
+      return item == id;
+    }).length;
+    return isPresent ? 'active-row': '';
+  };
 
 </script>
 
@@ -126,10 +135,6 @@
     unicode-bidi: isolate;
     border-color: inherit;
   }
-  tr:hover {
-      color: var(--bs-primary);
-    }
-
   th {
     display: table-cell;
     vertical-align: inherit;
@@ -158,6 +163,8 @@
     unicode-bidi: isolate;
     border-spacing: 2px;
     border-color: var(--bs-gray-500);
+    overflow-x: auto;
+    white-space: nowrap;
     &-container {
       padding: 1rem;      
     }
@@ -208,4 +215,32 @@
     border-color: inherit;
   }
 
+  .active-row {
+    color: var(--bs-primary);
+  }
+
+  /* Мобильные стили */
+  @media (max-width: 600px) {
+    .table {
+      font-size: 0.85rem; /* Меньший размер шрифта на маленьких экранах */
+    }
+
+    .table th, .table td {
+      padding: 0.4rem; /* Меньшие отступы для мобильных */
+    }
+
+    .table-container {
+      padding: 0.5rem; /* Уменьшаем отступы вокруг таблицы на мобильных */
+    }
+
+    .table th, .table td {
+      white-space: nowrap; /* Убираем перенос текста в ячейках */
+    }
+
+    /* Скроллинг для слишком узких экранов */
+    .table-container {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch; /* Плавный скроллинг для мобильных устройств */
+    }
+  }
 </style>

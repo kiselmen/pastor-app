@@ -1,5 +1,5 @@
 <template>
-  <div v-if="props.id" class="form">
+  <div v-if="curPersone.user_id" class="form">
     <div class="form-header"> {{ curPersone.name }} {{ curPersone.first_name }} {{ curPersone.patronymic }}</div>
     <div class="card-name">Права доступа</div>
     <div v-if="loader" class="form-text">Loading...</div>
@@ -89,7 +89,7 @@
   const peopleStore = usePeopleStore();
 
   const form = reactive({
-    persone_id: props.id,
+    persone_id: props.id ? props.id: peopleStore.onePersone.user_id,
     name: '',
     password: '',
     password_confirmation: '',
@@ -108,7 +108,12 @@
   ];
 
   const curPersone = computed(() => {
-    return peopleStore.peoples.filter(item => item.user_id == props.id)[0];
+    if (props.id) {
+      const filtered = peopleStore.peoples.filter(item => item.user_id == props.id);
+      return filtered[0];
+    } else {
+      return peopleStore.onePersone;
+    }
   });
 
   const onTypeSelect = (id) => {
@@ -121,7 +126,7 @@
 
   const onPermitionAdd = () => {
     const newPermition = JSON.parse(JSON.stringify(types.filter(item => item.id === typeID.value)))[0];
-    newPermition.user_id = props.id;
+    newPermition.user_id = curPersone.value.user_id;
     newPermition.type = typeID.value;
     if (typeID.value === 0 ) {
       newPermition.source_id = null;
@@ -147,7 +152,7 @@
   
   const onConfirmAction = async () => {
     loader.value = true;
-    await userStore.updatePersonePermitions(props.id, permitions.value);
+    await userStore.updatePersonePermitions(curPersone.value.user_id, permitions.value);
     loader.value = false;
     confirmWindow.value = false;
     emits('toggleModal');
@@ -168,7 +173,9 @@
       if (isPermition.length) {
         await nsiStore.getServices();
         await prihodStore.getPrihods();
-        await peopleStore.getPersonePermitions(props.id);
+        console.log('curPersone.value.user_id ', curPersone.value.user_id);
+        
+        await peopleStore.getPersonePermitions(curPersone.value.user_id);
         permitions.value = JSON.parse(JSON.stringify(peopleStore.personePermitions));
         permitions.value.forEach(item => {
           const type = item.type;

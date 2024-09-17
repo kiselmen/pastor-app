@@ -2,7 +2,9 @@
   <div class = "card">
     <div class="card-title">
       <span>
-        {{ props.family.name }}
+        <RouterLink :to="'/family/' + props.family?.id">
+          {{ props.family.name }}
+        </RouterLink>  
       </span>
       <EditDuotoneIcon class="change_button" @click="onEditClick"/>
     </div>
@@ -71,5 +73,9 @@
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
+  }
+  a {
+    text-decoration: none;
+    color: var(--bs-white);
   }
 </style>

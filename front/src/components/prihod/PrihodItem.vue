@@ -2,7 +2,9 @@
   <div class = "card">
     <div class="card-title">
       <span>
-        {{ props.prihod.name }}
+        <RouterLink :to="'/peoples?_prihod=' + props.prihod?.id">
+          {{ props.prihod.name }}
+        </RouterLink>  
       </span>
       <IconEditDuotone class="change_button" @click="onEditClick"/>
     </div>

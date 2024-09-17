@@ -104,6 +104,14 @@
         left: 50%;
         max-width: 952px;
         min-width: 454px;
+        @media (max-width: 454px) {
+          min-width: calc(100vw - 10px);
+        }
+        @media (max-width: 952px) {
+          max-width: calc(100vw - 10px);
+        }
+        max-height: 99vh; /* Установить максимальную высоту для контента */
+        overflow-y: auto; /* Если контента много, появится скролл */
         padding: 1.5rem;
         top: 50%;
         transform: translate(-50%, -50%);

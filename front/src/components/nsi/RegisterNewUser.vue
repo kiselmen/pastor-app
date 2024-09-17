@@ -1,5 +1,5 @@
 <template>
-  <div v-if="props.id" class="form">
+  <div class="form">
     <div class="form-header">Регистрация пользователя</div>
     <div v-if="!loader&&!confirmWindow&&formStep === 0" class="card-name">Регистрационные данные</div>
     <div v-if="!loader&&!confirmWindow&&formStep === 1" class="card-name">Права доступа</div>
@@ -169,7 +169,7 @@
   const loader = ref(false);
   const confirmWindow = ref(false);
   const form = reactive({
-    persone_id: props.id,
+    persone_id: null,
     email: '',
     name: '',
     password: '',
@@ -192,7 +192,13 @@
   ];
 
   const curPersone = computed(() => {
-    return peopleStore.peoples.filter(item => item.id == props.id)[0];    
+    if (props.id) {
+      form.persone_id = props.id;
+      return peopleStore.peoples.filter(item => item.id == props.id)[0];    
+    } else {
+      form.persone_id = peopleStore.onePersone.id;
+      return peopleStore.onePersone;
+    }
   });
 
   const onTypeSelect = (id) => {
@@ -246,7 +252,7 @@
   const onConfirmAction = async () => {
     loader.value = true;
     form.permitions = permitions.value;
-    await userStore.registerPersonAsUser(form);
+    await userStore.registerPersonAsUser(form, props.id);
     if (!userStore.totalCountErrors) {
       emits('toggleModal');
     } else {

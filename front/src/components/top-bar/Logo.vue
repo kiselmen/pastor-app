@@ -26,7 +26,7 @@
     top: 0;
     left: 0;
     width: 230px;
-    z-index: 10;
+    z-index: 98;
     transition: 0.5s ease-in-out;      
     background-color: var(--bs-primary);
     display: flex;

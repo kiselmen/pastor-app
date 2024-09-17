@@ -437,6 +437,9 @@
     flex-basis: 50%;
     padding: 0 20px;
     max-width: 750px;
+    @media (max-width: 1080px) {
+      flex-basis: 100%;
+    }  
   }
 
 </style>

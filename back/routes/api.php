@@ -27,6 +27,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/permition/delete', 'App\Http\Controllers\Api\PermitionController@delete'); // с правами доступа
 
     Route::get('/peoples', 'App\Http\Controllers\Api\PeopleController@index'); // с правами доступа
+    Route::get('/peoples/{id}', 'App\Http\Controllers\Api\PeopleController@show'); // с правами доступа
     Route::post('/peoples', 'App\Http\Controllers\Api\PeopleController@store'); // с правами доступа
     Route::post('/peoples/{id}/update', 'App\Http\Controllers\Api\PeopleController@update'); // с правами доступа
 
@@ -54,6 +55,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/prihods/{id}/update', 'App\Http\Controllers\Api\PrihodController@update'); // с правами доступа
 
     Route::get('/families', 'App\Http\Controllers\Api\FamilyController@index'); // с правами доступа
+    Route::get('/families/{id}', 'App\Http\Controllers\Api\FamilyController@show'); // с правами доступа
     Route::post('/families', 'App\Http\Controllers\Api\FamilyController@store'); // с правами доступа
     Route::post('/families/{id}/update', 'App\Http\Controllers\Api\FamilyController@update'); // с правами доступа
 });

@@ -89,13 +89,17 @@ export const useUserStore = defineStore('userStore', () => {
     loader.value = false;
   };
 
-  const registerPersonAsUser = async (credintails) => {
+  const registerPersonAsUser = async (credintails, type) => {
     console.log('credintails ', credintails);
     loader.value = true;
     setErrors({});
     try {
       const response = await axios.post('api/user', credintails);
-      peopleStore.peoples = [...peopleStore.peoples, response.data].sort((a ,b) => a.id - b.id);
+      if (type) {
+        peopleStore.peoples = [...peopleStore.peoples, response.data].sort((a ,b) => a.id - b.id);
+      } else {
+        peopleStore.onePersone = response.data;
+      }
       msgStore.addMessage({name: 'Пользователь: "' + credintails.name + '", добавлен.', icon: 'done'});
     } catch(error) {
       if (error.response?.status === 422) {

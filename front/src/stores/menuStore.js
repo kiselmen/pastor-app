@@ -8,6 +8,7 @@ export const useMenuStore = defineStore('menuStore', () => {
   const sideBarClasses =ref('');
   const topBarClasses = ref('');
   const contentClasses = ref('content');
+  const isMobileView = ref(false);
 
   const onBurgerClick = () => {
     const newStateBurger = burgerClasses.value.includes('open') ? 'burger close': 'burger open';
@@ -34,14 +35,20 @@ export const useMenuStore = defineStore('menuStore', () => {
     contentClasses.value = val;
   };
 
+  const setIsMobileView = (type) => {
+    isMobileView.value = type;
+  };
+
   return {
     burgerClasses,
     logoClasses,
     sideBarClasses,
     topBarClasses,
     contentClasses,
+    isMobileView,
     onBurgerClick,
     // removePaddingAndMargin,
     setContentClasses,
+    setIsMobileView,
   };
 });

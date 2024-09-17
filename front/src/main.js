@@ -7,6 +7,7 @@ import App from '@/App.vue';
 import router from '@/router';
 import axios from 'axios';
 
+
 import clickOutside from '@/directives/clickOutside.js';
 
 window.axios = axios;
@@ -15,7 +16,9 @@ axios.defaults.headers.common = {
   // "Content-Type": "application/json",
   Accept: "application/json"
 };
-axios.defaults.baseURL = 'http://localhost:8000';
+// axios.defaults.baseURL = 'http://localhost:8000';
+// axios.defaults.baseURL = 'https://api.oksiterm.by';
+axios.defaults.baseURL = import.meta.env.VITE_APP_API_URL;
 axios.defaults.withCredentials = true;
 axios.defaults.withXSRFToken = true;
 

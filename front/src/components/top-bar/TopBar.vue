@@ -23,7 +23,7 @@
     display: flex;
     justify-content: right;
     transition: all 0.2s ease-in-out;
-    z-index: 100;
+    z-index: 98;
     margin-left: auto;
     align-items: center;
     background-color: var(--bs-primary);

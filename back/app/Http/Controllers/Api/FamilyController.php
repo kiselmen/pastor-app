@@ -50,6 +50,36 @@ class FamilyController extends BaseController
 
   }
 
+  public function show($id){
+    $findFilmily = Family::find($id);
+
+    if ($findFilmily) {
+      $findFilmily = $findFilmily->load('head', 'people');;
+    } else {
+      return response()->json(['message' => 'Family not found'], 404);
+    }
+
+    $User = auth()->user()->load('permition');
+    $Permitions = $User->permition;
+    $isAdmin = false;
+
+    $prihodIDs = [];
+    foreach ($Permitions as $permition) {
+      if ($permition->type == 0) $isAdmin = true;
+      if ($permition->type == 1) {
+        if ($findFilmily->head) {
+          if ($permition->source_id == $findFilmily->head->prihod_id) $isAdmin = true;
+        }
+      }
+    }
+
+    if ($isAdmin) {
+      return $findFilmily;
+    } else {
+      return response()->json(['message' => 'Do not have permitions'], 403);
+    }
+  }
+
   public function store(Request $request){
     $this->storeValidator($request->all())->validate();
 

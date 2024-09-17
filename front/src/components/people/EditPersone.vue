@@ -403,7 +403,7 @@
     formData.append('live_addres', form.live_addres);
     formData.append('home_phone', form.home_phone);
     formData.append('mobile_phone', form.mobile_phone);
-    formData.append('id', props.id);
+    formData.append('id', form.id);
     formData.append('prihod_id', form.prihod_id);
     formData.append('target_id', form.target_id);
     formData.append('family_id', form.family_id);
@@ -412,7 +412,7 @@
       const fileData = image.value;
       formData.append('image', fileData, fileName);
     } 
-    await peopleStore.editPersone(formData);
+    await peopleStore.editPersone(formData, props.id);
     if (!peopleStore.totalCountErrors) {
       emits('toggleModal');
     }
@@ -424,7 +424,13 @@
     loader.value = true;
     peopleStore.clearErrorsState();
     await prihodStore.getPrihods();
-    persone.value = peopleStore.peoples.filter(item => item.id === props.id)[0];
+    
+    if (props.id) {
+      persone.value = peopleStore.peoples.filter(item => item.id === props.id)[0];
+    } else {
+      persone.value = peopleStore.onePersone;
+    }
+    // console.log('persone ', persone.value);
 
     await nsiStore.getTargets();
     await familyStore.getAllFamilies();
@@ -441,7 +447,11 @@
     form.live_addres = persone.value.live_addres;
     form.home_phone = persone.value.home_phone;
     form.mobile_phone = persone.value.mobile_phone;
-    form.id = props.id;
+    if (props.id) {
+      form.id = props.id;
+    } else {
+      form.id = peopleStore.onePersone.id;
+    }
     form.prihod = persone.value.PrihodName;
     form.prihod_id = persone.value.prihod_id;
     form.target = persone.value.TargetName;
@@ -479,6 +489,9 @@
     flex-basis: 50%;
     padding: 0 20px;
     max-width: 750px;
+    @media (max-width: 1080px) {
+      flex-basis: 100%;
+    }  
   }
 
   .card-box {

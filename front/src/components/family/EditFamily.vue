@@ -121,6 +121,15 @@
   const mainPersonName = ref('');
   const candidateId = ref(null);
 
+  const curFamily = computed(() =>{
+    if (props.id) {
+      const filtered = familyStore.families.filter(item => item.id === props.id);
+      return filtered[0];
+    } else {
+      return familyStore.oneFamily;
+    }
+  })
+
   const filteredPersons = computed(() => {
     const heads = [];
     peopleStore.peoples.forEach(item => {
@@ -174,7 +183,7 @@
   
   const onConfirmAction = async () => {
     loader.value = true;
-    await familyStore.editFamily(form);
+    await familyStore.editFamily(form, props.id);
     if (!familyStore.totalCountErrors) {
       emits('toggleModal');
     }
@@ -186,16 +195,16 @@
     loader.value = true;
     familyStore.clearErrorsState();
     await peopleStore.getAllPeople();
-    family.value = familyStore.families.filter(item => item.id === props.id)[0];
+    // family.value = familyStore.families.filter(item => item.id === props.id)[0];
 
-    form.name = family.value.name;
-    form.discription = family.value.discription;
-    form.id = props.id;
-    form.head_id = family.value.head_id;
-    const isPersone = peopleStore.peoples.filter(item => item.id == family.value.head_id);
+    form.name = curFamily.value.name;
+    form.discription = curFamily.value.discription;
+    form.id = curFamily.value.id;
+    form.head_id = curFamily.value.head_id;
+    const isPersone = peopleStore.peoples.filter(item => item.id == curFamily.value.head_id);
     if (isPersone.length) mainPersonName.value = isPersone[0].first_name + ' ' + isPersone[0].name;
 
-    peopleStore.peoples.filter(item => item.family_id == props.id && item.id != family.value.head_id).forEach(item=> {
+    peopleStore.peoples.filter(item => item.family_id == curFamily.value.id && item.id != curFamily.value.head_id).forEach(item=> {
       const newCandidate = { persone_id: item.id, Name: item.first_name + ' ' + item.name, image_url: item.image_url }
       form.candidates.push(newCandidate);
     })

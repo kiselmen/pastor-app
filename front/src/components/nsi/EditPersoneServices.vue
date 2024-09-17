@@ -48,7 +48,7 @@
 <script setup>
   import { useNsiStore } from '@/stores/nsiStore';
   import { usePeopleStore } from '@/stores/peopleStore';
-  import { onBeforeMount, ref } from 'vue';
+  import { onBeforeMount, ref, computed } from 'vue';
   import InputSelector from '@/components/ui/InputSelector.vue';
   import DismissIcon from '@/components/icons/IconDismiss.vue';
 
@@ -64,10 +64,19 @@
   const loader = ref(false);
   const confirmWindow = ref(false);
   const formElem = ref(null);
-  const persone = ref({});
+  // const persone = ref({});
   const pservices = ref([]); 
   const serviseId = ref(null);
 
+  const curPersone = computed(() => {
+    if (props.id) {
+      const filtered = peopleStore.peoples.filter(item => item.id == props.id);
+      return filtered[0];
+    } else {
+      return peopleStore.onePersone;
+    }
+  });
+  
   const onServiceSelect = (id) => {
     serviseId.value = id;
   };
@@ -76,7 +85,7 @@
     const isPresent = pservices.value.filter(item => item.service_id === serviseId.value);
     if (!isPresent.length) {
       const serviceToAdd = nsiStore.services.filter(item => item.id === serviseId.value);
-      pservices.value = [...pservices.value, {service_id: serviceToAdd[0].id, ServiceName: serviceToAdd[0].name, people_id: props.id}];
+      pservices.value = [...pservices.value, {service_id: serviceToAdd[0].id, ServiceName: serviceToAdd[0].name, people_id: curPersone.value.id}];
     }
   };
 
@@ -95,7 +104,7 @@
   
   const onConfirmAction = async () => {
     loader.value = true;
-    await peopleStore.updatePersoneServices(props.id, pservices.value);
+    await peopleStore.updatePersoneServices(curPersone.value.id, pservices.value, props.id);
     loader.value = false;
     confirmWindow.value = false;
     emits('toggleModal');
@@ -104,8 +113,13 @@
   onBeforeMount( async () => {
     loader.value = true;
     await nsiStore.getServices();
-    persone.value = peopleStore.peoples.filter(item => item.id === props.id)[0];
-    pservices.value = [...persone.value.pservice];
+    pservices.value = [...curPersone.value.pservice];
+    // if (props.id) {
+    //   persone.value = peopleStore.peoples.filter(item => item.id === props.id)[0];
+    //   pservices.value = [...persone.value.pservice];
+    // } else {
+    //   pservices.value = [...peopleStore.onePersone.pservice];
+    // }
     loader.value = false;
   });
 
@@ -123,6 +137,9 @@
     flex-basis: 50%;
     padding: 0 20px;
     max-width: 750px;
+    @media (max-width: 454px) {
+      flex-basis: 100%;
+    }  
   }
 
 </style>

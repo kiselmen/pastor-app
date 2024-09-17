@@ -40,8 +40,5 @@
     // transition: all 1s ease-in-out;
   }
 
-  // .burger.open > .line{
-  //   transition: all 0.3s ease-in-out;
-  // }
 
 </style>

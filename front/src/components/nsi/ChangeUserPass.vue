@@ -1,5 +1,5 @@
 <template>
-  <div v-if="props.id" class="form">
+  <div v-if="curPersone.user_id" class="form">
     <div class="form-header">{{ curPersone.name }} {{ curPersone.first_name }} {{ curPersone.patronymic }}</div>
     <div class="card-name">Новый пароль</div>
     <div v-if="!loader&&!confirmWindow" class="form-container section-container" ref="formElem" >
@@ -77,7 +77,7 @@
   const loader = ref(false);
   const confirmWindow = ref(false);
   const form = reactive({
-    user_id: props.id,
+    user_id: props.id ? props.id: peopleStore.onePersone.user_id,
     name: '',
     password: '',
     password_confirmation: '',
@@ -88,8 +88,12 @@
   const formElem = ref(null);
 
   const curPersone = computed(() => {
-    const filtered = peopleStore.peoples.filter(item => item.user_id == props.id);
-    return filtered[0];
+    if (props.id) {
+      const filtered = peopleStore.peoples.filter(item => item.user_id == props.id);
+      return filtered[0];
+    } else {
+      return peopleStore.onePersone;
+    }
   });
   
   const setShowPassword = (field) => {
@@ -118,6 +122,7 @@
   }
 
   onBeforeMount(() => {
+    // console.log('curPersone ', curPersone.value);
     form.name = curPersone.value.name + ' ' + curPersone.value.first_name + ' ' + curPersone.value.patronymic;    
   });
 

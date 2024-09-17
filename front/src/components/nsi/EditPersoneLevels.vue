@@ -1,5 +1,5 @@
 <template>
-  <div v-if="props.id" class="form">
+  <div v-if="curPersone.id" class="form">
     <div class="form-header">Дисциплина {{ curPersone.name }} {{ curPersone.first_name }} {{ curPersone.patronymic }}</div>
     <div v-if="loader" class="form-text">Loading...</div>
     <div v-if="!loader&&!confirmWindow" class="form-container section-container">
@@ -112,7 +112,7 @@
     id: null,
     date: null,
     level_id: null,
-    people_id: props.id,
+    people_id: null,
     discription: '',
   });
   const loader = ref(false);
@@ -131,8 +131,14 @@
   const emits = defineEmits(['toggleModal']);
 
   const curPersone = computed(() => {
-    const filtered = peopleStore.peoples.filter(item => item.id == props.id);
-    return filtered[0];
+    if (props.id) {
+      const filtered = peopleStore.peoples.filter(item => item.id == props.id);
+      form.people_id = filtered[0].id;
+      return filtered[0];
+    } else {
+      form.people_id = peopleStore.onePersone.id
+      return peopleStore.onePersone;
+    }
   });
   
   const onOpenForm = (type) => {
@@ -195,29 +201,29 @@
     form.id = null;
     form.date = null;
     form.level_id = null;
-    form.people_id = props.id;
+    form.people_id = curPersone.value.id;
     form.discription = '';
     levelText.value = '';
     formType.value = 'add';
   };
 
   const onConfirmAction = async () => {
+    loader.value = true;
     if (actionID.value === 0) {
       if (formType.value === 'add') {
-        await peopleStore.addPersonLevel(form);
+        await peopleStore.addPersonLevel(form, props.id);
         if (peopleStore.totalCountErrors === 0) {
           clearFormFields();
         }
       } else if (formType.value === 'edit') {
-        await peopleStore.editPersonLevel(form);
+        await peopleStore.editPersonLevel(form, props.id);
         if (peopleStore.totalCountErrors === 0) {
           clearFormFields();
         }
       }
     } else if (actionID.value === 1) {
-      loader.value = true;
       if (isOneRowAction.value) {
-        await peopleStore.deletePersonLevels([rowID.value], props.id);
+        await peopleStore.deletePersonLevels([rowID.value], curPersone.value.id, props.id);
       } else {
         const IDs = [];
         curPersone.value.plevel.forEach(item => {
@@ -226,7 +232,7 @@
           }
         });
         if (IDs.length) {
-          await peopleStore.deletePersonLevels(IDs, props.id);
+          await peopleStore.deletePersonLevels(IDs, curPersone.value.id, props.id);
         } else {
           msgStore.addMessage({name: 'Нет выбраных строк для выполнения опреации', icon: 'warning'});
         }
@@ -234,6 +240,7 @@
       clearFormFields();
     }
     clearConfirmData();
+    loader.value = false;
   };
 
   const onRowAction = async (action, row) => {
@@ -292,4 +299,5 @@
   .form-container {
     margin-top: 10px;
   }
+  
 </style>

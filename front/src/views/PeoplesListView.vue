@@ -5,23 +5,25 @@
   </div>
   <div v-if="!loader" class="card-container" >
     <div class="form-row">
-      <button 
-        v-if = 'isAvailableAdd'
-        @click="openActionModal('addPersone')" 
-        type="button" 
-        class="btn btn-blue" 
-      >
-          Создать
-      </button>
-      <PrihodFilter 
-        @changeFilter="onChangePrihodFilterMask"
-      />
-      <TargetFilter 
-        @changeFilter="onChangeTargetFilterMask"
-      />
-      <ServiceFilter 
-        @changeFilter="onChangeServiceFilterMask"
-      />
+      <div class="form-filter">
+        <button 
+          v-if = 'isAvailableAdd'
+          @click="openActionModal('addPersone')" 
+          type="button" 
+          class="btn btn-blue" 
+        >
+            Создать
+        </button>
+        <PrihodFilter 
+          @changeFilter="onChangePrihodFilterMask"
+        />
+        <TargetFilter 
+          @changeFilter="onChangeTargetFilterMask"
+        />
+        <ServiceFilter 
+          @changeFilter="onChangeServiceFilterMask"
+        />
+      </div>
       <div class="form-search">
         <input 
           type="text"

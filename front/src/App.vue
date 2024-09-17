@@ -40,18 +40,32 @@
     }
   }
 
+  const handleView = () => {
+    if (window.innerWidth <= 768) {
+      menuStore.setIsMobileView(true);
+    } else {
+      menuStore.setIsMobileView(false);
+    }
+  }
+
+  // onCreated(() => {
+  // });
+
   onBeforeMount(async () => {
     loader.value = true;
+    handleView();
+    window.addEventListener('resize', handleView);
     if (localStorage.getItem('authToken')) {
       await userStore.signIn();
     }
     localStoreWatcher = setInterval(() => checkLocalStorage(), 500);
-    loader.value = false;
     await nsiStore.getStatuses();
+    loader.value = false;
   });
 
   onBeforeUnmount(() => {
     clearInterval(localStoreWatcher);
+    window.removeEventListener('resize', handleView);
   });
 
 </script>
@@ -90,10 +104,14 @@
     overflow: hidden;
     min-height: 100vh;
     margin-left: 230px;
+    @media (max-width: 768px) {
+      margin-left: 0;
+    }
     padding-top: 64px;
     transition: 0.5s ease-in-out;
     &-off {
       margin-left: 0;
     }    
   }
+
 </style>

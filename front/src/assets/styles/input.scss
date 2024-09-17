@@ -102,8 +102,18 @@ input[type="color"]{
     color: var(--bs-gray-600);
   }
 
+  &-filter {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
   &-search {
     margin-left: auto;
+    @media (max-width: 768px) {
+      margin-left: 0;
+    }
     display: flex;
     position: relative;
   }

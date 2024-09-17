@@ -2,7 +2,7 @@
   <div class="sidebar" :class="menuStore.sideBarClasses">
     <ul>
         <li>
-          <RouterLink to="/">
+          <RouterLink to="/" @click="onMenuClick">
             <div class="sidebar-item">
               <EcosystemIcon class="sidebar-icon"/>
               <span class="sidebar-link">Dashboard</span>
@@ -10,7 +10,7 @@
           </RouterLink>
         </li>
         <li>
-          <RouterLink to="/peoples">
+          <RouterLink to="/peoples" @click="onMenuClick">
             <div class="sidebar-item">
               <CommunityIcon class="sidebar-icon"/>
               <span class="sidebar-link">Прихожане</span>
@@ -18,7 +18,7 @@
           </RouterLink>
         </li>
         <li v-if="userStore.isPermition(1)">
-          <RouterLink to="/families">
+          <RouterLink to="/families" @click="onMenuClick">
             <div class="sidebar-item">
               <SupportIcon class="sidebar-icon"/>
               <span class="sidebar-link">Семьи</span>
@@ -26,7 +26,7 @@
           </RouterLink>
         </li>
         <li v-if="userStore.isPermition(1)">
-          <RouterLink to="/prihods">
+          <RouterLink to="/prihods" @click="onMenuClick">
             <div class="sidebar-item">
               <DocumentationIcon class="sidebar-icon"/>
               <span class="sidebar-link">Участки</span>
@@ -43,21 +43,21 @@
           </a>
           <ul class="children">
             <li>
-              <RouterLink to="/target-groups">
+              <RouterLink to="/target-groups" @click="onMenuClick">
                 <div class="sidebar-subitem">
                   <span class="sidebar-link">Целевые группы</span>
                 </div>
               </RouterLink>
             </li>
             <li>
-              <RouterLink to="/services">
+              <RouterLink to="/services" @click="onMenuClick">
                 <div class="sidebar-subitem">
                   <span class="sidebar-link">Виды служения</span>
                 </div>
               </RouterLink>
             </li>
             <li>
-              <RouterLink to="/levels">
+              <RouterLink to="/levels" @click="onMenuClick">
                 <div class="sidebar-subitem">
                   <span class="sidebar-link">Уровни дисциплины</span>
                 </div>
@@ -87,6 +87,12 @@
     e.currentTarget.parentNode.classList.toggle('open');
   }
 
+  const onMenuClick = () => {
+    if (menuStore.isMobileView) {
+      menuStore.onBurgerClick();
+    }
+  }
+
 </script>
 
 <style lang="scss" scoped>
@@ -112,6 +118,9 @@
     top: 64px;
     left: 0;
     width: 230px;
+    @media (max-width: 768px) {
+      width: 100%;
+    }
     height: calc(100vh - 64px);
     overflow: auto;
     z-index: 10;
@@ -120,6 +129,9 @@
     background-color: var(--bs-gray-900);
     &-off{
       left: -230px;
+      @media (max-width: 768px) {
+        left: -100%;
+      }
     }
     &-item {
       display: flex;

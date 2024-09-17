@@ -10,6 +10,7 @@ export const useFamilyStore = defineStore('familyStore', () => {
   const msgStore = useMsgStore();
 
   const families = ref([]);
+  const oneFamily = ref(null);
   const loader = ref(false);
   const errors = ref({})
 
@@ -25,6 +26,19 @@ export const useFamilyStore = defineStore('familyStore', () => {
       msgStore.addMessage({name: error.message, icon: 'error'});
     }
     loader.value = false;
+  }; // with permitions
+
+  const getOneFamily = async (id) => {
+    loader.value = true;
+    try {
+      const response = await axios.get('api/families/' + id);
+      oneFamily.value = response.data;
+    } catch (error) {
+      console.log(error);
+      msgStore.addMessage({name: error.message, icon: 'error'});
+    }
+    loader.value = false;
+
   }; // with permitions
 
   const addNewFamily = async (data) => {
@@ -47,14 +61,18 @@ export const useFamilyStore = defineStore('familyStore', () => {
     loader.value = false;
   }; // with permitions
 
-  const editFamily = async (familyData) => {
+  const editFamily = async (familyData, type) => {
     loader.value = true;
     try {
       errors.value = {};
       const id = Number(familyData.id);
       const response = await axios.post('api/families/' + id + '/update', familyData);
-      const newFamilies = families.value.filter(item => item.id !== id);
-      families.value = [...newFamilies, response.data].sort((a ,b) => a.id - b.id)
+      if (type) {
+        const newFamilies = families.value.filter(item => item.id !== id);
+        families.value = [...newFamilies, response.data].sort((a ,b) => a.id - b.id);
+      } else {
+        oneFamily.value = response.data;
+      }
       msgStore.addMessage({name: 'Семья: "' + response.data.name + '", изменена.', icon: 'done'});
       peopleStore.getAllPeople();
     } catch (error) {
@@ -76,9 +94,11 @@ export const useFamilyStore = defineStore('familyStore', () => {
   return {
     totalCountErrors,
     families,
+    oneFamily,    
     loader,
     errors,
     getAllFamilies,
+    getOneFamily,
     addNewFamily,
     editFamily,
     clearErrorsState,
