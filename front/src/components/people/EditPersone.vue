@@ -22,6 +22,20 @@
               </div>
           </div>
           <div class="form-group" >
+            <label class="input-label">Пол</label>
+            <InputSelector
+                :text = "form.sex"
+                message = "Пол"
+                :id   = form.sex_id
+                :data ="nsiStore.sexes"
+                :parentElem = "formElem"
+                @selectItem="onSexSelect"
+              />
+            <div class="input-error" v-if="peopleStore.errors?.sex_id">
+              {{ peopleStore.errors?.sex_id[0] }}
+            </div>
+          </div>
+          <div class="form-group" >
             <label class="input-label">Участок</label>
             <InputSelector
                 :text = "form.prihod"
@@ -35,7 +49,7 @@
               {{ peopleStore.errors?.prihod_id[0] }}
             </div>
           </div>
-          <div class="form-group">
+          <!-- <div class="form-group">
             <label class="input-label">Целевая группа</label>
             <InputSelector
                 :text = "form.target"
@@ -48,7 +62,7 @@
             <div class="input-error" v-if="peopleStore.errors?.target_id">
               {{ peopleStore.errors?.target_id[0] }}
             </div>
-          </div>
+          </div> -->
           <div class="form-group">
               <FileUpload v-if="persone"
                 v-model="image"
@@ -319,8 +333,10 @@
     prihod: '',
     prihod_id: null,
     family_id: null,
-    target: '',
-    target_id: null,
+    sex: '',
+    sex_id: null,
+    // target: '',
+    // target_id: null,
   });
   const image = ref();
   const emits = defineEmits(['toggleModal']);
@@ -356,17 +372,15 @@
 
   const onPrihodSelect = (id) => {
     form.prihod_id = id;
-    if (!id) {
-      form.PrihodName = '';
-    }
   };
 
-  const onTargetSelect = (id) => {
-    form.target_id = id;
-    if (!id) {
-      form.TargetName = '';
-    }
+  const onSexSelect = (id) => {
+    form.sex_id = id;
   };
+  
+  // const onTargetSelect = (id) => {
+  //   form.target_id = id;
+  // };
 
   const onMoveToStep = (type) => {
     if (type === "-") {
@@ -405,8 +419,9 @@
     formData.append('mobile_phone', form.mobile_phone);
     formData.append('id', form.id);
     formData.append('prihod_id', form.prihod_id);
-    formData.append('target_id', form.target_id);
+    // formData.append('target_id', form.target_id);
     formData.append('family_id', form.family_id);
+    formData.append('sex_id', form.sex_id);
     if (image.value) {
       const fileName = image.value.name;
       const fileData = image.value;
@@ -432,7 +447,7 @@
     }
     // console.log('persone ', persone.value);
 
-    await nsiStore.getTargets();
+    // await nsiStore.getTargets();
     await familyStore.getAllFamilies();
     family.value = familyStore.families.filter(item => item.id === persone.value.family_id)[0];
 
@@ -454,8 +469,10 @@
     }
     form.prihod = persone.value.PrihodName;
     form.prihod_id = persone.value.prihod_id;
-    form.target = persone.value.TargetName;
-    form.target_id = persone.value.target_id;
+    // form.target = persone.value.TargetName;
+    // form.target_id = persone.value.target_id;
+    form.sex = persone.value.SexName;
+    form.sex_id = persone.value.sex_id;
     form.family_id = persone.value.family_id;
     loader.value = false;
   })

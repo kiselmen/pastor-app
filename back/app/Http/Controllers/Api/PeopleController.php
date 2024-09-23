@@ -38,7 +38,7 @@ class PeopleController extends BaseController
       'mobile_phone' => ['required'], 
       'email' => ['required'],
       'prihod_id' => ['required', 'numeric'],
-      'target_id' => ['required', 'numeric'],
+      'sex_id' => ['required', 'numeric'],
       'family_id' => ['required'],
     ]);
   }
@@ -55,15 +55,17 @@ class PeopleController extends BaseController
       'mobile_phone' => ['required'], 
       'email' => ['required'],
       'prihod_id' => ['required', 'numeric'],
-      'target_id' => ['required', 'numeric'],
+      'sex_id' => ['required', 'numeric'],
       'family_id' => ['required', 'numeric'],
     ]);
+
   }
 
   public function index(Request $request){
     $User = auth()->user()->load('permition');
     $Permitions = $User->permition;
     $isAdmin = false;
+    $onlyUserOperation = false;
     $prihodIDs = [];
     $serviceIDs = [];
     foreach ($Permitions as $permition) {
@@ -87,9 +89,22 @@ class PeopleController extends BaseController
     }
 
     $targetFilter = $request->query('_target');
+    // if ($targetFilter) {
+    //   $collection = $collection->where('target_id', '=', $targetFilter);
+    //   if ($collectionService) $collectionService = $collectionService->where('target_id', '=', $targetFilter);
+    // }
+
     if ($targetFilter) {
-      $collection = $collection->where('target_id', '=', $targetFilter);
-      if ($collectionService) $collectionService = $collectionService->where('target_id', '=', $targetFilter);
+      $collection = $collection->
+        whereHas('ptarget', function ($query) use ($targetFilter) {
+          return $query->whereIn('target_id', [intval($targetFilter)]);
+        });
+      if ($collectionService) {
+        $collectionService = $collectionService->
+          whereHas('ptarget', function ($query) use ($targetFilter) {
+            return $query->whereIn('target_id', [intval($targetFilter)]);
+          });
+      }
     }
 
     $prihodFilter = $request->query('_prihod');
@@ -123,18 +138,67 @@ class PeopleController extends BaseController
       }
     }
 
-    $collection = $collection->get()->load('pservice', 'plevel', 'family');
+    $collection = $collection->get()->load('pservice', 'plevel', 'ptarget', 'family');
     if ($collectionService) {
-      $collectionService = $collectionService->get()->load('pservice', 'plevel', 'family');
+      $collectionService = $collectionService->get()->load('pservice', 'plevel', 'ptarget', 'family');
       $collection = $collection->merge($collectionService);
     }
     return $collection;
   }
 
+  public function birthday(Request $request){
+    $User = auth()->user()->load('permition');
+    $Permitions = $User->permition;
+    $isAdmin = false;
+    $onlyUserOperation = false;
+    $prihodIDs = [];
+    $serviceIDs = [];
+    foreach ($Permitions as $permition) {
+      if ($permition->type == 0) $isAdmin = true;
+      if ($permition->type == 1) {
+        array_push($prihodIDs, $permition->source_id);
+      }
+      if ($permition->type == 2) {
+        array_push($serviceIDs, $permition->source_id);
+      }
+    }
+
+    if ($isAdmin) {
+        $collection = People::query();
+        $collectionService = null;
+    } else {
+        $collection = People::whereIn('prihod_id', $prihodIDs);
+        $collectionService = People::WhereHas('pservice', function ($query) use ($serviceIDs) {
+            return $query->whereIn('service_id', $serviceIDs);
+          });
+    }
+
+    $collection = $collection->get()->load('pservice', 'ptarget', 'plevel', 'family');
+    if ($collectionService) {
+      $collectionService = $collectionService->get()->load('pservice', 'ptarget', 'plevel', 'family');
+      $collection = $collection->merge($collectionService);
+    }
+
+    $currentDate = Carbon::now();
+    $weekBefore = $currentDate->copy()->subWeek();
+    $weekAfter = $currentDate->copy()->addWeek();
+
+    $collection = $collection->filter(function ($model) use ($weekBefore, $weekAfter) {
+      $birthday = Carbon::parse($model->birthday_date)->format('m-d');
+
+      $before = $weekBefore->format('m-d');
+      $after = $weekAfter->format('m-d');
+
+      return $birthday >= $before && $birthday <= $after;
+    });
+
+    return [...$collection];
+  }
+
   public function show($id){
     $findPersone = People::find($id);
     if ($findPersone) {
-      $findPersone = $findPersone->load('pservice', 'plevel', 'family');;
+      $findPersone = $findPersone->load('pservice', 'ptarget', 'plevel', 'family');;
     } else {
       return response()->json(['message' => 'Persone not found'], 404);
     }
@@ -207,6 +271,7 @@ class PeopleController extends BaseController
         'prihod_id'             => $request['prihod_id'],
         'target_id'             => $request['target_id'],
         'family_id'             => $request['family_id'],
+        'sex_id'                => $request['sex_id'],
       ]);
     } else {
       $this->familyValidator($request->all())->validate(); 
@@ -236,7 +301,7 @@ class PeopleController extends BaseController
       $CurrentFamily->head_id = $CurrentPersone->id;
       $CurrentFamily->save(); 
     }
-    $Persone = People::find($CurrentPersone->id)->load('pservice', 'plevel', 'family');
+    $Persone = People::find($CurrentPersone->id)->load('pservice', 'ptarget', 'plevel', 'family');
     return response()->json($Persone);
   }
 
@@ -285,6 +350,7 @@ class PeopleController extends BaseController
     $CurrentPersone->prihod_id        = $request['prihod_id'];
     $CurrentPersone->target_id        = $request['target_id'];
     $CurrentPersone->family_id        = $request['family_id'];
+    $CurrentPersone->sex_id           = $request['sex_id'];
     if ($file) {
       if ($CurrentPersone->image_url) {
         Storage::disk('public')->delete($CurrentPersone->image_url);

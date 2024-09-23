@@ -9,8 +9,7 @@
             {{ props.persone.name }} {{ props.persone.first_name }} {{ props.persone.patronymic }}
           </RouterLink>  
         </div>
-        <div class="change_button">
-          <!-- <EditDuotoneIcon  @click="onEditClick"/> -->
+        <div class="change_button" v-if="props.isActionPossible">
           <ActionMenu 
             :actions = "actions"
             @startAction="onStartAction"
@@ -23,12 +22,16 @@
     </div>
     <div class="card-box">
       <div class="card-row">
-        <div class="card-img" :style = "{ backgroundImage : 'url(' + getImgPath(props.persone.image_url) +')' }"></div>
+        <div class="card-column left">
+          <div class="card-img" :style = "{ backgroundImage : 'url(' + getImgPath(props.persone.image_url) +')' }"></div>
+        </div>  
         <div class="card-column">
+          <div class="sex-men" v-if="props.persone?.sex_id === 1">{{ props.persone?.SexName }}</div>
+          <div class="sex-women" v-if="props.persone?.sex_id === 2">{{ props.persone?.SexName }}</div>
           <PrihodMiniItem
             :prihod = "props.persone.prihod"
           />
-          <div class="card-target">{{ props.persone?.TargetName }}</div>
+          <div class="card-target" v-for="target in props.persone?.ptarget">{{target.TargetName }}</div>
           <FamilyMiniItem
             :family = "props.persone.family"
           />
@@ -85,6 +88,8 @@
             {{ props.persone.mobile_phone }}
           </template>
         </DateItem>
+      </div>
+      <div class="card-row">
         <DateItem>
           <template #icon>
             <PhoneIcon />
@@ -98,6 +103,7 @@
     <div class="card-row">
         <ServiceMiniItem
           :services = "props.persone.pservice"
+          :isActionPossible = props.isActionPossible
           @editServices = "onEditPersoneServices"
         />
 
@@ -109,7 +115,6 @@
   import getImgPath from '@/utils/imagePlugin.js';
   import { onBeforeMount, ref, computed } from 'vue';
   import { useUserStore } from '@/stores/userStore';
-  import { usePeopleStore } from '@/stores/peopleStore' ;
   import EditDuotoneIcon from '@/components/icons/IconEditDuotone.vue';
   import CrossIcon from '@/components/icons/IconCross.vue';
   import BirthdayIcon from '@/components/icons/IconBirthday.vue';
@@ -124,12 +129,12 @@
 
   const props = defineProps({
     persone: { type: Object, default: new Object() },
+    isActionPossible: { type: Boolean, default: true },
   });
 
   const userStore = useUserStore();
-  const peopleStore = usePeopleStore();
 
-  const emits = defineEmits(['editPersone', 'editPersoneLevels', 'editPersoneServices', 'registerNewUser', 'changeUserPass', 'changeUserPermitions']);
+  const emits = defineEmits(['editPersone', 'editPersoneLevels', 'editPersoneTargets', 'editPersoneServices', 'registerNewUser', 'changeUserPass', 'changeUserPermitions']);
 
   const actions = ref([]);
 
@@ -165,7 +170,7 @@
     const isAction = actions.value.filter(item => item.id === action);
     if (isAction.length) {
       const actionEmit = isAction[0].emit;
-      // console.log('actionEmit ', actionEmit);
+      console.log('actionEmit ', actionEmit);
       emits(actionEmit, props.persone.id);
     } else {
       console.log('Нет такой операции');
@@ -175,6 +180,10 @@
   const onEditPersoneServices = () => {
     emits('editPersoneServices', props.persone.id);
   }
+
+  // const onEditPersoneTargets = () => {
+  //   emits('editPersoneTargets', props.persone.id);
+  // }
 
   onBeforeMount(async () => {
     let isAdmin = false;
@@ -186,11 +195,12 @@
       if (permition.type == 2) serviceIDs.push(permition.source_id);
     });
     if (isAdmin) {
-      const isUserPresent = peopleStore.peoples.filter(item => item.id == props.persone.id)[0].user_id;
+      const isUserPresent = props.persone.user_id;
       if (isUserPresent) {
         actions.value = [
           { id: 0, name: 'Изменить', emit: 'editPersone' },
           { id: 1, name: 'Дисциплина', emit: 'editPersoneLevels' },
+          { id: 2, name: 'Целевые группы', emit: 'editPersoneTargets' },
           { id: 3, name: 'Сменить пароль', emit: 'changeUserPass' },
           { id: 4, name: 'Права доступа', emit: 'changeUserPermitions' },
         ]
@@ -198,7 +208,8 @@
         actions.value = [
           { id: 0, name: 'Изменить', emit: 'editPersone' },
           { id: 1, name: 'Дисциплина', emit: 'editPersoneLevels' },
-          { id: 2, name: 'Регистрация', emit: 'registerNewUser' },
+          { id: 2, name: 'Целевые группы', emit: 'editPersoneTargets' },
+          { id: 3, name: 'Регистрация', emit: 'registerNewUser' },
         ]
       }
     } else {
@@ -207,12 +218,13 @@
         actions.value = [
           { id: 0, name: 'Изменить', emit: 'editPersone' },
           { id: 1, name: 'Дисциплина', emit: 'editPersoneLevels' },
+          { id: 2, name: 'Целевые группы', emit: 'editPersoneTargets' },
         ]
       } else {
         const isServiceAdmin = serviceIDs.filter(item => props.persone.pservice.filter(service => service.service_id == item).length).length;
         if (isServiceAdmin) {
           actions.value = [
-            { id: 1, name: 'Дисциплина', emit: 'editPersoneLevels' },
+            { id: 0, name: 'Дисциплина', emit: 'editPersoneLevels' },
           ]
         } else {
           actions.value = [];
@@ -244,5 +256,18 @@
   a {
     text-decoration: none;
     color: var(--bs-white);
+  }
+  .sex{
+    &-men {
+      margin-left: 80%;
+      color: var(--bs-primary);
+    }
+    &-women {
+      margin-left: 80%;
+      color: var(--bs-pink);
+    }
+  }
+  .left {
+    align-items: flex-start
   }
 </style>

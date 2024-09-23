@@ -9,6 +9,7 @@ export const useNsiStore = defineStore('nsiStore', () => {
   const msgStore = useMsgStore();
   const userStore = useUserStore();
   const statuses = ref([]);
+  const sexes = ref([]);
   const targets = ref([]);
   const services = ref([]);
   const levels = ref([]);
@@ -37,6 +38,18 @@ export const useNsiStore = defineStore('nsiStore', () => {
     try {
       const response = await axios.get('api/statuses');
       statuses.value = response.data.sort((a ,b) => a.id - b.id);
+    } catch (error) {
+      console.log(error);
+      msgStore.addMessage({name: error.message, icon: 'error'});
+    }
+    loader.value = false;
+  };
+
+  const getSex = async () => {
+    loader.value = true;
+    try {
+      const response = await axios.get('api/sexes');
+      sexes.value = response.data.sort((a ,b) => a.id - b.id);
     } catch (error) {
       console.log(error);
       msgStore.addMessage({name: error.message, icon: 'error'});
@@ -210,11 +223,13 @@ export const useNsiStore = defineStore('nsiStore', () => {
     availableServices,
     errors,
     statuses,
+    sexes,
     targets,
     services,
     levels,
     loader,
     getStatuses,
+    getSex,
     getTargets,
     addNewTarget,
     getServices,

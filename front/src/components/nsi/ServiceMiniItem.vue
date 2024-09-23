@@ -32,6 +32,7 @@
 
   const props = defineProps({
     services: { type: Object, default: new Object() },
+    isActionPossible: { type: Boolean, default: true },
   });
 
   const emits = defineEmits(['editServices']);
@@ -43,6 +44,7 @@
     userStore.user?.permition?.forEach(permition => {
       if (permition.type == 0 || permition.type == 1) isAdmin = true;
     });
+    isAdmin = isAdmin&&props.isActionPossible
     return isAdmin;
   })
 

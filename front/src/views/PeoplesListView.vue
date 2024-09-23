@@ -55,6 +55,7 @@
         class="card-item"
         @editPersone = "onEditPersone"
         @editPersoneServices = "onEditPersonServices"
+        @editPersoneTargets = "onEditPersonTargets"
         @editPersoneLevels = "onEditPersonLevels"
         @registerNewUser = "onRegisterNewUser"
         @changeUserPass = "onChangePersonePass"
@@ -80,6 +81,10 @@
           :id="activePersone"
       />
       <EditPersoneServices v-if="action === 'editPersoneServices'"
+          @toggle-modal="isModalAction = false"
+          :id="activePersone"
+      />
+      <EditPersoneTargets v-if="action === 'editPersoneTargets'"
           @toggle-modal="isModalAction = false"
           :id="activePersone"
       />
@@ -112,6 +117,7 @@
   import EditPersone  from '@/components/people/EditPersone.vue';
   import PersoneItem from '@/components/people/PersoneItem.vue';
   import EditPersoneServices from '@/components/nsi/EditPersoneServices.vue';
+  import EditPersoneTargets from '@/components/nsi/EditPersoneTargets.vue';
   import EditPersoneLevels from '@/components/nsi/EditPersoneLevels.vue';
   import RegisterNewUser from '@/components/nsi/RegisterNewUser.vue';
   import ChangeUserPass from '@/components/nsi/ChangeUserPass.vue';
@@ -260,6 +266,12 @@
     activePersone.value = id;
     isModalAction.value = true;
   };
+
+  const onEditPersonTargets = (id) => {
+    action.value = 'editPersoneTargets';
+    activePersone.value = id;
+    isModalAction.value = true;
+  }
 
   const onEditPersonLevels = (id) => {
     action.value = 'editPersoneLevels';

@@ -21,6 +21,19 @@
             </div>
         </div>
         <div class="form-group">
+            <label class="input-label">Пол</label>
+            <InputSelector
+                :text ="form.sex"
+                :id   = null
+                :data ="nsiStore.sexes"
+                :parentElem = "formElem"
+                @selectItem="onSexSelect"
+              />
+            <div class="input-error" v-if="peopleStore.errors?.prihod_id">
+              {{ peopleStore.errors?.prihod_id[0] }}
+            </div>
+        </div>
+        <div class="form-group">
             <label class="input-label">Участок</label>
             <InputSelector
                 :text ="form.prihod"
@@ -33,7 +46,7 @@
               {{ peopleStore.errors?.prihod_id[0] }}
             </div>
         </div>
-        <div class="form-group">
+        <!-- <div class="form-group">
             <label class="input-label">Целевая группа</label>
             <InputSelector
                 :text ="form.target"
@@ -45,7 +58,7 @@
             <div class="input-error" v-if="peopleStore.errors?.target_id">
               {{ peopleStore.errors?.target_id[0] }}
             </div>
-        </div>
+        </div> -->
         <div class="form-group">
             <FileUpload
               v-model="image"
@@ -290,8 +303,10 @@
     prihod: '',
     prihod_id: null,
     family_id: null,
-    target: '',
-    target_id: null,
+    // target: '',
+    // target_id: null,
+    sex: '',
+    sex_id: null,
     family_name: '',
     family_discription: '',
     family_head_id: null,
@@ -334,8 +349,12 @@
     form.prihod_id = id;
   };
 
-  const onTargetSelect = (id) => {
-    form.target_id = id;
+  // const onTargetSelect = (id) => {
+  //   form.target_id = id;
+  // }
+
+  const onSexSelect = (id) => {
+    form.sex_id = id;
   }
 
   const onMoveToStep = (type) => {
@@ -378,8 +397,9 @@
     formData.append('home_phone', form.home_phone);
     formData.append('mobile_phone', form.mobile_phone);
     formData.append('prihod_id', form.prihod_id);
-    formData.append('target_id', form.target_id);
+    // formData.append('target_id', form.target_id);
     formData.append('family_id', form.family_id);
+    formData.append('sex_id', form.sex_id);
     if (image.value) {
       const fileName = image.value.name;
       const fileData = image.value;
@@ -403,7 +423,7 @@
     loader.value = true;
     peopleStore.clearErrorsState();
     await prihodStore.getPrihods();
-    await nsiStore.getTargets();
+    // await nsiStore.getTargets();
     await familyStore.getAllFamilies();
     loader.value = false;
   })

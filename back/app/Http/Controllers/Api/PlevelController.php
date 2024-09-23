@@ -26,8 +26,47 @@ class PlevelController extends BaseController
 
 
   public function index(Request $request) {
-    $Plevel = Plevel::all();
-    return $Plevel;
+    // $User = auth()->user()->load('permition');
+    // $Permitions = $User->permition;
+    // $isAdmin = false;
+    // $onlyUserOperation = false;
+    // $serviceIDs = [];
+    // $Persone = People::find($request['people_id'])->load('pservice');
+    // $pesoneServices = $Persone->pservice;
+    // foreach ($pesoneServices as $personeService) {
+    //   array_push($serviceIDs, $personeService->service_id);
+    // }
+
+    // foreach ($Permitions as $permition) {
+    //   if ($permition->type == 0) {
+    //     $isAdmin = true;
+    //     break;
+    //   }
+    //   if ($permition->type == 1) {
+    //     if ($permition->source_id == $Persone->prihod_id) {
+    //       $isAdmin = true;
+    //       break;
+    //     }
+    //   }
+    //   if ($permition->type == 2) {
+    //     $isPresent = count(array_filter($serviceIDs, function($item) use ($permition) { return  $item == $permition->source_id; }));
+    //     if ($isPresent) {
+    //       $isAdmin = true;
+    //       $onlyUserOperation = true;
+    //       break;
+    //     }
+    //   }
+    // }
+    // if ($isAdmin) {
+    //   $Plevel = Plevel::all();
+    //   if ($onlyUserOperation) {
+    //     return response()->json('QQQQQQQQQ');
+    //     $Plevel = $Plevel->where('user_id', $User->user_id);
+    //   }
+    //   return $Plevel;
+    // } else {
+    //   return response()->json([]);
+    // } 
   }
 
   public function store(Request $request) {
@@ -61,6 +100,7 @@ class PlevelController extends BaseController
       'people_id' 		  => $request['people_id'],
       'level_id'			  => $request['level_id'],
       'discription'     => $request['discription'],
+      'user_id'         => $User->id,
     ]);
     return response()->json($CurrentPlevel);
   }

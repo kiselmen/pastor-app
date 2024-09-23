@@ -118,8 +118,8 @@
   const loader = ref(false);
   const isFormOpen = ref(false);
   const formType = ref('add'); // 'add' - добавить, 'edit'- изменить
-  const tableHeadNames = ref(['Дата', 'Уровень', 'Описание']);
-  const tableHeadID = ref(['date', 'LevelName', 'discription']);
+  const tableHeadNames = ref(['Дата', 'Уровень', 'Описание', 'Автор']);
+  const tableHeadID = ref(['date', 'LevelName', 'discription', 'UserName']);
   const isAllRowSelected = ref(false);
   const levelText = ref('');
   const confirmWindow = ref(false);

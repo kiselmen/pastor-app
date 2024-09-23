@@ -10,6 +10,7 @@ export const usePeopleStore = defineStore('peopleStore', () => {
   const viewStore = useViewStore();
   const peoples = ref([]);
   const onePersone = ref(null); 
+  const peoplesWithBirthday=ref([]);
   const personePermitions =ref([]);
   const loader = ref(false);
   const errors = ref({});
@@ -171,6 +172,65 @@ export const usePeopleStore = defineStore('peopleStore', () => {
 
   }; // with permitions
 
+  const updatePersoneTargets = async (id, ptargets, type) => {
+    loader.value = true;
+    const persone = type ? peoples.value.filter(item => item.id === id)[0]: onePersone.value;
+    for (let i = 0; i < ptargets.length; i++) {
+      let isNotFind = true;
+      for (let j = 0; j < persone.ptarget.length; j++) {
+        if(ptargets[i].target_id === persone.ptarget[j].target_id) isNotFind = false;
+      };
+      if (isNotFind) {
+        try {
+          const response = await axios.post('api/ptargets', ptargets[i]);
+          msgStore.addMessage({name: 'Целевая группа: "' + response.data.TargetName + '", добавлена.', icon: 'done'});
+          persone.ptarget = [...persone.ptarget, response.data];
+        } catch (error) {
+          if (error.response?.status === 422) {
+            errors.value = error.response?.data?.errors;
+          } else if (error.response?.status === 403) {
+            msgStore.addMessage({name: error.response?.data?.message, icon: 'error'});
+          } else {
+            msgStore.addMessage({name: error.message, icon: 'error'});
+          }
+        }
+      }
+    };
+    
+    const oldTargets = [];
+    let itemsToDelete = [];
+    for (let i = 0; i < persone.ptarget.length; i++) {
+      let isNotFind = true;
+      for (let j = 0; j < ptargets.length; j++) {
+        if(persone.ptarget[i].target_id === ptargets[j].target_id) isNotFind = false;
+      };
+      if (isNotFind) {
+        itemsToDelete.push(persone.ptarget[i].id);
+        oldTargets.push(persone.ptarget[i]);
+      }
+    }
+    if (itemsToDelete.length) {
+      try {
+        // console.log('delete targets ', itemsToDelete);
+        await axios.post('api/ptargets/delete', { ids: itemsToDelete });
+        let filteredTargets = [...persone.ptarget];
+        oldTargets.forEach(target => {
+          filteredTargets = filteredTargets.filter(item => item.target_id !== target.target_id);
+        })
+        persone.ptarget = [...filteredTargets];
+        msgStore.addMessage({name: 'Целевые нруппы удалены.', icon: 'done'});
+      } catch (error) {
+        if (error.response?.status === 403) {
+          msgStore.addMessage({name: error.response?.data?.message, icon: 'error'});
+        } else if (error.response?.status === 403) {
+          msgStore.addMessage({name: error.response?.data?.message, icon: 'error'});
+        } else {
+        msgStore.addMessage({name: error.message, icon: 'error'});
+        }
+      }
+    }
+  }; // with permitions
+
   const addPersonLevel = async (levelData, type) => {
     loader.value = true;
     try {
@@ -274,6 +334,20 @@ export const usePeopleStore = defineStore('peopleStore', () => {
   const setPermitionToArray = (permitions) => {
     personePermitions.value = [...permitions];
   }; // with permitions
+
+  const getPeoplesWithBirthayOverWeek = async () => {
+    loader.value = true;
+    // console.log('viewStore.searchFilterMask ', viewStore.searchFilterMask);
+    try {
+      const response = await axios.get('api/birthday');
+      peoplesWithBirthday.value = response.data;
+    } catch (error) {
+      console.log(error);
+      msgStore.addMessage({name: error.message, icon: 'error'});
+    }
+    loader.value = false;
+
+  }
  
   const clearErrorsState = () => {
     errors.value = {}
@@ -282,6 +356,7 @@ export const usePeopleStore = defineStore('peopleStore', () => {
   return { 
     peoples,
     onePersone,
+    peoplesWithBirthday,
     personePermitions,
     errors,
     totalCountErrors,
@@ -290,12 +365,14 @@ export const usePeopleStore = defineStore('peopleStore', () => {
     addNewPersone,
     editPersone,
     updatePersoneServices,
+    updatePersoneTargets,
     addPersonLevel,
     deletePersonLevels,
     editPersonLevel,
     getPersonePermitions,
     addNewPermitionToArray,
     setPermitionToArray,
+    getPeoplesWithBirthayOverWeek,
     clearErrorsState,
   }  
 })

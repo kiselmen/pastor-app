@@ -60,6 +60,7 @@
     }
     localStoreWatcher = setInterval(() => checkLocalStorage(), 500);
     await nsiStore.getStatuses();
+    await nsiStore.getSex();
     loader.value = false;
   });
 

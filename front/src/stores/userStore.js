@@ -42,7 +42,7 @@ export const useUserStore = defineStore('userStore', () => {
       await axios.get('/sanctum/csrf-cookie');
       const loginResponse = await axios.post('login', credintails);
       await signIn();
-      router.push('home');
+      router.push('/');
     } catch(error) {
       if (error.response?.status === 422) {
         errors.value = error.response?.data?.errors;
@@ -78,7 +78,7 @@ export const useUserStore = defineStore('userStore', () => {
       localStorage.setItem('token', response.data.token);
       axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
       await signIn();
-      router.push('home');
+      router.push('/');
     } catch(error) {
       if (error.response?.status === 422) {
         errors.value = error.response?.data?.errors;

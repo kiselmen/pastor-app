@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import WelcomeView from '@/views/WelcomeView.vue';
+// import WelcomeView from '@/views/WelcomeView.vue';
 import { useUserStore } from '@/stores/userStore.js';
 
 const guest = (to, from, next) => {
@@ -44,7 +44,8 @@ const router = createRouter({
       path: '/',
       name: 'welcome',
       beforeEnter: auth,
-      component: WelcomeView
+      // component: WelcomeView
+      component: () => import('@/views/WelcomeView.vue') 
     },
     {
       path: '/login',
@@ -58,12 +59,12 @@ const router = createRouter({
       beforeEnter: guest,
       component: () => import('@/views/RegisterView.vue')
     },
-    {
-      path: '/home',
-      name: 'home',
-      beforeEnter: auth,
-      component: () => import('@/views/HomeView.vue') 
-    },
+    // {
+    //   path: '/home',
+    //   name: 'home',
+    //   beforeEnter: auth,
+    //   component: () => import('@/views/HomeView.vue') 
+    // },
     {
       path: '/peoples',
       name: 'peoples',

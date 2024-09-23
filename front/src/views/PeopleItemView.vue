@@ -35,7 +35,12 @@
             </div>
           </div>
           <div class="card-row">
-            <div class="card-img" :style = "{ backgroundImage : 'url(' + getImgPath(peopleStore.onePersone.image_url) +')' }"></div>
+            <div class="card-column">
+              <div class="card-img" :style = "{ backgroundImage : 'url(' + getImgPath(peopleStore.onePersone.image_url) +')' }"></div>
+
+              <div class="sex-men" v-if="peopleStore.onePersone.sex_id === 1">{{ peopleStore.onePersone.SexName }}</div>
+              <div class="sex-women" v-if="peopleStore.onePersone.sex_id === 2">{{ peopleStore.onePersone.SexName }}</div>
+            </div>
             <div class="card-column">
               <DateItem>
                 <template #icon>
@@ -87,6 +92,10 @@
               </DateItem>
 
               <div class="card-text"> {{ peopleStore.onePersone.email}}</div>
+
+              <hr class="custom-hr">
+
+              <div class="card-target" v-for="target in peopleStore.onePersone.ptarget">{{target.TargetName }}</div>
             </div>
           </div>
         </div>
@@ -188,6 +197,10 @@
         @toggle-modal="isModalAction = false"
         :id="activePersone"
     />
+    <EditPersoneTargets v-if="actionName === 'editPersoneTargets'"
+        @toggle-modal="isModalAction = false"
+        :id="activePersone"
+    />
     <RegisterNewUser v-if="actionName === 'registerNewUser'"
         @toggle-modal="isModalAction = false"
         :id="activePersone"
@@ -222,6 +235,7 @@
   import ModalWrapper from '@/components/ui/ModalWrapper.vue';
   import EditPersone  from '@/components/people/EditPersone.vue';
   import EditPersoneServices from '@/components/nsi/EditPersoneServices.vue';
+  import EditPersoneTargets from '@/components/nsi/EditPersoneTargets.vue';
   import EditPersoneLevels from '@/components/nsi/EditPersoneLevels.vue';
   import RegisterNewUser from '@/components/nsi/RegisterNewUser.vue';
   import ChangeUserPass from '@/components/nsi/ChangeUserPass.vue';
@@ -244,8 +258,8 @@
   const activePersone = ref(null);
   const activeUser = ref(null);
 
-  const levelTableHeadNames = ref(['Дата', 'Уровень', 'Описание']);
-  const levelTableHeadID = ref(['date', 'LevelName', 'discription']);
+  const levelTableHeadNames = ref(['Дата', 'Уровень', 'Описание', 'Автор']);
+  const levelTableHeadID = ref(['date', 'LevelName', 'discription', 'UserName']);
 
   const familyTableHeadNames = ref(['Фамилия', 'Имя', 'Отчество', 'Статус', 'Приход']);
   const familyTableHeadID = ref(['name', 'first_name', 'patronymic', 'TargetName', 'PrihodName']);
@@ -356,7 +370,7 @@
       if (isPrihodAdmin) {
         commonActions.value = [
           { id: 0, name: 'Изменить', emit: 'editPersone' },
-          // { id: 1, name: 'Дисциплина', emit: 'editPersoneLevels' },
+          { id: 1, name: 'Целевые группы', emit: 'editPersoneTargets' },
         ];
         levelActions.value = [
           { id: 0, name: 'Изменить', emit: 'editPersoneLevels' },
@@ -448,6 +462,26 @@
   }
   .space {
     margin-left: 40px;
+  }
+  .custom-hr {
+    border: none; /* Убираем стандартное обрамление */
+    height: 2px; /* Высота полоски */
+    background-color: var(--bs-gray-400); /* Цвет полоски */
+    width: 80%; /* Ширина полоски (100% - на всю ширину родителя) */
+    margin: 20px 0; /* Отступы сверху и снизу */
+  }
+  .card-column {
+    justify-content: space-between;    
+  }
+  .sex{
+    &-men {
+      padding-left: 10px;
+      color: var(--bs-primary);
+    }
+    &-women {
+      padding-left: 10px;
+      color: var(--bs-pink);
+    }
   }
 
 </style>

@@ -30,7 +30,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/peoples/{id}', 'App\Http\Controllers\Api\PeopleController@show'); // с правами доступа
     Route::post('/peoples', 'App\Http\Controllers\Api\PeopleController@store'); // с правами доступа
     Route::post('/peoples/{id}/update', 'App\Http\Controllers\Api\PeopleController@update'); // с правами доступа
-
+    Route::get('/birthday', 'App\Http\Controllers\Api\PeopleController@birthday'); // с правами доступа
+    
     Route::get('/targets', 'App\Http\Controllers\Api\TargetController@index'); // с правами доступа
     Route::post('/targets', 'App\Http\Controllers\Api\TargetController@store'); // с правами доступа
 
@@ -41,6 +42,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/pservices', 'App\Http\Controllers\Api\PserviceController@store');  // с правами доступа
     Route::post('/pservices/delete', 'App\Http\Controllers\Api\PserviceController@delete'); // с правами доступа
+
+    Route::post('/ptargets', 'App\Http\Controllers\Api\PtargetController@store');  // с правами доступа
+    Route::post('/ptargets/delete', 'App\Http\Controllers\Api\PtargetController@delete'); // с правами доступа
 
     Route::get('/levels', 'App\Http\Controllers\Api\LevelController@index'); // с правами доступа
     Route::post('/levels', 'App\Http\Controllers\Api\LevelController@store'); // с правами доступа
@@ -60,7 +64,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/families/{id}/update', 'App\Http\Controllers\Api\FamilyController@update'); // с правами доступа
 });
 Route::get('/statuses', 'App\Http\Controllers\Api\StatusController@index');
-
+Route::get('/sexes', 'App\Http\Controllers\Api\SexController@index'); // с правами доступа
 
 // Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 //     // return $request->user();
