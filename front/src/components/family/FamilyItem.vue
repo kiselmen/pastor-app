@@ -1,5 +1,5 @@
 <template>
-  <div class = "card">
+  <div class = "card" ref="cardElem">
     <div class="card-title">
       <span>
         <RouterLink :to="'/family/' + props.family?.id">

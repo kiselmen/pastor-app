@@ -31,6 +31,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/peoples', 'App\Http\Controllers\Api\PeopleController@store'); // с правами доступа
     Route::post('/peoples/{id}/update', 'App\Http\Controllers\Api\PeopleController@update'); // с правами доступа
     Route::get('/birthday', 'App\Http\Controllers\Api\PeopleController@birthday'); // с правами доступа
+    Route::post('/born_peoples', 'App\Http\Controllers\Api\PeopleController@born_report'); // с правами доступа
     
     Route::get('/targets', 'App\Http\Controllers\Api\TargetController@index'); // с правами доступа
     Route::post('/targets', 'App\Http\Controllers\Api\TargetController@store'); // с правами доступа

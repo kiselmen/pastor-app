@@ -34,9 +34,9 @@
 </template>
 
 <script setup>
-  import Table from '@/components/ui/Table.vue';
   import { useNsiStore } from '@/stores/nsiStore.js';
   import { ref, onBeforeMount } from 'vue';
+  import Table from '@/components/ui/Table.vue';
   import AddTarget from '@/components/nsi/AddTarget.vue';
   import ModalWrapper from '@/components/ui/ModalWrapper.vue';
 

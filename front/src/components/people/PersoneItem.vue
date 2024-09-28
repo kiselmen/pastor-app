@@ -1,5 +1,5 @@
 <template>
-  <div class = "card">
+  <div class = "card" ref="cardElem">
     <div class="card-title">
         <div :class="personeStatusStyle" :style = "{background: personeStatusColor }">
           {{ personeStatusLength ? personeStatusLength: ''}}
@@ -12,6 +12,7 @@
         <div class="change_button" v-if="props.isActionPossible">
           <ActionMenu 
             :actions = "actions"
+            :parentElem = "cardElem"
             @startAction="onStartAction"
           >
             <template #icon >
@@ -137,7 +138,8 @@
   const emits = defineEmits(['editPersone', 'editPersoneLevels', 'editPersoneTargets', 'editPersoneServices', 'registerNewUser', 'changeUserPass', 'changeUserPermitions']);
 
   const actions = ref([]);
-
+  const cardElem = ref(null);
+  
   const isAvailableActions = computed(() => {
     return actions.value.length;
   });

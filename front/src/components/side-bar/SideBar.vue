@@ -37,6 +37,24 @@
           <a @click.prevent="onToggleMenuItem">
             <div class="sidebar-item">
               <ToolingIcon class="sidebar-icon"/>
+              <span class="sidebar-link">Отчеты</span>
+              <ChevronDownIcon class="sidebar-chevron"/>
+            </div>
+          </a>
+          <ul class="children">
+            <li>
+              <RouterLink to="/report-borns" @click="onMenuClick">
+                <div class="sidebar-subitem">
+                  <span class="sidebar-link">Родилось/Умерли</span>
+                </div>
+              </RouterLink>
+            </li>
+          </ul>
+        </li>
+        <li v-if="userStore.isPermition(0)">
+          <a @click.prevent="onToggleMenuItem">
+            <div class="sidebar-item">
+              <ToolingIcon class="sidebar-icon"/>
               <span class="sidebar-link">НСИ</span>
               <ChevronDownIcon class="sidebar-chevron"/>
             </div>

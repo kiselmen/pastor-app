@@ -104,7 +104,7 @@
 </template>
 
 <script setup>
-  import { ref, watch, onBeforeMount, computed, onUpdated } from 'vue';
+  import { ref, watch, onBeforeMount, computed, onUnmounted } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
   import { usePeopleStore } from '@/stores/peopleStore';
   import { useUserStore } from '@/stores/userStore';
@@ -308,6 +308,10 @@
     await getPeoplesFromAPI();
     loader.value = false;
   });
+
+  onUnmounted(() => {
+    peopleStore.clearPeopleState();
+  })
 
 </script>
 

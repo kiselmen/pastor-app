@@ -44,8 +44,11 @@ export const useUserStore = defineStore('userStore', () => {
       await signIn();
       router.push('/');
     } catch(error) {
+      console.log(error);
       if (error.response?.status === 422) {
         errors.value = error.response?.data?.errors;
+      } else if (error.response?.status === 401) {
+        // errors.value = error.response?.data?.errors;
       } else {
         msgStore.addMessage({name: error.message, icon: 'error'});
       }
@@ -80,8 +83,11 @@ export const useUserStore = defineStore('userStore', () => {
       await signIn();
       router.push('/');
     } catch(error) {
+      console.log(error);
       if (error.response?.status === 422) {
         errors.value = error.response?.data?.errors;
+      } else if (error.response?.status === 401) {
+        // errors.value = error.response?.data?.errors;
       } else {
         msgStore.addMessage({name: error.message, icon: 'error'});
       }
@@ -102,11 +108,13 @@ export const useUserStore = defineStore('userStore', () => {
       }
       msgStore.addMessage({name: 'Пользователь: "' + credintails.name + '", добавлен.', icon: 'done'});
     } catch(error) {
+      console.log(error);
       if (error.response?.status === 422) {
-        console.log(error);
         errors.value = error.response?.data?.errors;
       } else if (error.response?.status === 403) {
         msgStore.addMessage({name: error.response?.data?.message, icon: 'error'});
+      } else if (error.response?.status === 401) {
+        // errors.value = error.response?.data?.errors;
       } else {
         msgStore.addMessage({name: error.message, icon: 'error'});
       }
@@ -122,11 +130,13 @@ export const useUserStore = defineStore('userStore', () => {
       const response = await axios.post('api/user/change', credintails);
       msgStore.addMessage({name: 'Пароль для: "' + credintails.name + '", изменен.', icon: 'done'});
     } catch(error) {
+      console.log(error);
       if (error.response?.status === 422) {
-        console.log(error);
         errors.value = error.response?.data?.errors;
       } else if (error.response?.status === 403) {
         msgStore.addMessage({name: error.response?.data?.message, icon: 'error'});
+      } else if (error.response?.status === 401) {
+        // errors.value = error.response?.data?.errors;
       } else {
         msgStore.addMessage({name: error.message, icon: 'error'});
       }
@@ -150,10 +160,13 @@ export const useUserStore = defineStore('userStore', () => {
           msgStore.addMessage({name: 'Доступ: "' + permitions[i].name + ' ' + permitions[i].source_name + '", добавлен.', icon: 'done'});
           peopleStore.addNewPermitionToArray(permitions[i]);
         } catch (error) {
+          console.log(error);
           if (error.response?.status === 422) {
             errors.value = error.response?.data?.errors;
           } else if (error.response?.status === 403) {
             msgStore.addMessage({name: error.response?.data?.message, icon: 'error'});
+          } else if (error.response?.status === 401) {
+            // errors.value = error.response?.data?.errors;
           } else {
             msgStore.addMessage({name: error.message, icon: 'error'});
           }
@@ -184,12 +197,15 @@ export const useUserStore = defineStore('userStore', () => {
         peopleStore.setPermitionToArray(filteredPermitions);
         msgStore.addMessage({name: 'Доступы удалены.', icon: 'done'});
       } catch (error) {
+        console.log(error);
         if (error.response?.status === 403) {
           msgStore.addMessage({name: error.response?.data?.message, icon: 'error'});
         } else if (error.response?.status === 403) {
           msgStore.addMessage({name: error.response?.data?.message, icon: 'error'});
+        } else if (error.response?.status === 401) {
+          // msgStore.addMessage({name: error.response?.data?.message, icon: 'error'});
         } else {
-        msgStore.addMessage({name: error.message, icon: 'error'});
+          msgStore.addMessage({name: error.message, icon: 'error'});
         }
       }
     }

@@ -195,6 +195,37 @@ class PeopleController extends BaseController
     return [...$collection];
   }
 
+  public function born_report(Request $request){
+    $User = auth()->user()->load('permition');
+    $Permitions = $User->permition;
+    $isAdmin = false;
+    $prihodIDs = [];
+    foreach ($Permitions as $permition) {
+      if ($permition->type == 0) $isAdmin = true;
+      if ($permition->type == 1) {
+        array_push($prihodIDs, $permition->source_id);
+      }
+    }
+
+    if ($isAdmin) {
+        $collection = People::query();
+    } else {
+        $collection = People::whereIn('prihod_id', $prihodIDs);
+    }
+
+    $start = $request['start'];    
+    $end = $request['end'];
+    $rip = $request['rip'];    
+
+    if ($rip) {
+      $collection = $collection->whereBetween('death_date', [$start, $end])->get()->load('family');
+    } else {
+      $collection = $collection->whereBetween('birthday_date', [$start, $end])->get()->load('family');
+    }
+    
+    return $collection;
+  }
+
   public function show($id){
     $findPersone = People::find($id);
     if ($findPersone) {

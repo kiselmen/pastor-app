@@ -101,9 +101,10 @@
     justify-content: flex-start;
     align-items: center;
   }
-  // &-text {
-  //   margin: auto;
-  // }
+  &-info {
+    padding: 2px;
+    font-size: 8px;
+  }
   &-img {
     width: 100%;
     max-width: 300px;

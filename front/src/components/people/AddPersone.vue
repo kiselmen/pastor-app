@@ -203,7 +203,7 @@
       <div v-if="formStep === 1" class="table1x">
           <div>
             <label class="checkbox-control">
-              <input type="checkbox" id="isLocalGame" v-model="isOpenNewFamily" @change="onClearFamilyData"/>
+              <input type="checkbox" v-model="isOpenNewFamily" @change="onClearFamilyData"/>
               Новая семья
             </label>
           </div>

@@ -122,6 +122,12 @@ const router = createRouter({
       beforeEnter: permition,
       component: () => import('@/views/LevelsListView.vue') 
     },
+    {
+      path: '/report-borns',
+      name: 'borns',
+      beforeEnter: permition,
+      component: () => import('@/views/ReportBornView.vue') 
+    },    
   ]
 })
 

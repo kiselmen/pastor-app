@@ -40,7 +40,9 @@ export const useNsiStore = defineStore('nsiStore', () => {
       statuses.value = response.data.sort((a ,b) => a.id - b.id);
     } catch (error) {
       console.log(error);
-      msgStore.addMessage({name: error.message, icon: 'error'});
+      if (error.response?.status !== 401) {
+        msgStore.addMessage({name: error.message, icon: 'error'});
+      }  
     }
     loader.value = false;
   };
@@ -52,7 +54,9 @@ export const useNsiStore = defineStore('nsiStore', () => {
       sexes.value = response.data.sort((a ,b) => a.id - b.id);
     } catch (error) {
       console.log(error);
-      msgStore.addMessage({name: error.message, icon: 'error'});
+      if (error.response?.status !== 401) {
+        msgStore.addMessage({name: error.message, icon: 'error'});
+      }  
     }
     loader.value = false;
   };
@@ -64,7 +68,9 @@ export const useNsiStore = defineStore('nsiStore', () => {
       targets.value = response.data.sort((a ,b) => a.id - b.id);
     } catch (error) {
       console.log(error);
-      msgStore.addMessage({name: error.message, icon: 'error'});
+      if (error.response?.status !== 401) {
+        msgStore.addMessage({name: error.message, icon: 'error'});
+      }  
     }
     loader.value = false;
   };
@@ -77,8 +83,11 @@ export const useNsiStore = defineStore('nsiStore', () => {
       targets.value = [...targets.value, response.data].sort((a ,b) => a.id - b.id);
       msgStore.addMessage({name: 'Целевая группа: "' + response.data.name + '", добавлена.', icon: 'done'});
     } catch (error) {
+      console.log(error);
       if (error.response?.status === 422) {
         errors.value = error.response?.data?.errors;
+      } else if (error.response?.status === 401) {
+        // errors.value = error.response?.data?.errors;
       } else {
         msgStore.addMessage({name: error.message, icon: 'error'});
       }
@@ -96,7 +105,9 @@ export const useNsiStore = defineStore('nsiStore', () => {
       });
     } catch (error) {
       console.log(error);
-      msgStore.addMessage({name: error.message, icon: 'error'});
+      if (error.response?.status !== 401) {
+        msgStore.addMessage({name: error.message, icon: 'error'});
+      }  
     }
     loader.value = false;
   };
@@ -111,6 +122,8 @@ export const useNsiStore = defineStore('nsiStore', () => {
     } catch (error) {
       if (error.response?.status === 422) {
         errors.value = error.response?.data?.errors;
+      } else if (error.response?.status === 401) {
+        // errors.value = error.response?.data?.errors;
       } else {
         msgStore.addMessage({name: error.message, icon: 'error'});
       }
@@ -129,6 +142,8 @@ export const useNsiStore = defineStore('nsiStore', () => {
     } catch (error) {
       if (error.response?.status === 422) {
         errors.value = error.response?.data?.errors;
+      } else if (error.response?.status === 401) {
+        // errors.value = error.response?.data?.errors;
       } else {
         msgStore.addMessage({name: error.message, icon: 'error'});
       }
@@ -150,6 +165,8 @@ export const useNsiStore = defineStore('nsiStore', () => {
       console.log('error ', error);
       if (error.response?.status === 422) {
         errors.value = error.response?.data?.errors;
+      } else if (error.response?.status === 401) {
+        // errors.value = error.response?.data?.errors;
       } else {
         msgStore.addMessage({name: error.message, icon: 'error'});
       }
@@ -173,7 +190,9 @@ export const useNsiStore = defineStore('nsiStore', () => {
       levels.value = response.data.sort((a ,b) => a.id - b.id);
     } catch (error) {
       console.log(error);
-      msgStore.addMessage({name: error.message, icon: 'error'});
+      if (error.response?.status !== 401) {
+        msgStore.addMessage({name: error.message, icon: 'error'});
+      }  
     }
     loader.value = false;
   };
@@ -188,6 +207,8 @@ export const useNsiStore = defineStore('nsiStore', () => {
     } catch (error) {
       if (error.response?.status === 422) {
         errors.value = error.response?.data?.errors;
+      } else if (error.response?.status === 401) {
+        // errors.value = error.response?.data?.errors;
       } else {
         msgStore.addMessage({name: error.message, icon: 'error'});
       }
@@ -207,6 +228,8 @@ export const useNsiStore = defineStore('nsiStore', () => {
     } catch (error) {
       if (error.response?.status === 422) {
         errors.value = error.response?.data?.errors;
+      } else if (error.response?.status === 401) {
+        // errors.value = error.response?.data?.errors;
       } else {
         msgStore.addMessage({name: error.message, icon: 'error'});
       }

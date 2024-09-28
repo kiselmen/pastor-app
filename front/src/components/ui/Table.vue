@@ -11,6 +11,7 @@
               />
               <ActionMenu
                 :actions = "multiRowActions"
+                :parentElem = "tableElem"
                 @startAction="onAllRowsAction"
               >
                 <template #icon>

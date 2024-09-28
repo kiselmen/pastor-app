@@ -19,7 +19,9 @@ export const usePrihodStore = defineStore('prihodStore', () => {
       prihods.value = response.data.sort((a ,b) => a.id - b.id);
     } catch (error) {
       console.log(error);
-      msgStore.addMessage({name: error.message, icon: 'error'});
+      if (error.response?.status !== 401) {
+        msgStore.addMessage({name: error.message, icon: 'error'});
+      }  
     }
     loader.value = false;
   }; // with permitions
@@ -32,10 +34,13 @@ export const usePrihodStore = defineStore('prihodStore', () => {
       prihods.value = [...prihods.value, response.data].sort((a ,b) => a.id - b.id);
       msgStore.addMessage({name: 'Участок: "' + response.data.name + '", добавлен.', icon: 'done'});
     } catch (error) {
+      console.log(error);
       if (error.response?.status === 422) {
         errors.value = error.response?.data?.errors;
       } else if (error.response?.status === 403) {
         msgStore.addMessage({name: error.response?.data?.message, icon: 'error'});
+      } else if (error.response?.status === 401) {
+        // msgStore.addMessage({name: error.response?.data?.message, icon: 'error'});
       } else {
         msgStore.addMessage({name: error.message, icon: 'error'});
       }
@@ -54,10 +59,13 @@ export const usePrihodStore = defineStore('prihodStore', () => {
       prihods.value = [...newPersons, response.data].sort((a ,b) => a.id - b.id)
       msgStore.addMessage({name: 'Участок: "' + response.data.name + '", изменен.', icon: 'done'});
     } catch (error) {
+      console.log(error);
       if (error.response?.status === 422) {
         errors.value = error.response?.data?.errors;
       } else if (error.response?.status === 403) {
         msgStore.addMessage({name: error.response?.data?.message, icon: 'error'});
+      } else if (error.response?.status === 401) {
+        // msgStore.addMessage({name: error.response?.data?.message, icon: 'error'});
       } else {
         msgStore.addMessage({name: error.message, icon: 'error'});
       }

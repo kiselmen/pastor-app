@@ -39,9 +39,32 @@ export const usePeopleStore = defineStore('peopleStore', () => {
       });
     } catch (error) {
       console.log(error);
-      msgStore.addMessage({name: error.message, icon: 'error'});
+      if (error.response?.status === 403) {
+        msgStore.addMessage({name: error.message, icon: 'error'});
+      } else if (error.response?.status === 401) {
+        // msgStore.addMessage({name: error.response?.data?.message, icon: 'error'});
+      } else {
+        msgStore.addMessage({name: error.message, icon: 'error'});
+      }
     }
     loader.value = false;
+  }; // with permitions
+
+  const getBornPeople = async (start, end, rip) => {
+    loader.value = true;
+    try {
+      const response = await axios.post('api/born_peoples', {start, end, rip});
+      peoples.value = response.data.sort((a ,b) => a.id - b.id);
+    } catch (error) {
+      console.log(error);
+      if (error.response?.status === 403) {
+        msgStore.addMessage({name: "Не достаточно прав доступа", icon: 'error'});
+      } else if (error.response?.status === 401) {
+        // msgStore.addMessage({name: error.response?.data?.message, icon: 'error'});
+      } else {
+        msgStore.addMessage({name: error.message, icon: 'error'});
+      }
+    }
   }; // with permitions
 
   const getOnePersone = async (id) => {
@@ -50,11 +73,15 @@ export const usePeopleStore = defineStore('peopleStore', () => {
       const response = await axios.get('api/peoples/' + id);
       onePersone.value = response.data;
     } catch (error) {
-      if (error.response.status == 403) msgStore.addMessage({name: "Не достаточно прав доступа", icon: 'error'});
-      else if (error.response.status == 404) msgStore.addMessage({name: "Не найдено", icon: 'error'});
-      else {
+      console.log(error);
+      if (error.response.status == 403) {
+        msgStore.addMessage({name: "Не достаточно прав доступа", icon: 'error'});
+      } else if (error.response.status == 404) {
+        msgStore.addMessage({name: "Не найдено", icon: 'error'});
+      } else if (error.response.status == 401) {
+        // msgStore.addMessage({name: "Не найдено", icon: 'error'});
+      } else {
         msgStore.addMessage({name: error.message, icon: 'error'});
-        console.log(error);
       }  
     }
       
@@ -72,12 +99,14 @@ export const usePeopleStore = defineStore('peopleStore', () => {
       });
       msgStore.addMessage({name: 'Прихожанин: "' + response.data.name + ' ' + response.data.first_name + '", добавлен.', icon: 'done'});
     } catch (error) {
+      console.log(error);
       if (error.response?.status === 422) {
         errors.value = error.response?.data?.errors;
       } else if (error.response?.status === 403) {
         msgStore.addMessage({name: error.response?.data?.message, icon: 'error'});
+      } else if (error.response?.status === 401) {
+        // msgStore.addMessage({name: error.response?.data?.message, icon: 'error'});
       } else {
-        console.log(error);
         msgStore.addMessage({name: error.message, icon: 'error'});
       }
     }
@@ -101,16 +130,23 @@ export const usePeopleStore = defineStore('peopleStore', () => {
       }
       msgStore.addMessage({name: 'Прихожанин: "' + response.data.name + ' ' + response.data.first_name + '", обновлен.', icon: 'done'});
     } catch (error) {
+      console.log(error);
       if (error.response?.status === 422) {
         errors.value = error.response?.data?.errors;
       } else if (error.response?.status === 403) {
         msgStore.addMessage({name: error.response?.data?.message, icon: 'error'});
+      } else if (error.response?.status === 401) {
+        // msgStore.addMessage({name: error.response?.data?.message, icon: 'error'});
       } else {
         msgStore.addMessage({name: error.message, icon: 'error'});
       }
     }
     loader.value = false;
   }; // with permitions
+
+  const clearPeopleState = () => {
+    peoples.value = [];
+  }
 
   const updatePersoneServices = async (id, pservices, type) => {
     loader.value = true;
@@ -126,10 +162,13 @@ export const usePeopleStore = defineStore('peopleStore', () => {
           msgStore.addMessage({name: 'Вид служения: "' + response.data.ServiceName + '", добавлен.', icon: 'done'});
           persone.pservice = [...persone.pservice, response.data];
         } catch (error) {
+          console.log(error);
           if (error.response?.status === 422) {
             errors.value = error.response?.data?.errors;
           } else if (error.response?.status === 403) {
             msgStore.addMessage({name: error.response?.data?.message, icon: 'error'});
+          } else if (error.response?.status === 401) {
+            // msgStore.addMessage({name: error.response?.data?.message, icon: 'error'});
           } else {
             msgStore.addMessage({name: error.message, icon: 'error'});
           }
@@ -160,12 +199,15 @@ export const usePeopleStore = defineStore('peopleStore', () => {
         persone.pservice = [...filteredServices];
         msgStore.addMessage({name: 'Виды служения удалены.', icon: 'done'});
       } catch (error) {
+        console.log(error);
         if (error.response?.status === 403) {
           msgStore.addMessage({name: error.response?.data?.message, icon: 'error'});
         } else if (error.response?.status === 403) {
           msgStore.addMessage({name: error.response?.data?.message, icon: 'error'});
+        } else if (error.response?.status === 401) {
+          // msgStore.addMessage({name: error.response?.data?.message, icon: 'error'});
         } else {
-        msgStore.addMessage({name: error.message, icon: 'error'});
+          msgStore.addMessage({name: error.message, icon: 'error'});
         }
       }
     }
@@ -186,10 +228,13 @@ export const usePeopleStore = defineStore('peopleStore', () => {
           msgStore.addMessage({name: 'Целевая группа: "' + response.data.TargetName + '", добавлена.', icon: 'done'});
           persone.ptarget = [...persone.ptarget, response.data];
         } catch (error) {
+          console.log(error);
           if (error.response?.status === 422) {
             errors.value = error.response?.data?.errors;
           } else if (error.response?.status === 403) {
             msgStore.addMessage({name: error.response?.data?.message, icon: 'error'});
+          } else if (error.response?.status === 401) {
+            // msgStore.addMessage({name: error.response?.data?.message, icon: 'error'});
           } else {
             msgStore.addMessage({name: error.message, icon: 'error'});
           }
@@ -220,12 +265,13 @@ export const usePeopleStore = defineStore('peopleStore', () => {
         persone.ptarget = [...filteredTargets];
         msgStore.addMessage({name: 'Целевые нруппы удалены.', icon: 'done'});
       } catch (error) {
+        console.log(error);
         if (error.response?.status === 403) {
           msgStore.addMessage({name: error.response?.data?.message, icon: 'error'});
-        } else if (error.response?.status === 403) {
-          msgStore.addMessage({name: error.response?.data?.message, icon: 'error'});
+        } else if (error.response?.status === 401) {
+          // msgStore.addMessage({name: error.response?.data?.message, icon: 'error'});
         } else {
-        msgStore.addMessage({name: error.message, icon: 'error'});
+          msgStore.addMessage({name: error.message, icon: 'error'});
         }
       }
     }
@@ -244,10 +290,13 @@ export const usePeopleStore = defineStore('peopleStore', () => {
       }
       msgStore.addMessage({name: 'Дисциплина: "' + response.data.LevelName + '", добавлена.', icon: 'done'});
     } catch (error) {
+      console.log(error);
       if (error.response?.status === 422) {
         errors.value = error.response?.data?.errors;
       } else if (error.response?.status === 403) {
         msgStore.addMessage({name: error.response?.data?.message, icon: 'error'});
+      } else if (error.response?.status === 401) {
+        // msgStore.addMessage({name: error.response?.data?.message, icon: 'error'});
       } else {
         msgStore.addMessage({name: error.message, icon: 'error'});
       }
@@ -276,8 +325,11 @@ export const usePeopleStore = defineStore('peopleStore', () => {
       }
       msgStore.addMessage({name: 'Дисциплина удалена.', icon: 'done'});
     } catch (error) {
+      console.log(error);
       if (error.response?.status === 422) {
         errors.value = error.response?.data?.errors;
+      } else if (error.response?.status === 401) {
+        // errors.value = error.response?.data?.errors;
       } else {
         msgStore.addMessage({name: error.message, icon: 'error'});
       }
@@ -300,8 +352,11 @@ export const usePeopleStore = defineStore('peopleStore', () => {
       }
       msgStore.addMessage({name: 'Дисциплина: "' + response.data.LevelName + '", изменена.', icon: 'done'});
     } catch (error) {
+      console.log(error);
       if (error.response?.status === 422) {
         errors.value = error.response?.data?.errors;
+      } else if (error.response?.status === 401) {
+        // errors.value = error.response?.data?.errors;
       } else {
         msgStore.addMessage({name: error.message, icon: 'error'});
       }
@@ -315,11 +370,13 @@ export const usePeopleStore = defineStore('peopleStore', () => {
       const response = await axios.get('api/user/' + user_id + '/permitions');
       personePermitions.value = response.data;
     } catch (error) {
+      console.log(error);
       if (error.response?.status === 422) {
-        console.log(error);
         errors.value = error.response?.data?.errors;
       } else if (error.response?.status === 403) {
         msgStore.addMessage({name: error.response?.data?.message, icon: 'error'});
+      } else if (error.response?.status === 401) {
+        // msgStore.addMessage({name: error.response?.data?.message, icon: 'error'});
       } else {
         msgStore.addMessage({name: error.message, icon: 'error'});
       }
@@ -343,11 +400,16 @@ export const usePeopleStore = defineStore('peopleStore', () => {
       peoplesWithBirthday.value = response.data;
     } catch (error) {
       console.log(error);
-      msgStore.addMessage({name: error.message, icon: 'error'});
-    }
+      if (error.response?.status === 422) {
+        msgStore.addMessage({name: error.message, icon: 'error'});
+      } else if (error.response?.status === 401) {
+        // msgStore.addMessage({name: error.response?.data?.message, icon: 'error'});
+      } else {
+        msgStore.addMessage({name: error.message, icon: 'error'});
+      }
+    }  
     loader.value = false;
-
-  }
+  };
  
   const clearErrorsState = () => {
     errors.value = {}
@@ -361,9 +423,11 @@ export const usePeopleStore = defineStore('peopleStore', () => {
     errors,
     totalCountErrors,
     getAllPeople,
+    getBornPeople,
     getOnePersone,
     addNewPersone,
     editPersone,
+    clearPeopleState,
     updatePersoneServices,
     updatePersoneTargets,
     addPersonLevel,

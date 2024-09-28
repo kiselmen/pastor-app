@@ -1,11 +1,11 @@
 <template>
-    <div class="action-container" ref="el">
-      <div class="action-icon">
+    <div class="action-container" ref="actionElem">
+      <div class="action-icon" ref="iconElem">
         <slot name="icon"></slot>
       </div>
 
-      <div class="action-menu--wrapper" v-if="actions" :class="[checkDirection ? 'down' : 'up']">
-        <div class="action-menu">
+      <div class="action-menu--wrapper" v-if="actions" :class="[checkVDirection]" :style = "{left : checkHDirection}">
+        <div class="action-menu" ref= "menuElem">
           <span class="action-item" v-for="action in actions" @click="onAction(action.id)">
             {{ action.name }}
           </span>
@@ -24,7 +24,9 @@
   });
 
   const limit = ref(null);
-  const el = ref(null);
+  const actionElem = ref(null);
+  const iconElem = ref(null);
+  const menuElem = ref(null);
 
   const emits = defineEmits(['startAction']);
 
@@ -32,15 +34,35 @@
     emits('startAction', actionID, props.boxID);
   }
 
-  const checkDirection = computed (() => {
-    // console.log('el ', el.value);
-    // console.log('Parent ', props.parentElem);
-    if (!props.parentElem || !el.value) {
-      return true
+  const checkHDirection = computed(() => {
+    if (iconElem.value && menuElem.value) {
+      const iconLeft = iconElem.value.getBoundingClientRect().left
+      const menuSize = menuElem.value.getBoundingClientRect().right - menuElem.value.getBoundingClientRect().left;
+      // console.log('iconLeft ', iconLeft, ' menuSize ', menuSize);
+      let direction = 'right';
+      if (iconLeft < menuSize) { 
+        // direction = 'right';
+        direction = iconLeft;
+      } else {
+        // direction = 'left';
+        direction = 'calc(100% - ' + menuSize + 'px)';
+      }
+      return direction
+    }  
+  });
+
+
+  const checkVDirection = computed (() => {
+    if (!props.parentElem || !actionElem.value) {
+      return 'down';
     } else {
-      const totalBottom = props.parentElem.getBoundingClientRect().bottom;
-      const totalTop = props.parentElem.getBoundingClientRect().top;
-      const input = el.value.querySelector(".action-icon").getBoundingClientRect().bottom
+      const parentBottom = props.parentElem.getBoundingClientRect().bottom;
+      const parentTop = props.parentElem.getBoundingClientRect().top;
+      const parentLeft = props.parentElem.getBoundingClientRect().left;
+      const parentRight = props.parentElem.getBoundingClientRect().right;
+      const iconBottom = iconElem.value.getBoundingClientRect().bottom
+      // console.log('parentLeft ', parentLeft, ' parentRight ', parentRight);
+      
       let limited = props.actions.length;
       if (props.actions) {
         limited = props.actions.length;
@@ -48,20 +70,20 @@
         limited = 0;
       }
       // console.log('Limit ', limited);
-      if ((totalBottom - input) < limited * 32 && (input - totalTop - 40) < (limited + 1) * 32) {
+      if ((parentBottom - iconBottom) < limited * 32 && (iconBottom - parentTop - 40) < (limited + 1) * 32) {
         // console.log('Not enouth space');
-        // console.log('top: ', totalTop, 'input: ', input, 'bottom: ', totalBottom);
-        let limitBottom = Math.trunc((totalBottom - input) / 32);
-        let limitTop = Math.trunc((input - totalTop - 40) / 32) + 1;
+        // console.log('top: ', parentTop, 'iconBottom: ', iconBottom, 'bottom: ', parentBottom);
+        let limitBottom = Math.trunc((parentBottom - iconBottom) / 32);
+        let limitTop = Math.trunc((iconBottom - parentTop - 40) / 32) + 1;
         if (limitBottom > limitTop) {
           limit.value = Math.min(limitBottom, limit.value);
-          return true
+          return 'down';
         } else {
           limit.value = Math.min(limitTop, limit.value);
-          return false
+          return 'up';
         }
       }
-      return (totalBottom - input) > limited * 32 ? true : false;
+      return (parentBottom - iconBottom) > limited * 32 ? 'down': 'up';
     }
   })
 
@@ -98,7 +120,7 @@
             background-color: var(--bs-gray-200);
         }
         &--wrapper {
-            left: calc(100% - 140px);
+            // left: calc(100% - 140px);
             opacity: 0;
             padding-bottom: 8px;
             position: absolute;
