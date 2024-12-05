@@ -59,6 +59,9 @@ input[type="color"]{
   border: 1px solid var(--bs-primary);
   border-radius: 0px;
   padding-bottom: 20px;
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
 
   &-group {
     margin-top: 20px;
@@ -133,13 +136,21 @@ input[type="color"]{
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: flex-start;
-    margin: 0 auto;
+    // margin: 0 auto;
     margin-top: 30px;
   }
 
   &-line {
     border-top: 0.25px solid var(--bs-gray-600);
     margin: 0 20px;
+  }
+
+  &-bottom {
+    flex-shrink: 0;
+  }
+
+  &-middle {
+    flex-grow: 1;    
   }
 }
 

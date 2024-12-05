@@ -8,7 +8,7 @@
     >
       <div v-if="props.isModalActive" class="modal" ref="modalEl" @click="onCloseModal">
         <div
-          class="modal__content"
+          class="modal__content scroll"
           :class="{ 'sticky-top' : props.isSticky?.value && props.isSticky?.position === 'top' }"
         >
         <!-- @click.stop -->

@@ -13,6 +13,7 @@ export const useNsiStore = defineStore('nsiStore', () => {
   const targets = ref([]);
   const services = ref([]);
   const levels = ref([]);
+  const relations = ref([]);
   const loader = ref(false);
   const errors = ref({});
 
@@ -237,6 +238,40 @@ export const useNsiStore = defineStore('nsiStore', () => {
     loader.value = false;
   };
 
+  const getRelations = async () => {
+    loader.value = true;
+    try {
+      const response = await axios.get('api/relations');
+      relations.value = response.data.sort((a ,b) => a.id - b.id);
+    } catch (error) {
+      console.log(error);
+      if (error.response?.status !== 401) {
+        msgStore.addMessage({name: error.message, icon: 'error'});
+      }  
+    }
+    loader.value = false;
+  };
+
+  const addNewRelation = async (data) => {
+    loader.value = true;
+    try {
+      errors.value = {};
+      const response = await axios.post('api/relations', data);
+      relations.value = [...relations.value, response.data].sort((a ,b) => a.id - b.id);
+      msgStore.addMessage({name: 'Отношение: "' + response.data.name + '", добавлено.', icon: 'done'});
+    } catch (error) {
+      console.log(error);
+      if (error.response?.status === 422) {
+        errors.value = error.response?.data?.errors;
+      } else if (error.response?.status === 401) {
+        // errors.value = error.response?.data?.errors;
+      } else {
+        msgStore.addMessage({name: error.message, icon: 'error'});
+      }
+    }
+    loader.value = false;
+  }
+
   const clearErrorsState = () => {
     errors.value = {}
   };
@@ -250,6 +285,7 @@ export const useNsiStore = defineStore('nsiStore', () => {
     targets,
     services,
     levels,
+    relations,
     loader,
     getStatuses,
     getSex,
@@ -265,6 +301,8 @@ export const useNsiStore = defineStore('nsiStore', () => {
     getLevels,
     addNewLevel,
     editLevel,
+    getRelations,
+    addNewRelation,
     clearErrorsState,
   }
 });

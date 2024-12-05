@@ -1,8 +1,10 @@
 <template>
-  <div v-if="curPersone.id" class="form">
+  <div v-if="curPersone.id" class="form" ref="formElem">
     <div class="form-header">Дисциплина {{ curPersone.name }} {{ curPersone.first_name }} {{ curPersone.patronymic }}</div>
-    <div v-if="loader" class="form-text">Loading...</div>
-    <div v-if="!loader&&!confirmWindow" class="form-container section-container">
+    <div v-if="loader" class="form-container section-container form-middle">
+      <div class="form-text">Loading...</div>
+    </div>
+    <div v-if="!loader&&!confirmWindow" class="form-container section-container form-middle">
       <div class = "table1x">
         <div v-if="curPersone.plevel.length" class="card-table">
           <Table
@@ -20,12 +22,8 @@
         </div>
         <div v-if="!curPersone.plevel.length" class="card-table">Нарушений нет</div>
       </div>  
-      <div v-if="!isFormOpen" class="form-buttons">
-        <button @click.prevent="onOpenForm('add')" class="btn btn-blue" >{{ formType == 'add' ? 'Новая запись': 'Изминить' }}</button>
-        <button @click.prevent="emits('toggleModal')" class="btn btn-gray">Отмена</button>
-      </div>
     </div>
-    <div v-if = "!loader&&isFormOpen&&!confirmWindow" class="form-container section-container">
+    <div v-if="!loader&&isFormOpen&&!confirmWindow" class="form-container section-container form-middle">
       <!-- <div class="form-line"></div> -->
       <div class = "table1x">
         <div class="form-text">{{formType == 'add'? 'Добавление дисциплины' : 'Изменение дисциплины'}}</div>
@@ -72,19 +70,23 @@
             </div>
         </div>
       </div>
-      <div class="form-buttons">
-        <button @click.prevent="onCreatePLevel" class="btn btn-blue" :disabled="loader">{{ loader ? 'Сохранение...': formType == 'add' ? 'Добавить' : 'Изменить'}}</button>
-        <button @click.prevent="onCancelAction" class="btn btn-gray">Отмена</button>
-      </div>
     </div>
-    <div v-if = "!loader&&confirmWindow" class="form-container section-container">
+    <div v-if="!loader&&confirmWindow" class="form-container section-container form-middle">
       <div class = "table1x">
         <div class="form-text">{{ confirmMessage }}</div>
-        <div class="form-buttons">
-        <button @click.prevent="onConfirmAction" class="btn btn-blue" :disabled="loader">{{ loader ? 'Обработка...': 'Да'}}</button>
-        <button @click.prevent="onCancelAction" class="btn btn-gray">Отмена</button>
       </div>
-      </div>
+    </div>
+    <div v-if="!isFormOpen&&!confirmWindow" class="form-buttons form-bottom">
+      <button @click.prevent="onOpenForm('add')" class="btn btn-blue" >{{ formType == 'add' ? 'Новая запись': 'Изминить' }}</button>
+      <button @click.prevent="emits('toggleModal')" class="btn btn-gray">Отмена</button>
+    </div>
+    <div v-if="isFormOpen&&!confirmWindow" class="form-buttons form-bottom">
+      <button @click.prevent="onCreatePLevel" class="btn btn-blue" :disabled="loader">{{ loader ? 'Сохранение...': formType == 'add' ? 'Добавить' : 'Изменить'}}</button>
+      <button @click.prevent="onCancelAction" class="btn btn-gray">Отмена</button>
+    </div>
+    <div v-if="confirmWindow" class="form-buttons form-bottom">
+      <button @click.prevent="onConfirmAction" class="btn btn-blue" :disabled="loader">{{ loader ? 'Обработка...': 'Да'}}</button>
+      <button @click.prevent="onCancelAction" class="btn btn-gray">Отмена</button>
     </div>
   </div>
 
@@ -127,6 +129,7 @@
   const rowID = ref(null);
   const actionID = ref(null);
   const isOneRowAction = ref(true);
+  const formElem = ref(null);
 
   const emits = defineEmits(['toggleModal']);
 

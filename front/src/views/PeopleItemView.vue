@@ -20,12 +20,13 @@
     </div>
     <div v-if="!loader&&peopleStore.onePersone" class="card-container">
       <div class="square4x">
-        <div class="card-box">
+        <div class="card-box" ref="mainElem">
           <div class="card-name">
             Ощие данные
             <div class="change_button">
               <ActionMenu 
                 :actions = "commonActions"
+                :parentElem = "mainElem"
                 @startAction="onStartCommonAction"
               >
                 <template #icon >
@@ -99,12 +100,13 @@
             </div>
           </div>
         </div>
-        <div class="card-box">
+        <div class="card-box" ref="levelElem">
           <div class="card-name">
             Дисциплина
             <div class="change_button">
               <ActionMenu 
                 :actions = "levelActions"
+                :parentElem = "levelElem"
                 @startAction="onStartLevelAction"
               >
                 <template #icon >
@@ -139,12 +141,13 @@
             />
           </div>
         </div>
-        <div class="card-box">
+        <div class="card-box" ref="serviceElem">
           <div class="card-name">
             Участок и занятия
             <div class="change_button">
               <ActionMenu 
                 :actions = "serviceActions"
+                :parentElem = "serviceElem"
                 @startAction="onStartPersoneAction"
               >
                 <template #icon >
@@ -257,6 +260,9 @@
   const isModalAction = ref(false);
   const activePersone = ref(null);
   const activeUser = ref(null);
+  const mainElem = ref(null);
+  const levelElem = ref(null);
+  const serviceElem = ref(null);
 
   const levelTableHeadNames = ref(['Дата', 'Уровень', 'Описание', 'Автор']);
   const levelTableHeadID = ref(['date', 'LevelName', 'discription', 'UserName']);

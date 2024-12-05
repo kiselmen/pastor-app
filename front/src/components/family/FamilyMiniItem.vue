@@ -36,7 +36,7 @@
     }
     &-number {
       display: flex;
-      right: -10px;
+      right: -13px;
       top: 0px;
       position: absolute;
       width: 20px;
@@ -47,6 +47,7 @@
       // background-color: var(--bs-primary);
       border: 1px solid var(--bs-primary);
       color: var(--bs-primary);
+      outline: 4px solid var(--bs-white);
       font-size: 16px;
     }
     &-img {
@@ -54,7 +55,7 @@
       width: 50px;
       height: 50px;
       background-repeat: no-repeat;
-      background-size: contain;
+      background-size: cover;
       background-position: center center;
     }
   }

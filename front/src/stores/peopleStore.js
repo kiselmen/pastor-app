@@ -9,6 +9,7 @@ export const usePeopleStore = defineStore('peopleStore', () => {
   const msgStore = useMsgStore();
   const viewStore = useViewStore();
   const peoples = ref([]);
+  const allPeoples = ref([]);
   const onePersone = ref(null); 
   const peoplesWithBirthday=ref([]);
   const personePermitions =ref([]);
@@ -33,10 +34,12 @@ export const usePeopleStore = defineStore('peopleStore', () => {
       // console.log('mask ', mask);
 
       const response = await axios.get('api/peoples' + mask);
-      peoples.value = response.data.sort((a ,b) => a.id - b.id).map(item => {
+      peoples.value = response.data.sort((a ,b) => a.name > b.name ? 1: -1).map(item => {
         item.plevel.sort((a, b) => new Date(a.date) - new Date(b.date));
         return item;
       });
+      // console.log('store ', peoples.value);
+      
     } catch (error) {
       console.log(error);
       if (error.response?.status === 403) {
@@ -50,11 +53,30 @@ export const usePeopleStore = defineStore('peopleStore', () => {
     loader.value = false;
   }; // with permitions
 
+  const getAllPeopleForSelect = async () => {
+    loader.value = true;
+    try {
+      const response = await axios.get('api/allpeoples');
+      allPeoples.value = response.data.sort((a ,b) => a.name > b.name ? 1: -1);
+      
+    } catch (error) {
+      console.log(error);
+      if (error.response?.status === 403) {
+        msgStore.addMessage({name: error.message, icon: 'error'});
+      } else if (error.response?.status === 401) {
+        // msgStore.addMessage({name: error.response?.data?.message, icon: 'error'});
+      } else {
+        msgStore.addMessage({name: error.message, icon: 'error'});
+      }
+    }
+    loader.value = false;
+  };
+
   const getBornPeople = async (start, end, rip) => {
     loader.value = true;
     try {
-      const response = await axios.post('api/born_peoples', {start, end, rip});
-      peoples.value = response.data.sort((a ,b) => a.id - b.id);
+      const response = await axios.post('api/bornpeoples', {start, end, rip});
+      peoples.value = response.data.sort((a ,b) => a.name > b.name ? 1: -1);
     } catch (error) {
       console.log(error);
       if (error.response?.status === 403) {
@@ -93,7 +115,7 @@ export const usePeopleStore = defineStore('peopleStore', () => {
     try {
       errors.value = {};
       const response = await axios.post('api/peoples', personeData);
-      peoples.value = [...peoples.value, response.data].sort((a ,b) => a.id - b.id).map(item => {
+      peoples.value = [...peoples.value, response.data].sort((a ,b) => a.name > b.name ? 1: -1).map(item => {
         item.plevel.sort((a, b) => new Date(a.date) - new Date(b.date));
         return item;
       });
@@ -121,7 +143,7 @@ export const usePeopleStore = defineStore('peopleStore', () => {
       const response = await axios.post('api/peoples/' + id + '/update', personeData);
       if (type) {
         const newPeoples = peoples.value.filter(item => item.id !== id);
-        peoples.value = [...newPeoples, response.data].sort((a ,b) => a.id - b.id).map(item => {
+        peoples.value = [...newPeoples, response.data].sort((a ,b) => a.name > b.name ? 1: -1).map(item => {
           item.plevel.sort((a, b) => new Date(a.date) - new Date(b.date));
           return item;
         });
@@ -144,9 +166,74 @@ export const usePeopleStore = defineStore('peopleStore', () => {
     loader.value = false;
   }; // with permitions
 
+  const mergePersons = async (personsData) => {
+    loader.value = true;
+    try {
+      const response = await axios.post('api/mergepeoples', personsData);
+      const newPeoples = peoples.value.filter(person => {
+        let isPresent = true;
+        response.data.forEach(responsePersone => {
+          if (person.id == responsePersone.id) isPresent = false;
+        })
+        return isPresent;
+      })
+      peoples.value = [...newPeoples, ...response.data].sort((a ,b) => a.name > b.name ? 1: -1).map(item => {
+        item.plevel.sort((a, b) => new Date(a.date) - new Date(b.date));
+        return item;
+      });
+     
+    } catch (error) {
+      console.log(error);
+      if (error.response?.status === 422) {
+        errors.value = error.response?.data?.errors;
+        msgStore.addMessage({name: 'Заполните все обязательные поля', icon: 'error'});
+      } else if (error.response?.status === 403) {
+        msgStore.addMessage({name: error.response.data.message, icon: 'error'});
+      } else if (error.response?.status === 401) {
+        // msgStore.addMessage({name: error.response?.data?.message, icon: 'error'});
+      } else {
+        msgStore.addMessage({name: error.message, icon: 'error'});
+      }
+    }
+    loader.value = false;
+  };
+
+  const splitPersons = async (personsData) => {
+    loader.value = true;
+    try {
+      const response = await axios.post('api/splitpeoples', personsData);
+      const newPeoples = peoples.value.filter(person => {
+        let isPresent = true;
+        response.data.forEach(responsePersone => {
+          if (person.id == responsePersone.id) isPresent = false;
+        })
+        return isPresent;
+      })
+      peoples.value = [...newPeoples, ...response.data].sort((a ,b) => a.name > b.name ? 1: -1).map(item => {
+        item.plevel.sort((a, b) => new Date(a.date) - new Date(b.date));
+        return item;
+      });
+     
+    } catch (error) {
+      console.log(error);
+      if (error.response?.status === 422) {
+        errors.value = error.response?.data?.errors;
+        msgStore.addMessage({name: 'Заполните все обязательные поля', icon: 'error'});
+      } else if (error.response?.status === 403) {
+        msgStore.addMessage({name: error.response.data.message, icon: 'error'});
+      } else if (error.response?.status === 401) {
+        // msgStore.addMessage({name: error.response?.data?.message, icon: 'error'});
+      } else {
+        msgStore.addMessage({name: error.message, icon: 'error'});
+      }
+    }
+    loader.value = false;
+  };
+
+
   const clearPeopleState = () => {
     peoples.value = [];
-  }
+  };
 
   const updatePersoneServices = async (id, pservices, type) => {
     loader.value = true;
@@ -417,16 +504,20 @@ export const usePeopleStore = defineStore('peopleStore', () => {
 
   return { 
     peoples,
+    allPeoples,
     onePersone,
     peoplesWithBirthday,
     personePermitions,
     errors,
     totalCountErrors,
     getAllPeople,
+    getAllPeopleForSelect,
     getBornPeople,
     getOnePersone,
     addNewPersone,
     editPersone,
+    mergePersons,
+    splitPersons,
     clearPeopleState,
     updatePersoneServices,
     updatePersoneTargets,

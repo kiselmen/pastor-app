@@ -1,8 +1,11 @@
 <template>
-  <div v-if="curPersone.user_id" class="form">
+  <div v-if="curPersone.user_id" class="form" ref="formElem" >
     <div class="form-header">{{ curPersone.name }} {{ curPersone.first_name }} {{ curPersone.patronymic }}</div>
     <div class="card-name">Новый пароль</div>
-    <div v-if="!loader&&!confirmWindow" class="form-container section-container" ref="formElem" >
+    <div v-if="loader" class="form-container section-container form-middle">
+      <div class="form-text">Loading...</div>
+    </div>
+    <div v-if="!loader&&!confirmWindow" class="form-container section-container form-middle">
       <div class = "table1x">
         <div class="form-group">
           <label class="input-label">Пароль</label>
@@ -41,19 +44,19 @@
             </div>
         </div>
       </div>
-      <div class="form-buttons">
-        <button @click.prevent="onChangePassword" class="btn btn-blue" :disabled="loader">{{ loader ? 'Смена...': 'Сменить'}}</button>
-        <button @click.prevent="emits('toggleModal')" class="btn btn-gray" :disabled="loader">Отмена</button>
-      </div>
     </div>
-    <div v-if="!loader&&confirmWindow" class="form-container section-container">
+    <div v-if="!loader&&confirmWindow" class="form-container section-container form-middle">
       <div class = "table1x">
         <div class="form-text">Сменить пароль?</div>
-        <div class="form-buttons">
-          <button @click.prevent="onConfirmAction" class="btn btn-blue" :disabled="loader">{{ loader ? 'Обработка...': 'Да'}}</button>
-          <button @click.prevent="onCancelAction" class="btn btn-gray">Отмена</button>
-        </div>
       </div>
+    </div>
+    <div v-if="!confirmWindow" class="form-buttons form-bottom">
+      <button @click.prevent="onChangePassword" class="btn btn-blue" :disabled="loader">{{ loader ? 'Смена...': 'Сменить'}}</button>
+      <button @click.prevent="emits('toggleModal')" class="btn btn-gray" :disabled="loader">Отмена</button>
+    </div>
+    <div v-if="confirmWindow" class="form-buttons form-bottom">
+      <button @click.prevent="onConfirmAction" class="btn btn-blue" :disabled="loader">{{ loader ? 'Обработка...': 'Да'}}</button>
+      <button @click.prevent="onCancelAction" class="btn btn-gray">Отмена</button>
     </div>
   </div>  
 </template>

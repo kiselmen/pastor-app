@@ -139,7 +139,7 @@ const removePhoto = () => {
       position: relative;
       border-radius: 10px;
       background-repeat: no-repeat;
-      background-size: contain;
+      background-size: cover;
       background-position: center center;
       width: 100%;
       height: 100%;

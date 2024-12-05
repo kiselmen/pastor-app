@@ -37,13 +37,14 @@ class FamilyController extends BaseController
     }
 
     if ($isAdmin) {
-      $Family = Family::all();
+      $Family = Family::where('is_passive', 0)->get();
       return $Family;
     } else {
       $Family = Family::
         whereHas('head', function ($query) use ($prihodIDs) {
           return $query->whereIn('prihod_id', $prihodIDs);
         })
+        ->where('is_passive', 0)
         ->get();
       return $Family;
     }

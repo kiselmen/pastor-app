@@ -2,7 +2,7 @@
   <div v-click-outside="onCloseDropDown" :class="[selectorOpen ? 'select__open selector' : 'selector']" ref="el">
     <div class="selector-box selector-box__active">
       <div v-if="activeItem && isImgPresent" 
-          class = "item-img"
+          class = "item-img item-img_selected"
           :style = "{ backgroundImage : 'url(' + getImgPath(activeItem.image_url) +')' }"
       ></div>
       <input 
@@ -25,14 +25,17 @@
       >
         <ChrvronDownIcon/>
       </div>
-      <div v-if="activeItem||selectedItem"
+      <div v-if="activeItem !== null || selectedItem !== null"
         @click="onClearChoise"
       >
         <TrashIcon/>
       </div>
     </div>
-    <ul v-if="props.data&&selectorOpen" :class="{ 'dropdown-menu' : selectorOpen&&checkDirection, 'dropup-menu' : selectorOpen&&!checkDirection }">
-      <li class="dropdown-item"
+    <ul v-if="props.data&&selectorOpen"
+        :class="{ 'scroll menu-drop menu-down' : selectorOpen&&checkDirection, 'scroll menu-drop menu-up' : selectorOpen&&!checkDirection }"
+        :style="{ 'maxHeight': checkHeght}"
+    >
+      <li class="menu-item"
         v-if="selectorOpen"
         v-for="item in filteredItems"
         @click="onSelectItem(item)"
@@ -42,7 +45,7 @@
               class = "item-img"
               :style = "{ backgroundImage : 'url(' + getImgPath(item.image_url) +')' }"
           ></div>
-          <div>{{item.name}}</div>
+          <div>{{ item.FullName ? item.FullName: item.name }}</div>
       </li>
     </ul>
   </div>
@@ -62,6 +65,7 @@
     limit       : {type: Number, default : 10},
     parentElem  : null,
     message     : {type: String, default : ''},
+    // disabled    : {type: Boolean, default: false},
   });
 
   const emits = defineEmits(['selectItem']);
@@ -89,13 +93,15 @@
       return x < y ? -1 : x > y ? 1 : 0;
     });
 
-    let Iteration = limit.value;
-    let Limited = [];
-    if (NotLimited.length < Iteration) Iteration = NotLimited.length;
-    for (let i = 0; i < Iteration; i++){
-        Limited[i] = NotLimited[i];
-    }
-    return Limited;
+    return NotLimited;
+
+    // let Iteration = limit.value;
+    // let Limited = [];
+    // if (NotLimited.length < Iteration) Iteration = NotLimited.length;
+    // for (let i = 0; i < Iteration; i++){
+    //     Limited[i] = NotLimited[i];
+    // }
+    // return Limited;
   });
 
   const activeItem = computed(() => {
@@ -107,37 +113,61 @@
     // console.log(props.parentElem);
     if (!props.parentElem) {
       return true
+    } 
+
+    const totalBottom = props.parentElem.getBoundingClientRect().bottom;
+    const totalTop = props.parentElem.getBoundingClientRect().top;
+    const input = el.value.querySelector(".selector-box").getBoundingClientRect().bottom
+    let limited = 0;
+    if (props.data) {
+      limited = Math.min(limit.value, props.data.length)
     } else {
-      const totalBottom = props.parentElem.getBoundingClientRect().bottom;
-      const totalTop = props.parentElem.getBoundingClientRect().top;
-      const input = el.value.querySelector(".selector-box").getBoundingClientRect().bottom
-      let limited = 0;
-      if (props.data) {
-        limited = Math.min(limit.value, props.data.length)
-      } else {
-        limited = 0;
-      }
-      // console.log('Limit ', limited);
-      if ((totalBottom - input) < limited * 30 && (input - totalTop - 40) < (limited + 1) * 30) {
-        // console.log('Not enouth space');
-        // console.log('top: ', totalTop, 'input: ', input, 'bottom: ', totalBottom);
-        let limitBottom = Math.trunc((totalBottom - input) / 30);
-        let limitTop = Math.trunc((input - totalTop - 40) / 30) + 1;
-        if (limitBottom > limitTop) {
-          limit.value = Math.min(limitBottom, limit.value);
-          return true
-        } else {
-          limit.value = Math.min(limitTop, limit.value);
-          return false
-        }
-      }
-      return (totalBottom - input) > limited * 30 ? true : false;
+      limited = 0;
     }
+    // console.log('Limit ', limited);
+    if ((totalBottom - input) < limited * 30 && (input - totalTop - 40) < (limited + 1) * 30) {
+      // console.log('Not enouth space');
+      // console.log('top: ', totalTop, 'input: ', input, 'bottom: ', totalBottom);
+      let limitBottom = Math.trunc((totalBottom - input) / 30);
+      let limitTop = Math.trunc((input - totalTop - 40) / 30) + 1;
+      if (limitBottom > limitTop) {
+        limit.value = Math.min(limitBottom, limit.value);
+        return true
+      } else {
+        limit.value = Math.min(limitTop, limit.value);
+        return false
+      }
+    }
+    return (totalBottom - input) > limited * 30 ? true : false;
   });
+
+  const checkHeght = computed(() => {
+    if (!props.parentElem) {
+      return '120px';
+    } 
+    const totalBottom = props.parentElem.getBoundingClientRect().bottom;
+    const totalTop = props.parentElem.getBoundingClientRect().top;
+    const input = el.value.querySelector(".selector-box").getBoundingClientRect().bottom
+    const limitItem = Math.min(filteredItems.value.length, props.limit);
+    const limitHeight = 30 * limitItem + 5;
+    // console.log('totalBottom ', totalBottom, ' totalTop ', totalTop, ' input ', input);
+    
+    if (checkDirection.value) {
+      // console.log('Down');
+      const height = totalBottom - input;
+      const resultHeight = Math.min(limitHeight, height);
+      return resultHeight + 'px';
+    } else {
+      // console.log('Up');
+      const height = input - totalTop - 50;
+      const resultHeight = Math.min(limitHeight, height);
+      return resultHeight + 'px';
+    }
+  })
 
   const onSelectItem = (elem) => {
     selectedItem.value = elem.id;
-    selectorInput.value = elem.name;
+    selectorInput.value = elem.FullName ? elem.FullName: elem.name;
     selectorOpen.value = false;
     selectorActive.value = false;
     emits('selectItem', selectedItem.value);
@@ -145,7 +175,7 @@
 
   const onClearChoise = () => {
     selectedItem.value = null;
-    selectorInput.value = props.message;
+    selectorInput.value = props.text;
     selectorOpen.value = false;
     selectorActive.value = false;
     emits('selectItem', null);
@@ -180,7 +210,7 @@
     if (event.keyCode === 13) {
       // console.log(' filteredItems: ', filteredItems);
       selectedItem.value = filteredItems.value[0].id;
-      selectorInput.value = filteredItems.value[0].name;
+      selectorInput.value = filteredItems.value[0].FullName ? filteredItems.value[0].FullName: filteredItems.value[0].name;
       selectorOpen.value = false;
       selectorActive.value = false;
       emits('selectItem', selectedItem.value);
@@ -188,11 +218,15 @@
   };
 
   onBeforeMount (() => {
+    
     limit.value = props.limit;
-    if (props.id) {
-      selectorInput.value = props.text;
+    if (props.id !== null) {
+      // console.log('mount ', props.id, '  ', props.data?.filter(item => item.id == props.id)[0].name);
+      selectorInput.value = props.data.filter(item => item.id == props.id)[0].FullName ? 
+      props.data.filter(item => item.id == props.id)[0].FullName: props.data.filter(item => item.id == props.id)[0].name;
+      // selectorInput.value = props.text;
     } else {
-      selectorInput.value = props.message;
+      selectorInput.value = props.text;
     }
     const dataObj = props.data[0];
     if (dataObj) {
@@ -241,52 +275,59 @@
     }
   }
 
-  .dropup-menu {
-    position: absolute;
-    z-index: 20;
-    bottom: 46px;
-    left: 0;
-    background: var(--bs-white);
-    width: 100%;
-    border: 1px solid var(--bs-gray-500);
-  }
+  .menu {
+    &-drop {
+      position: absolute;
+      z-index: 20;
+      left: 0;
+      background: var(--bs-white);
+      width: 100%;
+      border: 1px solid var(--bs-gray-500);
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
 
-  .dropdown-menu {
-    position: absolute;
-    z-index: 20;
-    top: 46px;
-    left: 0;
-    background: var(--bs-white);
-    width: 100%;
-    border: 1px solid var(--bs-gray-500);
-    border-top: none;
-  }
+    &-up {
+      bottom: 46px;
+      border-bottom: none;
+    }
+    &-down{
+      top: 46px;
+      border-top: none;
+    }
 
-  .dropdown-item {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    // gap: 10px;
-    width: 100%;
-    padding: .2rem 1.6rem;
-    clear: both;
-    color: var(--bs-black);
-    text-align: inherit;
-    background-color: transparent;
-    border: 0;
-    &:hover{
-      color:var(--bs-primary);
+    &-item {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      // gap: 10px;
+      width: 100%;
+      padding: .2rem 1.6rem;
+      clear: both;
+      color: var(--bs-black);
+      text-align: inherit;
+      background-color: transparent;
+      border: 0;
+      &:hover{
+        color:var(--bs-primary);
+      }
     }
   }
 
   .item {
     &-img {
       width: 30px;
+      min-width: 30px;
       height: 30px;
-      margin: 0 10px;
+      margin-right: 10px;
       border-radius: 50%;
-      background-size: contain;
+      background-size: cover;
       background-repeat: no-repeat;
+      z-index: 10;
+      &_selected {
+        margin-right: 0;
+        margin-left: 10px;
+      }
     }
   }
 
@@ -296,7 +337,6 @@
     padding: 0;
   }
     li {
-      /**/
       cursor: pointer;
     }
 

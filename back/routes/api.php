@@ -27,16 +27,22 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/permition/delete', 'App\Http\Controllers\Api\PermitionController@delete'); // с правами доступа
 
     Route::get('/peoples', 'App\Http\Controllers\Api\PeopleController@index'); // с правами доступа
+    Route::get('/allpeoples', 'App\Http\Controllers\Api\PeopleController@indexAll'); // с правами доступа
     Route::get('/peoples/{id}', 'App\Http\Controllers\Api\PeopleController@show'); // с правами доступа
     Route::post('/peoples', 'App\Http\Controllers\Api\PeopleController@store'); // с правами доступа
     Route::post('/peoples/{id}/update', 'App\Http\Controllers\Api\PeopleController@update'); // с правами доступа
     Route::get('/birthday', 'App\Http\Controllers\Api\PeopleController@birthday'); // с правами доступа
-    Route::post('/born_peoples', 'App\Http\Controllers\Api\PeopleController@born_report'); // с правами доступа
+    Route::post('/mergepeoples', 'App\Http\Controllers\Api\PeopleController@mergePeoples'); // с правами доступа
+    Route::post('/splitpeoples', 'App\Http\Controllers\Api\PeopleController@splitPeoples'); // с правами доступа
+    Route::post('/bornpeoples', 'App\Http\Controllers\Api\PeopleController@bornReport'); // с правами доступа
     
-    Route::get('/targets', 'App\Http\Controllers\Api\TargetController@index'); // с правами доступа
+    // Route::get('/targets', 'App\Http\Controllers\Api\TargetController@index'); // с правами доступа
     Route::post('/targets', 'App\Http\Controllers\Api\TargetController@store'); // с правами доступа
 
-    Route::get('/services', 'App\Http\Controllers\Api\ServiceController@index'); // с правами доступа
+    // Route::get('/relations', 'App\Http\Controllers\Api\RelationController@index'); // с правами доступа
+    Route::post('/relations', 'App\Http\Controllers\Api\RelationController@store'); // с правами доступа
+
+    // Route::get('/services', 'App\Http\Controllers\Api\ServiceController@index'); // с правами доступа
     Route::post('/services', 'App\Http\Controllers\Api\ServiceController@store'); // с правами доступа
     Route::post('/services/{id}/update', 'App\Http\Controllers\Api\ServiceController@update'); // с правами доступа
     Route::post('/services/delete', 'App\Http\Controllers\Api\ServiceController@delete'); // с правами доступа
@@ -66,6 +72,9 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 Route::get('/statuses', 'App\Http\Controllers\Api\StatusController@index');
 Route::get('/sexes', 'App\Http\Controllers\Api\SexController@index'); // с правами доступа
+Route::get('/relations', 'App\Http\Controllers\Api\RelationController@index'); // с правами доступа
+Route::get('/targets', 'App\Http\Controllers\Api\TargetController@index'); // с правами доступа
+Route::get('/services', 'App\Http\Controllers\Api\ServiceController@index'); // с правами доступа
 
 // Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 //     // return $request->user();

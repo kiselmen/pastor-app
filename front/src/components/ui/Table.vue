@@ -1,5 +1,5 @@
 <template>
-  <div class="table-container" ref="tableElem">
+  <div class="table-container scroll" ref="tableElem">
     <table class="table">
       <thead class="table-head">
         <tr>
@@ -167,7 +167,8 @@
     overflow-x: auto;
     white-space: nowrap;
     &-container {
-      padding: 1rem;      
+      padding: 1rem;
+      overflow: auto;      
     }
     &-actions {
       display: flex;

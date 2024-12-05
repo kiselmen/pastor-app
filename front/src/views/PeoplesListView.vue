@@ -8,11 +8,11 @@
       <div class="form-filter">
         <button 
           v-if = 'isAvailableAdd'
-          @click="openActionModal('addPersone')" 
+          @click="openActionModal('selectAction')" 
           type="button" 
           class="btn btn-blue" 
         >
-            Создать
+            Операция
         </button>
         <PrihodFilter 
           @changeFilter="onChangePrihodFilterMask"
@@ -69,12 +69,23 @@
       :is-modal-active="isModalAction"
       @close-modal="isModalAction = false"
     >
+      <SelectAction v-if="action === 'selectAction'"
+          @cancelSelect="isModalAction = false"
+          @acceptSelect="onAcceptAction"
+          :actions="personeActions"
+      />
       <AddPersone v-if="action === 'addPersone'"
           @toggle-modal="isModalAction = false"
       />
       <EditPersone v-if="action === 'editPersone'"
           @toggle-modal="isModalAction = false"
           :id="activePersone"
+      />
+      <MergePersons v-if="action === 'mergePersons'"
+          @toggle-modal="isModalAction = false"
+      />
+      <SplitPersons v-if="action === 'splitPersons'"
+          @toggle-modal="isModalAction = false"
       />
       <EditPersoneLevels v-if="action === 'editPersoneLevels'"
           @toggle-modal="isModalAction = false"
@@ -116,6 +127,8 @@
   import AddPersone  from '@/components/people/AddPersone.vue';
   import EditPersone  from '@/components/people/EditPersone.vue';
   import PersoneItem from '@/components/people/PersoneItem.vue';
+  import MergePersons from '@/components/people/MergePersons.vue';
+  import SplitPersons from '@/components/people/SplitPersons.vue';
   import EditPersoneServices from '@/components/nsi/EditPersoneServices.vue';
   import EditPersoneTargets from '@/components/nsi/EditPersoneTargets.vue';
   import EditPersoneLevels from '@/components/nsi/EditPersoneLevels.vue';
@@ -127,6 +140,7 @@
   import PrihodFilter from '@/components/prihod/PrihodFilter.vue';
   import TargetFilter from '@/components/nsi/TargetFilter.vue';
   import ServiceFilter from '@/components/nsi/ServiceFilter.vue';
+  import SelectAction from '@/components/ui/SelectAction.vue';
 
   const route = useRoute();
   const router = useRouter();
@@ -150,6 +164,19 @@
     return isAdmin;
   });
 
+  const personeActions = computed(() => {
+    let actions = [];
+    if (isAvailableAdd) {
+      const addAction = [
+        {id: 'addPersone', name: 'Добавить'},
+        {id: 'mergePersons', name: 'Оформить брак'},
+        {id: 'splitPersons', name: 'Офорить развод'},
+      ];
+      actions = [...addAction];
+    }
+    return actions;
+  })
+
   watch( () => route.query, () => {
     // console.log('watch query');
     setQueryParameters();
@@ -164,6 +191,10 @@
     }
   });
 
+  const onAcceptAction = (action) => {
+    openActionModal(action);
+  };
+
   const createURL = (key, value) => {
     let url = '';
     viewStore.allowFilterData.forEach(item => {
@@ -171,13 +202,13 @@
         if (value) url = url + '&_' + key + '=' + value;
       } else {
         const storeKey = item.name + 'FilterMask';
-        console.log('storeKey ', viewStore[storeKey]);
+        // console.log('storeKey ', viewStore[storeKey]);
         const storeValue = viewStore[storeKey];
         if (storeValue) url = url + '&_' + item.name + '=' + storeValue;
       }
     });
     if (url) url = '?' + url.substring(1);
-    console.log('url ', url);
+    // console.log('url ', url);
     return url;
   };
 
@@ -302,8 +333,6 @@
     loader.value = true;
     await router.isReady();
     await prihodStore.getPrihods();
-    await nsiStore.getTargets();
-    await nsiStore.getServices();
     setQueryParameters();
     await getPeoplesFromAPI();
     loader.value = false;

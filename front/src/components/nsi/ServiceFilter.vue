@@ -1,10 +1,10 @@
 <template>
-  <InputSelector
+      <!-- :text ="serviceFilterMaskText" -->
+    <InputSelector
       v-if="nsiStore.availableServices"
-      :text ="serviceFilterMaskText"
       :id   = viewStore.serviceFilterMask
       :data ="nsiStore.availableServices"
-      :message ="'Служение'"
+      text ="Служение"
       @selectItem="onServiceSelect"
   />
 </template>
@@ -25,14 +25,14 @@
   const nsiStore = useNsiStore();
   // const userStore = useUserStore();
 
-  const serviceFilterMaskText = computed(() => {
-    if (viewStore.serviceFilterMask === null) {
-      return "Группа"
-    } else {
-      const service = nsiStore.services.filter(item => item.id == viewStore.serviceFilterMask)[0];
-      return service?.name;
-    }
-  });
+  // const serviceFilterMaskText = computed(() => {
+  //   if (viewStore.serviceFilterMask === null) {
+  //     return "Группа"
+  //   } else {
+  //     const service = nsiStore.services.filter(item => item.id == viewStore.serviceFilterMask)[0];
+  //     return service?.name;
+  //   }
+  // });
 
   const onServiceSelect = (id) => {
     emits('changeFilter', id);

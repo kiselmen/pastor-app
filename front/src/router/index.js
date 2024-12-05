@@ -123,6 +123,12 @@ const router = createRouter({
       component: () => import('@/views/LevelsListView.vue') 
     },
     {
+      path: '/relations',
+      name: 'relations',
+      beforeEnter: permition,
+      component: () => import('@/views/RelationsListView.vue') 
+    },
+    {
       path: '/report-borns',
       name: 'borns',
       beforeEnter: permition,

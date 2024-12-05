@@ -1,12 +1,29 @@
 <template>
   <div class="form" ref="formElem">
     <div class="form-header">Добавление прихожанина</div>
-    <div v-if="loader" class="form-text">Loading...</div>
+    <div v-if="loader" class="form-container section-container form-middle">
+      <div class="form-text">Loading...</div>
+    </div>
     <div v-if="!loader&&!confirmWindow&&formStep === 0" class="card-name">Общая информация</div>
     <div v-if="!loader&&!confirmWindow&&formStep === 1" class="card-name">Семья</div>
-    <div v-if="!loader&&!confirmWindow" class="form-container section-container">
+    <div v-if="!loader&&!confirmWindow" class="form-container section-container form-middle">
+      <div v-if="formStep === 0" class = "table1x">
+          <div class="form-group">
+            <label class="input-label">Основание</label>
+            <InputSelector
+                text = "Выберите операцию"
+                :id   = form.action_id
+                :data ="actionsData"
+                :parentElem = "formElem"
+                @selectItem="onActionSelect"
+              />
+            <div class="input-error" v-if="peopleStore.errors?.action_id">
+              {{ peopleStore.errors?.action_id[0] }}
+            </div>
+          </div>
+      </div>    
       <div v-if="formStep === 0" class = "table2x">
-        <div class="form-group">
+        <div class="form-group" v-if="curAction !== null">
             <label class="input-label">EMail</label>
             <input 
                 type="email"
@@ -20,11 +37,11 @@
               {{ peopleStore.errors?.email[0] }}
             </div>
         </div>
-        <div class="form-group">
+        <div class="form-group" v-if="curAction !== null">
             <label class="input-label">Пол</label>
             <InputSelector
-                :text ="form.sex"
-                :id   = null
+                text ="Выберите пол"
+                :id   = form.sex_id
                 :data ="nsiStore.sexes"
                 :parentElem = "formElem"
                 @selectItem="onSexSelect"
@@ -33,11 +50,11 @@
               {{ peopleStore.errors?.prihod_id[0] }}
             </div>
         </div>
-        <div class="form-group">
+        <div class="form-group" v-if="curAction !== null">
             <label class="input-label">Участок</label>
             <InputSelector
-                :text ="form.prihod"
-                :id   = null
+                text ="Участок"
+                :id   = "form.prihod_id"
                 :data ="avalablePrihods"
                 :parentElem = "formElem"
                 @selectItem="onPrihodSelect"
@@ -46,20 +63,21 @@
               {{ peopleStore.errors?.prihod_id[0] }}
             </div>
         </div>
-        <!-- <div class="form-group">
-            <label class="input-label">Целевая группа</label>
-            <InputSelector
-                :text ="form.target"
-                :id   = null
-                :data ="nsiStore.targets"
-                :parentElem = "formElem"
-                @selectItem="onTargetSelect"
-              />
-            <div class="input-error" v-if="peopleStore.errors?.target_id">
-              {{ peopleStore.errors?.target_id[0] }}
+        <div class="form-group" v-if="curAction === 3 && curAction !== null">
+            <label class="input-label">Причина переезда</label>
+            <input 
+                type="text"
+                autocomplete = "off"
+                class="input-box"
+                :class="{ 'is-invalid': peopleStore.errors?.discription }"
+                v-model="form.discription" 
+                id="discription"
+            >
+            <div class="input-error" v-if="peopleStore.errors?.discription">
+              {{ peopleStore.errors?.discription[0] }}
             </div>
-        </div> -->
-        <div class="form-group">
+        </div>
+        <div class="form-group" v-if="curAction !== null">
             <FileUpload
               v-model="image"
               @uploadImage="onImageUploaded"
@@ -69,7 +87,7 @@
       </div>
       <div v-if="formStep === 0" class="table2x">
 
-        <div class="form-group">
+        <div class="form-group" v-if="curAction !== null">
             <label class="input-label">Имя</label>
             <input 
                 type="text"
@@ -83,7 +101,7 @@
               {{ peopleStore.errors?.first_name[0] }}
             </div>
         </div>
-        <div class="form-group">
+        <div class="form-group" v-if="curAction !== null">
             <label class="input-label">Фамилия</label>
             <input 
                 type="text"
@@ -97,7 +115,7 @@
               {{ peopleStore.errors?.name[0] }}
             </div>
         </div>
-        <div class="form-group">
+        <div class="form-group" v-if="curAction !== null">
             <label class="input-label">Отчество</label>
             <input 
                 type="text"
@@ -111,7 +129,7 @@
               {{ peopleStore.errors?.patronymic[0] }}
             </div>
         </div>
-        <div class="form-row">
+        <div class="form-row" v-if="curAction !== null">
           <div class="form-group">
             <label class="input-label">Дата рождения</label>
             <input 
@@ -126,7 +144,7 @@
               {{ peopleStore.errors?.birthday_date[0] }}
             </div>
           </div>
-          <div class="form-group">
+          <div class="form-group" v-if="curAction === 0 || curAction === 2 || curAction === 3">
             <label class="input-label">Дата крещения</label>
             <input 
                 type="date"
@@ -140,7 +158,7 @@
               {{ peopleStore.errors?.baptism_date[0] }}
             </div>
           </div>
-          <div class="form-group">
+          <div class="form-group" v-if="curAction === 0">
             <label class="input-label">Дата смерти</label>
             <input 
                 type="date"
@@ -155,7 +173,7 @@
             </div>
           </div>
         </div>            
-        <div class="form-group">
+        <div class="form-group" v-if="curAction !== null">
             <label class="input-label">Адрес</label>
             <input 
                 type="text"
@@ -169,7 +187,7 @@
               {{ peopleStore.errors?.live_addres[0] }}
             </div>
         </div>
-        <div class="form-row">
+        <div class="form-row" v-if="curAction !== null">
           <div class="form-group">
             <label class="input-label">Дом телефон</label>
             <input 
@@ -204,25 +222,40 @@
           <div>
             <label class="checkbox-control">
               <input type="checkbox" v-model="isOpenNewFamily" @change="onClearFamilyData"/>
-              Новая семья
+              Новая семья (Только для главы семьи)
             </label>
           </div>
-
-          <div class="form-group" v-if="familyStore.families?.length && !isOpenNewFamily">
-            <label class="input-label">Семья</label>
+          <KeepAlive>
+            <div class="form-group" v-if="families?.length && !isOpenNewFamily">
+              <label class="input-label">Семья</label>
+              <InputSelector
+                  text ="Выберите семью"
+                  :id   = form.family_id
+                  :data ="families"
+                  :parentElem = "formElem"
+                  @selectItem="onFamilySelect"
+                />
+              <div class="input-error" v-if="peopleStore.errors?.family_id">
+                {{ peopleStore.errors?.family_id[0] }}
+              </div>
+            </div>
+          </KeepAlive>
+          <div class="form-group" v-if="nsiStore.relations?.length && !isOpenNewFamily">
+            <label class="input-label">Отношение</label>
             <InputSelector
-                text ="Выберите семью"
-                :id   = form.family_id
-                :data ="familyStore.families"
+                text = "Выберите отношение"
+                :id   = form.relation_id
+                :data ="sexRelations"
                 :parentElem = "formElem"
-                @selectItem="onFamilySelect"
+                @selectItem="onRelationSelect"
               />
-            <div class="input-error" v-if="peopleStore.errors?.family_id">
-              {{ peopleStore.errors?.family_id[0] }}
+            <div class="input-error" v-if="peopleStore.errors?.relation_id">
+              {{ peopleStore.errors?.relation_id[0] }}
             </div>
           </div>
+
           <div v-if="isOpenNewFamily" class="form-group">
-              <label class="input-label">Название</label>
+              <label class="input-label">Название семьи</label>
               <input 
                   type="text" 
                   autocomplete="off" 
@@ -234,7 +267,7 @@
               </div>
           </div>
           <div v-if="isOpenNewFamily" class="form-group">
-              <label class="input-label">Описание</label>
+              <label class="input-label">Описание семьи</label>
               <input 
                   type="text" 
                   autocomplete="off" 
@@ -247,28 +280,26 @@
                   {{ peopleStore.errors?.family_discription[0] }}
               </div>
           </div>
-          <!-- <div v-if="isOpenNewFamily" class="form-buttons">
-            <button @click.prevent="onCreateFamily" class="btn btn-blue" :disabled="loader">{{ loader ? 'Сохранение...': 'Создать семью'}}</button>
-          </div> -->
-      </div>
-      <div class="form-buttons" v-if="formStep === maxFormSteps">
-        <button @click.prevent="onMoveToStep('-')" class="btn btn-blue" :disabled="formStep <= 0">Назад</button>
-        <button @click.prevent="onCreatePerson" class="btn btn-blue" :disabled="loader">{{ loader ? 'Сохранение...': 'Сохранить'}}</button>
-        <button @click.prevent="emits('toggleModal')" class="btn btn-gray">Отмена</button>
-      </div>
-      <div class="form-buttons" v-if="formStep !== maxFormSteps">
-        <button @click.prevent="onMoveToStep('-')" class="btn btn-blue" :disabled="formStep <= 0">Назад</button>
-        <button @click.prevent="onMoveToStep('+')" class="btn btn-blue" :disabled="formStep >= maxFormSteps">Вперед</button>
       </div>
     </div>
-    <div v-if="!loader&&confirmWindow" class="form-container section-container">
+    <div v-if="!loader&&confirmWindow" class="form-container section-container form-middle">
       <div class = "table1x">
         <div class="form-text">Создать прихожанина?</div>
-        <div class="form-buttons">
-          <button @click.prevent="onConfirmAction" class="btn btn-blue" :disabled="loader">{{ loader ? 'Обработка...': 'Да'}}</button>
-          <button @click.prevent="onCancelAction" class="btn btn-gray">Отмена</button>
-        </div>
       </div>
+    </div>
+    <div v-if="formStep === maxFormSteps&&!confirmWindow" class="form-buttons form-bottom">
+      <button @click.prevent="onMoveToStep('-')" class="btn btn-blue" :disabled="formStep <= 0">Назад</button>
+      <button @click.prevent="onCreatePerson" class="btn btn-blue" :disabled="loader">{{ loader ? 'Сохранение...': 'Сохранить'}}</button>
+      <button @click.prevent="emits('toggleModal')" class="btn btn-gray">Отмена</button>
+    </div>
+    <div v-if="formStep !== maxFormSteps&&!confirmWindow" class="form-buttons form-bottom">
+      <button @click.prevent="onMoveToStep('-')" class="btn btn-blue" :disabled="formStep <= 0">Назад</button>
+      <button @click.prevent="onMoveToStep('+')" class="btn btn-blue" :disabled="formStep >= maxFormSteps || curAction === null">Вперед</button>
+      <button @click.prevent="emits('toggleModal')" class="btn btn-gray">Отмена</button>
+    </div>
+    <div v-if="confirmWindow" class="form-buttons form-bottom">
+      <button @click.prevent="onConfirmAction" class="btn btn-blue" :disabled="loader">{{ loader ? 'Обработка...': 'Да'}}</button>
+      <button @click.prevent="onCancelAction" class="btn btn-gray">Отмена</button>
     </div>
   </div>
 </template>
@@ -303,14 +334,16 @@
     prihod: '',
     prihod_id: null,
     family_id: null,
-    // target: '',
-    // target_id: null,
+    relation_id: null,
+    action: '',
+    action_id: null,
     sex: '',
     sex_id: null,
     family_name: '',
     family_discription: '',
     family_head_id: null,
     family_candidates: [],
+    discription: '',
   });
 
   const formElem = ref(null);
@@ -318,10 +351,18 @@
   const emits = defineEmits(['toggleModal']);
   const loader = ref(false);
   const confirmWindow = ref(false);
-  const family = ref(null);
+  // const family = ref(null);
   const formStep = ref(0);
   const maxFormSteps = 1;
   const isOpenNewFamily = ref(false);
+  const curAction = ref(null);
+
+  const actionsData = [
+    {id: 0, name: 'Ввод начальных данных'},
+    {id: 1, name: 'Рождение'},
+    {id: 2, name: 'Вхождение в веру'},
+    {id: 3, name: 'Переехал из другой церкви'},
+  ];
 
   const avalablePrihods = computed(() => {
     let isAdmin = false;
@@ -337,6 +378,22 @@
     }
   });
 
+  const sexRelations = computed(() => {
+    return form.sex_id !== null ? nsiStore.relations.filter(item => item.sex_id == form.sex_id): nsiStore.relations;
+  });
+
+  const families = computed(() => {
+    const rebuildedFamilies = [];
+    familyStore.families.forEach(item => {
+      const newFamilyItem = {};
+      newFamilyItem.id = item.id;
+      newFamilyItem.name = item.name;
+      newFamilyItem.image_url = item.head ? item.head.image_url: null;
+      rebuildedFamilies.push(newFamilyItem);
+    });
+    return rebuildedFamilies;
+  });
+
   const onImageUploaded = (data) => {
     image.value = data;
   };
@@ -349,9 +406,13 @@
     form.prihod_id = id;
   };
 
-  // const onTargetSelect = (id) => {
-  //   form.target_id = id;
-  // }
+  const onActionSelect = (id) => {
+    form.action_id = id;
+    if (form.action_id !== null) {
+      form.action = actionsData.filter(item => item.id == id)[0].name;
+    }
+    curAction.value = id;
+  }
 
   const onSexSelect = (id) => {
     form.sex_id = id;
@@ -366,13 +427,21 @@
   };
 
   const onFamilySelect = (id) => {
-    family.value = familyStore.families.filter(item => item.id === id)[0];
+    // family.value = familyStore.families.filter(item => item.id === id)[0];
     form.family_id = id;
   };
 
   const onClearFamilyData = () => {
-    console.log('isOpenNewFamily ', isOpenNewFamily.value);
-    if (isOpenNewFamily.value) form.family_id = null;
+    if (isOpenNewFamily.value) {
+      form.family_id = null;
+      form.relation_id = 0;
+    } else {
+      form.relation_id = null;
+    }
+  };
+
+  const onRelationSelect = (id) => {
+    form.relation_id = id;
   };
 
   const onCreatePerson = () => {
@@ -385,6 +454,7 @@
   
   const onConfirmAction = async () => {
     loader.value = true;
+    peopleStore.clearErrorsState();
     let formData = new FormData();
     formData.append('email', form.email);
     formData.append('first_name', form.first_name);
@@ -397,9 +467,15 @@
     formData.append('home_phone', form.home_phone);
     formData.append('mobile_phone', form.mobile_phone);
     formData.append('prihod_id', form.prihod_id);
-    // formData.append('target_id', form.target_id);
+    formData.append('action_id', form.action_id);
     formData.append('family_id', form.family_id);
+    if (form.family_id === null) {
+      formData.append('relation_id', form.sex_id == 1 ? 0: 1);
+    } else {
+      formData.append('relation_id', form.relation_id);
+    }
     formData.append('sex_id', form.sex_id);
+    formData.append('discription', form.discription);
     if (image.value) {
       const fileName = image.value.name;
       const fileData = image.value;
@@ -421,7 +497,7 @@
 
   onBeforeMount(async () => {
     loader.value = true;
-    peopleStore.clearErrorsState();
+    peopleStore.clearErrorsState();0
     await prihodStore.getPrihods();
     // await nsiStore.getTargets();
     await familyStore.getAllFamilies();

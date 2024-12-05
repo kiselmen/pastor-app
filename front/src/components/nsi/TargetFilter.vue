@@ -1,10 +1,9 @@
 <template>
   <InputSelector
       v-if="!loader"
-      :text ="targetFilterMaskText"
+      text ="Группа"
       :id   = viewStore.targetFilterMask
       :data ="nsiStore.targets"
-      :message ="'Группа'"
       @selectItem="onTargetSelect"
   />
 </template>
@@ -23,14 +22,14 @@
   const viewStore = useViewStore();
   const nsiStore = useNsiStore();
 
-  const targetFilterMaskText = computed(() => {
-    if (viewStore.targetFilterMask === null) {
-      return "Группа"
-    } else {
-      const target = nsiStore.targets.filter(item => item.id == viewStore.targetFilterMask)[0];
-      return target?.name;
-    }
-  });
+  // const targetFilterMaskText = computed(() => {
+  //   if (viewStore.targetFilterMask === null) {
+  //     return "Группа"
+  //   } else {
+  //     const target = nsiStore.targets.filter(item => item.id == viewStore.targetFilterMask)[0];
+  //     return target?.name;
+  //   }
+  // });
 
   const onTargetSelect = (id) => {
     emits('changeFilter', id);

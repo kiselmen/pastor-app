@@ -38,13 +38,16 @@
     if (iconElem.value && menuElem.value) {
       const iconLeft = iconElem.value.getBoundingClientRect().left
       const menuSize = menuElem.value.getBoundingClientRect().right - menuElem.value.getBoundingClientRect().left;
-      // console.log('iconLeft ', iconLeft, ' menuSize ', menuSize);
-      let direction = 'right';
+      const parentLeft = props.parentElem.getBoundingClientRect().left;
+      const parentRight = props.parentElem.getBoundingClientRect().right;
+      // console.log('iconLeft ', iconLeft, ' menuSize ', menuSize, ' parentRight ', parentRight);
+      let direction;
+      if (parentRight - (iconLeft + menuSize) > 0) {
+        return direction = iconLeft;
+      } 
       if (iconLeft < menuSize) { 
-        // direction = 'right';
         direction = iconLeft;
       } else {
-        // direction = 'left';
         direction = 'calc(100% - ' + menuSize + 'px)';
       }
       return direction
@@ -58,8 +61,6 @@
     } else {
       const parentBottom = props.parentElem.getBoundingClientRect().bottom;
       const parentTop = props.parentElem.getBoundingClientRect().top;
-      const parentLeft = props.parentElem.getBoundingClientRect().left;
-      const parentRight = props.parentElem.getBoundingClientRect().right;
       const iconBottom = iconElem.value.getBoundingClientRect().bottom
       // console.log('parentLeft ', parentLeft, ' parentRight ', parentRight);
       

@@ -1,10 +1,12 @@
 <template>
-  <div class="form">
+  <div class="form" ref="formElem" >
     <div class="form-header">Регистрация пользователя</div>
     <div v-if="!loader&&!confirmWindow&&formStep === 0" class="card-name">Регистрационные данные</div>
     <div v-if="!loader&&!confirmWindow&&formStep === 1" class="card-name">Права доступа</div>
-    <div v-if="loader" class="form-text">Loading...</div>
-    <div v-if="!loader&&!confirmWindow" class="form-container section-container" ref="formElem" >
+    <div v-if="loader" class="form-container section-container form-middle">
+      <div class="form-text">Loading...</div>
+    </div>
+    <div v-if="!loader&&!confirmWindow" class="form-container section-container form-middle">
       <div v-if="formStep === 0" class = "table1x">
         <div class="form-group">
             <label class="input-label">Email</label>
@@ -118,26 +120,25 @@
             </div> 
         </div>
       </div>
-
-      <div  v-if="formStep === maxFormSteps" class="form-buttons">
-        <button @click.prevent="onMoveToStep('-')" class="btn btn-blue" :disabled="formStep <= 0||loader">Назад</button>
-        <button @click.prevent="onCreateUser" class="btn btn-blue" :disabled="loader">{{ loader ? 'Сохранение...': 'Регистрация'}}</button>
-        <button @click.prevent="emits('toggleModal')" class="btn btn-gray" :disabled="loader">Отмена</button>
-      </div>
-      <div v-if="formStep !== maxFormSteps" class="form-buttons">
-        <button @click.prevent="onMoveToStep('-')" class="btn btn-blue" :disabled="formStep <= 0">Назад</button>
-        <button @click.prevent="onMoveToStep('+')" class="btn btn-blue" :disabled="formStep >= maxFormSteps">Вперед</button>
-        <button @click.prevent="emits('toggleModal')" class="btn btn-gray" :disabled="loader">Отмена</button>
-      </div>
     </div>
-    <div v-if="!loader&&confirmWindow" class="form-container section-container">
+    <div v-if="!loader&&confirmWindow" class="form-container section-container form-middle">
       <div class = "table1x">
         <div class="form-text">Создать пользователя?</div>
-        <div class="form-buttons">
-          <button @click.prevent="onConfirmAction" class="btn btn-blue" :disabled="loader">{{ loader ? 'Обработка...': 'Да'}}</button>
-          <button @click.prevent="onCancelAction" class="btn btn-gray">Отмена</button>
-        </div>
       </div>
+    </div>
+    <div  v-if="formStep === maxFormSteps&&!confirmWindow" class="form-buttons form-bottom">
+      <button @click.prevent="onMoveToStep('-')" class="btn btn-blue" :disabled="formStep <= 0||loader">Назад</button>
+      <button @click.prevent="onCreateUser" class="btn btn-blue" :disabled="loader">{{ loader ? 'Сохранение...': 'Регистрация'}}</button>
+      <button @click.prevent="emits('toggleModal')" class="btn btn-gray" :disabled="loader">Отмена</button>
+    </div>
+    <div v-if="formStep !== maxFormSteps&&!confirmWindow" class="form-buttons form-bottom">
+      <button @click.prevent="onMoveToStep('-')" class="btn btn-blue" :disabled="formStep <= 0">Назад</button>
+      <button @click.prevent="onMoveToStep('+')" class="btn btn-blue" :disabled="formStep >= maxFormSteps">Вперед</button>
+      <button @click.prevent="emits('toggleModal')" class="btn btn-gray" :disabled="loader">Отмена</button>
+    </div>
+    <div v-if="confirmWindow" class="form-buttons form-bottom">
+      <button @click.prevent="onConfirmAction" class="btn btn-blue" :disabled="loader">{{ loader ? 'Обработка...': 'Да'}}</button>
+      <button @click.prevent="onCancelAction" class="btn btn-gray">Отмена</button>
     </div>
   </div>
 </template>

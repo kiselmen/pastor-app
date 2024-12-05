@@ -81,6 +81,13 @@
                 </div>
               </RouterLink>
             </li>
+            <li>
+              <RouterLink to="/relations" @click="onMenuClick">
+                <div class="sidebar-subitem">
+                  <span class="sidebar-link">Отношения</span>
+                </div>
+              </RouterLink>
+            </li>
           </ul>
         </li>
     </ul>

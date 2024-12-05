@@ -27,8 +27,20 @@
           <div class="card-img" :style = "{ backgroundImage : 'url(' + getImgPath(props.persone.image_url) +')' }"></div>
         </div>  
         <div class="card-column">
-          <div class="sex-men" v-if="props.persone?.sex_id === 1">{{ props.persone?.SexName }}</div>
-          <div class="sex-women" v-if="props.persone?.sex_id === 2">{{ props.persone?.SexName }}</div>
+          <div class="sex sex-men" v-if="props.persone?.sex_id == 1">
+              <MariedIcon v-if="personRelationStatus !== null && personRelationStatus === true && props.persone.relation?.pair === 1"/>
+              <ConfusedIcon v-if="personRelationStatus !== null && personRelationStatus === false && props.persone.relation?.pair === 1"/>
+              <BabyIcon v-if="props.persone.relation?.pair === 0 && isUnder18"/>
+              <ConfusedIcon class="card-border" v-if="props.persone.relation?.pair === 0 && !isUnder18"/>
+              {{ props.persone?.SexName }}
+          </div>
+          <div class="sex sex-women" v-if="props.persone?.sex_id == 2">
+              <MariedIcon v-if="personRelationStatus !== null && personRelationStatus === true && props.persone.relation?.pair === 1"/>
+              <ConfusedIcon v-if="personRelationStatus !== null && personRelationStatus === false && props.persone.relation?.pair === 1"/>
+              <BabyIcon v-if="props.persone.relation?.pair === 0 && isUnder18"/>
+              <ConfusedIcon class="card-border" v-if="props.persone.relation?.pair === 0 && !isUnder18"/>
+              {{ props.persone?.SexName }}
+          </div>
           <PrihodMiniItem
             :prihod = "props.persone.prihod"
           />
@@ -107,7 +119,6 @@
           :isActionPossible = props.isActionPossible
           @editServices = "onEditPersoneServices"
         />
-
       </div> 
   </div>
 </template>
@@ -116,12 +127,16 @@
   import getImgPath from '@/utils/imagePlugin.js';
   import { onBeforeMount, ref, computed } from 'vue';
   import { useUserStore } from '@/stores/userStore';
+
   import EditDuotoneIcon from '@/components/icons/IconEditDuotone.vue';
   import CrossIcon from '@/components/icons/IconCross.vue';
   import BirthdayIcon from '@/components/icons/IconBirthday.vue';
   import RIPIcon from '@/components/icons/IconRIP.vue';
   import AdressIcon from '@/components/icons/IconAdress.vue';
   import PhoneIcon from '@/components/icons/IconPhone.vue';
+  import MariedIcon from '@/components/icons/IconMaried.vue';
+  import ConfusedIcon from '@/components/icons/IconConfused.vue';
+  import BabyIcon from '@/components/icons/IconBaby.vue'
   import DateItem from '@/components/people/DateItem.vue';
   import PrihodMiniItem from '@/components/prihod/PrihodMiniItem.vue';
   import ServiceMiniItem from '@/components/nsi/ServiceMiniItem.vue';
@@ -168,11 +183,29 @@
     return props.persone.plevel.length;
   });
 
+  const personRelationStatus = computed(() => {
+    const persone = props.persone;
+    if (persone) {
+      if (!persone.relation) return null;
+      const family = persone.family;
+      if (family) {
+        return persone.Pair.length ? true: false; 
+      } else return null;
+    } else return null;
+  });
+
+  const isUnder18 = computed(() => {
+    const persone = props.persone;
+    if (persone) {
+      return persone.Under18;
+    } else return false;  
+  })
+
   const onStartAction = (action) => {
     const isAction = actions.value.filter(item => item.id === action);
     if (isAction.length) {
       const actionEmit = isAction[0].emit;
-      console.log('actionEmit ', actionEmit);
+      // console.log('actionEmit ', actionEmit);
       emits(actionEmit, props.persone.id);
     } else {
       console.log('Нет такой операции');
@@ -259,13 +292,16 @@
     text-decoration: none;
     color: var(--bs-white);
   }
-  .sex{
+  .sex {
+    display: flex;
+    justify-content: space-between;
+    padding-left: 10px;
+    align-items: center;
+    width: 100%;
     &-men {
-      margin-left: 80%;
       color: var(--bs-primary);
     }
     &-women {
-      margin-left: 80%;
       color: var(--bs-pink);
     }
   }

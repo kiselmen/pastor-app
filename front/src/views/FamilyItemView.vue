@@ -17,12 +17,13 @@
     </div>
     <div v-if="!loader&&familyStore.oneFamily" class="card-container">
       <div class="square2x">
-        <div class="card-box">
+        <div class="card-box" ref="mainElem">
           <div class="card-name">
             Глава
             <div class="change_button">
               <ActionMenu 
                 :actions = "commonActions"
+                :parentElem = "mainElem"
                 @startAction="onStartCommonAction"
               >
                 <template #icon >
@@ -103,6 +104,8 @@
   const actionName = ref('');
   const isModalAction = ref(false);
   const activeFamily = ref(null);
+
+  const mainElem = ref(null);
 
   const onStartCommonAction = (action) => {
     const isAction = commonActions.value.filter(item => item.id === action);

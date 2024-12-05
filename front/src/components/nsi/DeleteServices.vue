@@ -1,24 +1,26 @@
 <template>
   <div class="form" ref="formElem">
     <div class="form-header">Удаление вида служения</div>
-    <div v-if="loader" class="form-text">Loading...</div>
-    <div v-if="!loader&&!confirmWindow" class="form-container section-container">
+    <div v-if="loader" class="form-container section-container form-middle">
+      <div class="form-text">Loading...</div>
+    </div>
+    <div v-if="!loader&&!confirmWindow" class="form-container section-container form-middle">
       <div class = "table1x">
           <div class="form-text">Удалить служения {{ service }}?</div>
-          <div class="form-row">
-            <button @click.prevent="onDeleteService" class="btn btn-warning" :disabled="loader">{{ loader ? 'Удаление...': 'Удалить'}}</button>
-            <button @click.prevent="emits('toggleModal')" class="btn btn-blue" :disabled="loader">{{ loader ? 'Отмена...': 'Отменить'}}</button>
-          </div>
       </div>
     </div>
-    <div v-if="!loader&&confirmWindow" class="form-container section-container">
+    <div v-if="!loader&&confirmWindow" class="form-container section-container form-middle">
       <div class = "table1x">
         <div class="form-text">Удалить запись?</div>
-        <div class="form-buttons">
-          <button @click.prevent="onConfirmAction" class="btn btn-blue" :disabled="loader">{{ loader ? 'Обработка...': 'Да'}}</button>
-          <button @click.prevent="onCancelAction" class="btn btn-gray">Отмена</button>
-        </div>
       </div>
+    </div>
+    <div v-if="!confirmWindow" class="form-row form-bottom">
+      <button @click.prevent="onDeleteService" class="btn btn-warning" :disabled="loader">{{ loader ? 'Удаление...': 'Удалить'}}</button>
+      <button @click.prevent="emits('toggleModal')" class="btn btn-blue" :disabled="loader">{{ loader ? 'Отмена...': 'Отменить'}}</button>
+    </div>
+    <div v-if="confirmWindow" class="form-buttons form-bottom">
+      <button @click.prevent="onConfirmAction" class="btn btn-blue" :disabled="loader">{{ loader ? 'Обработка...': 'Да'}}</button>
+      <button @click.prevent="onCancelAction" class="btn btn-gray">Отмена</button>
     </div>
   </div>
 </template>

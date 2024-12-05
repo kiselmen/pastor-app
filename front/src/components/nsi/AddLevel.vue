@@ -1,5 +1,5 @@
 <template>
-  <div class="form">
+  <div class="form" ref="formElem">
     <div class="form-header">Добавление церковная дисциплины (уровни)</div>
     <!-- <div v-if="loader" class="form-text">Loading...</div> -->
     <div v-if="!loader&&!confirmWindow" class="form-container section-container">
@@ -66,7 +66,7 @@
 
 <script setup>
   import { useNsiStore } from '@/stores/nsiStore';
-  import { reactive, onBeforeMount } from 'vue';
+  import { reactive, onBeforeMount, ref } from 'vue';
 
   const nsiStore = useNsiStore();
   const form = reactive({
@@ -75,6 +75,8 @@
     color: null,
   });
   const emits = defineEmits(['toggleModal']);
+
+  const formElem = ref(null);
   const loader = ref(false);
   const confirmWindow = ref(false);
 

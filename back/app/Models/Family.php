@@ -11,7 +11,7 @@ class Family extends Model
   ];
 
   protected $fillable = [
-      'name' ,'discription', 'head_id'
+      'name' ,'discription', 'head_id', 'is_passive',
   ];
 
   protected $appends = [
