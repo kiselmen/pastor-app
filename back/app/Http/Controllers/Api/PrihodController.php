@@ -61,6 +61,7 @@ class PrihodController extends BaseController
       'name' 		        => $request['name'],
       'discription'			=> $request['discription'],
       'number'    			=> $request['number'],
+      'is_global'  			=> $request['is_global'],
     ]);
     return response()->json($CurrentPrihod);
   }
@@ -84,6 +85,7 @@ class PrihodController extends BaseController
     $CurrentPrihod->name 		      = $request['name'];
     $CurrentPrihod->number 		    = $request['number'];
     $CurrentPrihod->discription 	= $request['discription'];
+    $CurrentPrihod->is_global 	  = $request['is_global'];
     $CurrentPrihod->save();
 
     return $CurrentPrihod;

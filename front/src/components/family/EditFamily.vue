@@ -27,6 +27,7 @@
                 :id=form.head_id 
                 :data="filteredPersons" 
                 :parentElem="formElem"
+                :disabled="isChangesNotPossible"
                 @selectItem="onMainPersonSelect" />
             <div class="input-error" v-if="familyStore.errors?.head_id">
                 {{ familyStore.errors?.head_id[0] }}
@@ -41,19 +42,20 @@
                   :id   ="candidateId"
                   :data ="filteredPersons"
                   :parentElem = "formElem"
+                  :disabled="isChangesNotPossible"
                   @selectItem="onSelectCandidate"
               />
             </div> 
             <div class="form-group">
-              <button @click.prevent="onAddToFamily" class="btn btn-blue">В семью</button>
+              <button @click.prevent="onAddToFamily" :disabled = "isChangesNotPossible" class="btn btn-blue">В семью</button>
             </div>  
           </div>
           <div class="table2x">
             <div v-if ="!loader" class="group-items">
-              <div class="group-item" v-if = "form.candidates.length" v-for ="candidate in form.candidates" >
+              <div class="group-item" v-if = "form.candidates.length" v-for ="candidate in form.candidates" :key="candidate.id">
                 <div class="group-avatar" :style = "{ backgroundImage : 'url(' + getImgPath(candidate.image_url) +')' }"></div>
                 <div class="group-name">{{ candidate.Name }}</div>
-                  <div class="group-delete" @click="onDeleteCandidate(candidate.persone_id)">
+                  <div v-if = "!isChangesNotPossible" class="group-delete" @click="onDeleteCandidate(candidate.persone_id)">
                     <DismissIcon/>
                   </div>
                 </div> 
@@ -103,7 +105,8 @@
 
   const props = defineProps({
     id: { type: Number, default: null },
-  })
+    isChangesNotPossible: { type: Boolean, default: true },
+  });
 
   const emits = defineEmits(['toggleModal']);
 
@@ -117,9 +120,10 @@
     discription: '',
     head_id: null,
     candidates: [],
+    disable_change: true,
   });
   const formElem = ref(null);
-  const family = ref(null);
+  // const family = ref(null);
   const mainPersonName = ref('');
   const candidateId = ref(null);
 
@@ -203,6 +207,7 @@
     form.discription = curFamily.value.discription;
     form.id = curFamily.value.id;
     form.head_id = curFamily.value.head_id;
+    form.disable_change = props.isChangesNotPossible;
     const isPersone = peopleStore.peoples.filter(item => item.id == curFamily.value.head_id);
     if (isPersone.length) mainPersonName.value = isPersone[0].first_name + ' ' + isPersone[0].name;
 

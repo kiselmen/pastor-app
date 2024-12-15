@@ -49,9 +49,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/pservices', 'App\Http\Controllers\Api\PserviceController@store');  // с правами доступа
     Route::post('/pservices/delete', 'App\Http\Controllers\Api\PserviceController@delete'); // с правами доступа
+    Route::post('/mergepservices', 'App\Http\Controllers\Api\PserviceController@merge');  // с правами доступа
 
     Route::post('/ptargets', 'App\Http\Controllers\Api\PtargetController@store');  // с правами доступа
     Route::post('/ptargets/delete', 'App\Http\Controllers\Api\PtargetController@delete'); // с правами доступа
+    Route::post('/mergeptargets', 'App\Http\Controllers\Api\PtargetController@merge');  // с правами доступа
 
     Route::get('/levels', 'App\Http\Controllers\Api\LevelController@index'); // с правами доступа
     Route::post('/levels', 'App\Http\Controllers\Api\LevelController@store'); // с правами доступа
@@ -69,6 +71,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/families/{id}', 'App\Http\Controllers\Api\FamilyController@show'); // с правами доступа
     Route::post('/families', 'App\Http\Controllers\Api\FamilyController@store'); // с правами доступа
     Route::post('/families/{id}/update', 'App\Http\Controllers\Api\FamilyController@update'); // с правами доступа
+    Route::post('/movefamily', 'App\Http\Controllers\Api\FamilyController@move'); // с правами доступа
+
+    Route::get('/globalactions', 'App\Http\Controllers\Api\GlobalActionsController@index'); // с правами доступа
 });
 Route::get('/statuses', 'App\Http\Controllers\Api\StatusController@index');
 Route::get('/sexes', 'App\Http\Controllers\Api\SexController@index'); // с правами доступа

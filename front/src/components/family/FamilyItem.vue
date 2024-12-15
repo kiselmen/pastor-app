@@ -6,7 +6,18 @@
           {{ props.family.name }}
         </RouterLink>  
       </span>
-      <EditDuotoneIcon class="change_button" @click="onEditClick"/>
+      <!-- <EditDuotoneIcon class="change_button" @click="onEditClick"/> -->
+      <div class="change_button">
+        <ActionMenu 
+          :actions = "actions"
+          :parentElem = "cardElem"
+          @startAction="onStartAction"
+        >
+          <template #icon >
+            <EditDuotoneIcon/>
+          </template>
+        </ActionMenu>
+      </div>
     </div>
     <div class="card-box">
       <div class="card-row">
@@ -27,6 +38,7 @@
       <div class="card-row flex-wrap">
         <PersoneMiniItem
             v-for="persone in props.family.people"
+            :key = "persone.id"
             :persone = "persone"
         />
       </div>
@@ -47,20 +59,44 @@
 <script setup>
 
   import getImgPath from '@/utils/imagePlugin.js';
+  import { onBeforeMount, ref, } from 'vue';
+
   import EditDuotoneIcon from '@/components/icons/IconEditDuotone.vue';
   import DateItem from '@/components/people/DateItem.vue';
   import PrihodMiniItem from '@/components/prihod/PrihodMiniItem.vue';
   import PersoneMiniItem from '@/components/people/PersoneMiniItem.vue';
+  import ActionMenu from '@/components/ui/ActionMenu.vue';
 
   const props = defineProps({
     family: { type: Object, default: new Object() },
   })
 
-  const emits = defineEmits(['editFamily']);
+  const emits = defineEmits(['editFamily', 'moveFamily']);
 
-  const onEditClick = () => {
-    emits('editFamily', props.family.id)
-  }
+  const actions = ref([]);
+  const cardElem = ref(null);
+
+  const onStartAction = (action) => {
+    const isAction = actions.value.filter(item => item.id === action);
+    if (isAction.length) {
+      const actionEmit = isAction[0].emit;
+      console.log('actionEmit ', actionEmit);
+      emits(actionEmit, props.family.id);
+    } else {
+      console.log('Нет такой операции');
+    }
+  };
+
+  // const onEditClick = () => {
+  //   emits('editFamily', props.family.id)
+  // };
+
+  onBeforeMount(() => {
+    actions.value = [
+      { id: 0, name: 'Изменить', emit: 'editFamily' },
+      { id: 1, name: 'Оформить переезд', emit: 'moveFamily' },
+    ];
+  });
 
 </script>
 

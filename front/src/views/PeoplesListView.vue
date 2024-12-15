@@ -32,19 +32,15 @@
         />
         <div class="form-icons">
           <div class="form-icon-delete">
-            <!-- <RouterLink :to="'/peoples'"> -->
               <DismissIcon 
                   v-if = "search"
                   @click="onClearSearchFilterMask"
               />
-            <!-- </RouterLink>   -->
           </div>  
           <div class="form-icon-search">
-            <!-- <RouterLink :to="'/peoples?search=' + search"> -->
               <SearchLupaIcon 
                   @click="onChangeSearchFilterMask"
               />
-            <!-- </RouterLink>   -->
           </div>  
         </div>
       </div>
@@ -115,6 +111,7 @@
 </template>
 
 <script setup>
+  import { createURL } from '@/utils/helper.js';
   import { ref, watch, onBeforeMount, computed, onUnmounted } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
   import { usePeopleStore } from '@/stores/peopleStore';
@@ -177,12 +174,6 @@
     return actions;
   })
 
-  watch( () => route.query, () => {
-    // console.log('watch query');
-    setQueryParameters();
-    getPeoplesFromAPI();
-  }, { deep: true });
-
   const activeUser = computed(() => {
     if (activePersone.value) {
       return peopleStore.peoples.filter(item => item.id == activePersone.value)[0].user_id;
@@ -191,50 +182,40 @@
     }
   });
 
+  watch( () => route.query, async () => {
+    loader.value = true;
+    setQueryParameters();
+    await getPeoplesFromAPI();
+    loader.value = false;
+  }, { deep: true });
+
   const onAcceptAction = (action) => {
     openActionModal(action);
   };
 
-  const createURL = (key, value) => {
-    let url = '';
-    viewStore.allowFilterData.forEach(item => {
-      if (item.name === key) {
-        if (value) url = url + '&_' + key + '=' + value;
-      } else {
-        const storeKey = item.name + 'FilterMask';
-        // console.log('storeKey ', viewStore[storeKey]);
-        const storeValue = viewStore[storeKey];
-        if (storeValue) url = url + '&_' + item.name + '=' + storeValue;
-      }
-    });
-    if (url) url = '?' + url.substring(1);
-    // console.log('url ', url);
-    return url;
-  };
-
   const onChangePrihodFilterMask = (mask) => {
-    const URL = createURL('prihod', mask);
+    const URL = createURL('prihod', mask, viewStore);
     router.push(URL);
   };
 
   const onChangeTargetFilterMask = (mask) => {
-    const URL = createURL('target', mask);
+    const URL = createURL('target', mask,viewStore);
     router.push(URL);
   };
 
   const onChangeServiceFilterMask = (mask) => {
-    const URL = createURL('service', mask);
+    const URL = createURL('service', mask, viewStore);
     router.push(URL);
   }
 
   const onChangeSearchFilterMask = () => {
-    const URL = createURL('search', search.value);
+    const URL = createURL('search', search.value, viewStore);
     router.push(URL);
   };
 
   const onClearSearchFilterMask = () => {
     search.value = ''
-    const URL = createURL('search', search.value);
+    const URL = createURL('search', search.value,viewStore);
     router.push(URL);
   };
 

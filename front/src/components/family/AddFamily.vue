@@ -48,7 +48,7 @@
           </div>
           <div class="table2x">
             <div v-if ="!loader" class="group-items">
-              <div class="group-item" v-if = "form.candidates.length" v-for ="candidate in form.candidates" >
+              <div class="group-item" v-if = "form.candidates.length" v-for ="candidate in form.candidates" :key="candidate.id">
                 <div class="group-avatar" :style = "{ backgroundImage : 'url(' + getImgPath(candidate.image_url) +')' }"></div>
                 <div class="group-name">{{ candidate.Name }}</div>
                   <div class="group-delete" @click="onDeleteCandidate(candidate.persone_id)">

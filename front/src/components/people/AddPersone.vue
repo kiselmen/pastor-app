@@ -329,8 +329,8 @@
     baptism_date: '',
     death_date: '',
     live_addres: '',
-    home_phone: '',
-    mobile_phone: '',
+    home_phone: null,
+    mobile_phone: null,
     prihod: '',
     prihod_id: null,
     family_id: null,
@@ -340,10 +340,10 @@
     sex: '',
     sex_id: null,
     family_name: '',
-    family_discription: '',
+    family_discription: null,
     family_head_id: null,
     family_candidates: [],
-    discription: '',
+    discription: null,
   });
 
   const formElem = ref(null);

@@ -12,7 +12,7 @@ const guest = (to, from, next) => {
 };
 
 const auth = (to, from, next) => {
-  const userStore = useUserStore();
+  // const userStore = useUserStore();
   if (localStorage.getItem("authToken")) {
     return next();
   } else {
@@ -133,6 +133,12 @@ const router = createRouter({
       name: 'borns',
       beforeEnter: permition,
       component: () => import('@/views/ReportBornView.vue') 
+    },    
+    {
+      path: '/global-list',
+      name: 'global-list',
+      beforeEnter: permition,
+      component: () => import('@/views/GlobalListView.vue') 
     },    
   ]
 })

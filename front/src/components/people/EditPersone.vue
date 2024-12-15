@@ -250,116 +250,7 @@
           </div>
       </div>
 
-      <!-- <div v-if="formStep ===0  && curAction === 7" class = "table1x">
-          <div class="form-group" v-if="peoplesWithoutPair?.length">
-            <label class="input-label">Вторая половинка</label>
-            <InputSelector
-                text = "Выберите партнера"
-                :id   = form.pair_id
-                :data ="peoplesWithoutPair"
-                :parentElem = "formElem"
-                @selectItem="onPairSelect"
-              />
-            <div class="input-error" v-if="peopleStore.errors?.pair_id">
-              {{ peopleStore.errors?.pair_id[0] }}
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="input-label">Установить фамилию</label>
-            <InputSelector
-                :text = famalyNameActions[form.familyNameAction_id].name
-                :id   = form.familyNameAction_id
-                :data ="famalyNameActions"
-                :parentElem = "formElem"
-                @selectItem="onFamilyNameActionSelect"
-              />
-            <div class="input-error" v-if="peopleStore.errors?.familyNameAction_id">
-              {{ peopleStore.errors?.familyNameAction_id[0] }}
-            </div>
-          </div>
-          <div class="form-group" v-if="isNeedCreateFamily">
-              <label class="input-label">Название семьи</label>
-              <input 
-                  type="text" 
-                  autocomplete="off" 
-                  class="input-box" 
-                  :class="{ 'is-invalid': peopleStore.errors?.family_name }"
-                  v-model="form.family_name" id="name">
-              <div class="input-error" v-if="peopleStore.errors?.family_name">
-                  {{ peopleStore.errors?.family_name[0] }}
-              </div>
-          </div>
-          <div class="form-group" v-if="isNeedCreateFamily">
-              <label class="input-label">Описание семьи</label>
-              <input 
-                  type="text" 
-                  autocomplete="off" 
-                  class="input-box"
-                  :class="{ 'is-invalid': 
-                  peopleStore.errors?.family_discription }" 
-                  v-model="form.family_discription" 
-                  id="first_name">
-              <div class="input-error" v-if="peopleStore.errors?.family_discription">
-                  {{ peopleStore.errors?.family_discription[0] }}
-              </div>
-          </div>
-      </div>   -->
-
-      <!-- <div v-if="formStep ===0  && curAction === 8" class = "table1x">
-        <div>
-            <label class="checkbox-control">
-              Новая семья для бывшего партнера
-            </label>
-        </div>
-        <div class="form-group">
-            <label class="input-label">Название семьи</label>
-            <input 
-                type="text" 
-                autocomplete="off" 
-                class="input-box" 
-                :class="{ 'is-invalid': peopleStore.errors?.family_name }"
-                v-model="form.family_name" id="name">
-            <div class="input-error" v-if="peopleStore.errors?.family_name">
-                {{ peopleStore.errors?.family_name[0] }}
-            </div>
-        </div>
-        <div class="form-group">
-            <label class="input-label">Описание семьи</label>
-            <input 
-                type="text" 
-                autocomplete="off" 
-                class="input-box"
-                :class="{ 'is-invalid': 
-                peopleStore.errors?.family_discription }" 
-                v-model="form.family_discription" 
-                id="first_name">
-            <div class="input-error" v-if="peopleStore.errors?.family_discription">
-                {{ peopleStore.errors?.family_discription[0] }}
-            </div>
-        </div>
-        <div class="form-group" v-if="!isCloseNewFamilyName">
-            <label class="input-label">Фамилия партнера после развода</label>
-            <input 
-                type="text" 
-                autocomplete="off" 
-                class="input-box"
-                :class="{ 'is-invalid': 
-                peopleStore.errors?.new_pair_name }" 
-                v-model="form.new_pair_name" 
-                id="first_name">
-            <div class="input-error" v-if="peopleStore.errors?.new_pair_name">
-                {{ peopleStore.errors?.new_pair_name[0] }}
-            </div>
-        </div>
-        <div>
-            <label class="checkbox-control">
-              <input type="checkbox" v-model="isCloseNewFamilyName"/>
-              Оставить текущую фамилию
-            </label>
-        </div>
-      </div> -->
-
-      <div v-if="formStep === 0 && curAction === 9" class = "table1x">
+      <div v-if="formStep === 0 && (curAction === 9 || curAction === 14)" class = "table1x">
         <div class="form-group">
             <label class="input-label">Участок</label>
             <InputSelector
@@ -403,7 +294,6 @@
   import { useFamilyStore } from '@/stores/familyStore';
   import { usePrihodStore } from '@/stores/prihodStore';
   import { useNsiStore } from '@/stores/nsiStore';
-  import { useUserStore } from '@/stores/userStore';
 
   import FileUpload from '@/components/ui/FileUpload.vue';
   import InputSelector from '@/components/ui/InputSelector.vue';
@@ -417,7 +307,6 @@
   const peopleStore = usePeopleStore();
   const prihodStore = usePrihodStore();
   const nsiStore = useNsiStore();
-  const userStore = useUserStore();
   const familyStore = useFamilyStore();
 
   const form = reactive({
@@ -430,8 +319,8 @@
     death_date: '',
     image_url: null,
     live_addres: '',
-    home_phone: '',
-    mobile_phone: '',
+    home_phone: null,
+    mobile_phone: null,
     prihod: '',
     prihod_id: null,
     family_id: null,
@@ -483,8 +372,8 @@
       return [
         {id: 4, name: 'Изменить данные'},
         {id: 5, name: 'Оформить смерть'},
-        // {id: 8, name: 'Оформить развод'},
         {id: 9, name: 'Сменить участок'},
+        {id: 14, name: 'Выбытие в другую церковь'},
       ]
     } else 
       if (isUnder18.value) {
@@ -492,22 +381,23 @@
           {id: 4, name: 'Изменить данные'},
           {id: 5, name: 'Оформить смерть'},
           {id: 9, name: 'Сменить участок'},
+          {id: 14, name: 'Выбытие в другую церковь'},
         ]
       } else {
         if (isHeadOfFamily.value) {
           return [
             {id: 4, name: 'Изменить данные'},
             {id: 5, name: 'Оформить смерть'},
-            // {id: 7, name: 'Оформить брак'},
             {id: 9, name: 'Сменить участок'},
+            {id: 14, name: 'Выбытие в другую церковь'},
           ]
         } else {
           return [
             {id: 4, name: 'Изменить данные'},
             {id: 5, name: 'Оформить смерть'},
             {id: 6, name: 'Выделить в новую семью'},
-            // {id: 7, name: 'Оформить брак'},
             {id: 9, name: 'Сменить участок'},
+            {id: 14, name: 'Выбытие в другую церковь'},
           ]
         }
       }
@@ -515,16 +405,10 @@
   });
 
   const avalablePrihods = computed(() => {
-    let isAdmin = false;
-    const prihodsIDs = [];
-    userStore.user?.permition?.forEach(permition => {
-      if (permition.type == 0) isAdmin = true;
-      if (permition.type == 1) prihodsIDs.push(permition.source_id);
-    });
-    if (isAdmin) {
-      return prihodStore.prihods
+    if (curAction.value == 14) {
+      return prihodStore.prihods.filter(item => item.is_global);
     } else {
-      return prihodStore.prihods.filter(item => prihodsIDs.filter(id => id == item.id).length);
+      return prihodStore.prihods.filter(item => !item.is_global);
     }
   });
 
@@ -543,93 +427,6 @@
     });
     return rebuildedFamilies;
   });
-
-  // const peoplesWithoutPair = computed(() => {
-  //   const avalablePeoples = [];
-    
-  //   peopleStore.peoples.forEach(onePersone => {
-  //     if (onePersone.sex_id !== persone.value.sex_id) {
-  //       if (onePersone.relation_id === null) {
-  //         avalablePeoples.push(onePersone);
-  //       } else {
-  //         const family = onePersone.family;
-  //         if (family) {
-  //           if (persone.value.id === 6) console.log(onePersone);
-  //           const withoutMe = family.people.filter(item => item.id !== onePersone.id);
-  //           // if (onePersone.id === 6) console.log('withoutMe ', onePersone, '  ', withoutMe);
-  //           if (!withoutMe.length) {
-  //             avalablePeoples.push(onePersone);
-  //           } else {
-  //             const isMaried = withoutMe.filter(item => {
-  //               if (!item.relation || !onePersone.sex) return false;
-  //               return item.sex.id !== onePersone.sex.id && onePersone.relation.pair === 1 && item.relation.pair === 1;
-  //             });
-  //             if (!isMaried.length) {
-  //               const [year, month, day] = onePersone.birthday_date.split('-').map(Number);      
-  //               const birthDate = new Date(year, month - 1, day);
-  //               const currentDate = new Date();
-  //               let fullYearsPassed = currentDate.getFullYear() - birthDate.getFullYear();
-  //               const hadBirthdayThisYear =  currentDate.getMonth() > birthDate.getMonth() || 
-  //                   (currentDate.getMonth() === birthDate.getMonth() && currentDate.getDate() >= birthDate.getDate());
-  //               if (!hadBirthdayThisYear) {
-  //                 fullYearsPassed--;
-  //               }
-  //               // console.log(onePersone.name + ' ' + onePersone.first_name + ' fullYearsPassed ', fullYearsPassed);
-  //               if (fullYearsPassed > 18) {
-  //                 avalablePeoples.push(onePersone);
-  //               }
-  //             }
-  //           }
-  //         } else {
-  //           avalablePeoples.push(onePersone);            
-  //         }         
-  //       }
-  //     }
-  //   });
-
-  //   const newAvailablePeoples = [];
-  //   avalablePeoples.forEach(item => {
-  //     newAvailablePeoples.push({ ...item, name: item.name + ' ' + item.first_name + ' ' + item.patronymic})
-  //   });
-  //   return newAvailablePeoples;
-  // });
-
-  // const famalyNameActions = computed(() => {
-  //   return [
-  //     {id: 0, name: 'Мужа'},
-  //     {id: 1, name: 'Жены'},
-  //     {id: 2, name: 'Не менять'},
-  //   ];
-  // });
-
-  // const isNeedCreateFamily = computed(() => {
-  //   let isPersonAloneInFamily = null;
-  //   if (persone.value.relation_id === 0 || persone.value.relation_id === 1) {
-  //     isPersonAloneInFamily = true;
-  //   } else {
-  //     isPersonAloneInFamily = false;
-  //   }
-
-  //   let isPairPersonAloneInFamily = null;
-  //   if (form.pair_id) {
-  //     const isPairPersonePresent = peopleStore.peoples.filter(item => item.id == form.pair_id);
-  //     if (isPairPersonePresent.length) {
-  //       const pairPersone = isPairPersonePresent[0];
-  //       if (pairPersone.relation_id === 0 || pairPersone.relation_id === 1) {
-  //         isPairPersonAloneInFamily = true;
-  //       } else {
-  //         isPairPersonAloneInFamily = false;
-  //       }
-  //     }
-  //   }
-
-  //   if (isPersonAloneInFamily === false && isPairPersonAloneInFamily === false) {
-  //     console.log('isNeedCreateFamily ', isPersonAloneInFamily, ' ', isPairPersonAloneInFamily, ' ', true);
-  //     return true;
-  //   }
-  //   console.log('isNeedCreateFamily ', isPersonAloneInFamily, ' ', isPairPersonAloneInFamily, ' ', false);
-  //   return false;
-  // });
 
   const onImageUploaded = (data) => {
     image.value = data;
@@ -717,23 +514,11 @@
     if (!peopleStore.totalCountErrors) {
       emits('toggleModal');
     }
+    console.log(formData);
+    
     confirmWindow.value = false;
     loader.value = false;
   };
-
-  const onPairSelect = (id) => {
-    // console.log('onPairSelect ' , peopleStore.peoples);
-    const persone = peopleStore.peoples.filter(item => item.id === id)[0];
-    form.pair_id = id;
-    form.pair = persone.name + ' ' + persone.first_name + ' ' + persone.patronymic;
-  };
-
-  const onFamilyNameActionSelect = (id) => {
-    form.familyNameAction_id = id;
-  };
-
-  // const onChangeFamilyQuestion = () => {
-  // };
 
   onBeforeMount( async () => {
     loader.value = true;

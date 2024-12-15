@@ -96,7 +96,7 @@
 
               <hr class="custom-hr">
 
-              <div class="card-target" v-for="target in peopleStore.onePersone.ptarget">{{target.TargetName }}</div>
+              <div class="card-target" v-for="target in peopleStore.onePersone.ptarget" :key = "target.id">{{target.TargetName }}</div>
             </div>
           </div>
         </div>
@@ -166,7 +166,7 @@
               </div>
               <div class="card-box" v-if="peopleStore.onePersone.pservice.length">
                 <div class="card-column">
-                  <div class="card-text" v-for="service in peopleStore.onePersone.pservice">{{ service.ServiceName }}</div>
+                  <div class="card-text" v-for="service in peopleStore.onePersone.pservice" :key = "service.id">{{ service.ServiceName }}</div>
                 </div>  
               </div>
             </div>

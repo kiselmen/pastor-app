@@ -20,7 +20,7 @@
               </ActionMenu>
             </div>
           </th>
-          <th v-for="name in props.tableHeadNames">
+          <th v-for="name in props.tableHeadNames" :key = "name">
             {{ name }}
           </th>
         </tr>
@@ -46,7 +46,7 @@
               </ActionMenu>
             </div>  
           </td>
-          <td v-for="element_id in props.tableHeadID" :style = "{color: isColorRow(element_id, row[element_id]) }">
+          <td v-for="element_id in props.tableHeadID" :key = "element_id" :style = "{color: isColorRow(element_id, row[element_id]) }">
             {{ row[element_id] }}
           </td>
         </tr>

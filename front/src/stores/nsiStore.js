@@ -2,18 +2,21 @@ import { ref, computed } from 'vue';
 import { defineStore } from 'pinia';
 import { useMsgStore } from '@/stores/msgStore';
 import { useUserStore } from '@/stores/userStore';
+import { useViewStore } from '@/stores/viewStore';
 import axios from 'axios';
 
 export const useNsiStore = defineStore('nsiStore', () => {
 
   const msgStore = useMsgStore();
   const userStore = useUserStore();
+  const viewStore = useViewStore();
   const statuses = ref([]);
   const sexes = ref([]);
   const targets = ref([]);
   const services = ref([]);
   const levels = ref([]);
   const relations = ref([]);
+  const globalActions = ref([]);
   const loader = ref(false);
   const errors = ref({});
 
@@ -270,7 +273,22 @@ export const useNsiStore = defineStore('nsiStore', () => {
       }
     }
     loader.value = false;
-  }
+  };
+
+  const getGlobalActions = async () => {
+    loader.value = true;
+    try {
+      const mask = '?' + '_start=' + viewStore.startDate + '&_end=' + viewStore.endDate;
+      const response = await axios.get('api/globalactions' + mask);
+      globalActions.value = response.data.sort((a ,b) => a.id - b.id);
+    } catch (error) {
+      console.log(error);
+      if (error.response?.status !== 401) {
+        msgStore.addMessage({name: error.message, icon: 'error'});
+      }  
+    }
+    loader.value = false;
+  };
 
   const clearErrorsState = () => {
     errors.value = {}
@@ -286,6 +304,7 @@ export const useNsiStore = defineStore('nsiStore', () => {
     services,
     levels,
     relations,
+    globalActions,
     loader,
     getStatuses,
     getSex,
@@ -303,6 +322,7 @@ export const useNsiStore = defineStore('nsiStore', () => {
     editLevel,
     getRelations,
     addNewRelation,
+    getGlobalActions,
     clearErrorsState,
   }
 });

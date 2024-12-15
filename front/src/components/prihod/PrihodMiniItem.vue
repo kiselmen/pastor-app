@@ -4,7 +4,9 @@
       <ChurchIcon class="church-item" />
     </RouterLink>  
     <span class="church-title">{{ props.prihod?.name }}</span>
-    <div class="church-number">{{ props.prihod?.number }}</div>
+    <div class="church-number" :class="{ global: props.prihod.is_global }">
+      {{ props.prihod?.number }}
+    </div>
   </div>
 </template>
 
@@ -48,5 +50,9 @@
       color: var(--bs-white);
       font-size: 14px;
     }
+  }
+
+  .global {
+    background-color: var(--bs-danger);    
   }
 </style>

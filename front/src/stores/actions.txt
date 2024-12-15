@@ -1,0 +1,37 @@
+      if ($actionID == 0) {
+        $actionName = 'Ввод начальных данных';
+      } else if ($actionID == 1) {
+        $actionName = 'Рождение';
+      } else if ($actionID == 2) {
+        $actionName = 'Вхождение в веру';
+      } else if ($actionID == 3) {
+        $actionName = 'Переехал из другой церкви';
+      } else ($actionID == 4) {
+        $actionName = 'Изменить данные';
+      } else if ($actionID == 5) {
+        $actionName = 'Оформить смерть';
+      } else if ($actionID == 6) {
+        $actionName = 'Выделить в новую семью';
+      } else if ($actionID == 7) {
+        $actionName = 'Оформить брак';
+      } else if ($actionID == 8) {
+        $actionName = 'Оформить развод';
+      } else if ($actionID == 9) {
+        $actionName = 'Сменить участок';
+      } else if ($actionID == 10) {
+        $actionName = 'Добавить служение';
+      } else if ($actionID == 11) {
+        $actionName = 'Удалить служение';
+      } else if ($actionID == 12) {
+        $actionName = 'Добавить целевую группу';
+      } else if ($actionID == 13) {
+        $actionName = 'Удалить целевую группу';
+      } else if ($actionID == 14) {
+        $actionName = 'Выбытие в другую церковь';
+      } else if ($actionID == 15) {
+        $actionName = 'Обновить целевые группы';
+      } else if ($actionID == 16) {
+        $actionName = 'Обновить служения';
+      } else ша ($actionID == 17) {
+        $actionName = 'Изменить данные семьи';
+      }

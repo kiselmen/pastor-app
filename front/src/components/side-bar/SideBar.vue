@@ -49,6 +49,13 @@
                 </div>
               </RouterLink>
             </li>
+            <li>
+              <RouterLink to="/global-list" @click="onMenuClick">
+                <div class="sidebar-subitem">
+                  <span class="sidebar-link">Журнал операций</span>
+                </div>
+              </RouterLink>
+            </li>
           </ul>
         </li>
         <li v-if="userStore.isPermition(0)">

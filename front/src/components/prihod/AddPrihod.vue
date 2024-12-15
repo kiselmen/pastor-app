@@ -48,6 +48,19 @@
             {{ prihodStore.errors?.number[0] }}
           </div>
         </div>
+        <div class="form-group">
+          <label class="input-label">Тип участка</label>
+          <InputSelector
+              text = "Тип"
+              :id   = form.is_global
+              :data ="prihodTypes"
+              :parentElem = "formElem"
+              @selectItem="onTypeSelect"
+            />
+          <div class="input-error" v-if="prihodStore.errors?.is_global">
+            {{ prihodStore.errors?.is_global[0] }}
+          </div>
+        </div>
       </div>
     </div>
     <div v-if="!loader&&confirmWindow" class="form-container section-container form-middle">
@@ -68,7 +81,9 @@
 
 <script setup>
   import { usePrihodStore } from '@/stores/prihodStore';
-  import { reactive, onBeforeMount, ref } from 'vue';
+  import { reactive, onBeforeMount, ref, computed } from 'vue';
+
+  import InputSelector from '@/components/ui/InputSelector.vue';
 
   const prihodStore = usePrihodStore();
 
@@ -76,6 +91,7 @@
     name: '',
     discription: '',
     number: 0,
+    is_global: 0,
   });
 
   const emits = defineEmits(['toggleModal']);
@@ -83,6 +99,15 @@
   const loader = ref(false);
   const confirmWindow = ref(false);
   const formElem = ref(null);
+
+  const prihodTypes = [
+    { id: 0, name: 'Локальная церковь' },
+    { id: 1, name: 'Другие церкви' },
+  ];
+
+  const onTypeSelect = (id) => {
+    form.is_global = id;
+  };
 
   const onCreatePrihod = () => {
     confirmWindow.value = true;

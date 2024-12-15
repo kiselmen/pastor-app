@@ -5,13 +5,16 @@
   </div>
   <div v-if="!loader" class="card-container">
     <div class="form-row">
-      <button 
+      <!-- <button 
         @click="openActionModal('addFamily')" 
         type="button" 
         class="btn btn-blue" 
       >
           Создать
-      </button>
+      </button> -->
+      <PrihodFilter 
+        @changeFilter="onChangePrihodFilterMask"
+      />
       <div class="form-search">
         <input 
           type="text"
@@ -20,14 +23,15 @@
         />
         <div class="form-icons">
           <div class="form-icon-delete">
-            <RouterLink :to="'/families'">
-              <DismissIcon v-if = "search" @click="search=''"/>
-            </RouterLink>  
+              <DismissIcon 
+                v-if = "search" 
+                @click="onClearSearchFilterMask"
+              />
           </div>  
           <div class="form-icon-search">
-            <RouterLink :to="'/families?search=' + search">
-              <SearchLupaIcon />
-            </RouterLink>  
+              <SearchLupaIcon 
+                @click="onChangeSearchFilterMask"
+              />
           </div>  
         </div>
       </div>
@@ -37,8 +41,9 @@
       <FamilyItem 
         class="card-item"
         @editFamily = "onEditFamily"
-        v-for="family in filteredFamilies"
-        :key = family.Id
+        @moveFamily = "onMoveFamily"
+        v-for="family in familyStore.families"
+        :key = family.id
         :family = family
       />
     </div>
@@ -54,51 +59,92 @@
           @toggle-modal="isModalAction = false"
           :id="activeFamily"
       />
+      <MoveFamily v-if="action === 'moveFamily'"
+          @toggle-modal="isModalAction = false"
+          :id="activeFamily"
+      />
   </ModalWrapper>
 </template>
 
 <script setup>
+  import { createURL } from '@/utils/helper.js';
   import { ref, watch, onBeforeMount } from 'vue';
   import { useRoute, useRouter } from 'vue-router'
   import { useFamilyStore } from '@/stores/familyStore.js';
+  import { useViewStore } from '@/stores/viewStore';  
+  import { usePrihodStore } from '@/stores/prihodStore';
   import ModalWrapper from '@/components/ui/ModalWrapper.vue';
   import AddFamily  from '@/components/family/AddFamily.vue';
   import EditFamily  from '@/components/family/EditFamily.vue';
+  import MoveFamily  from '@/components/family/MoveFamily.vue';
   import FamilyItem  from '@/components/family/FamilyItem.vue';
   import SearchLupaIcon from '@/components/icons/IconSearchLupa.vue';
   import DismissIcon from '@/components/icons/IconDismiss.vue'
+  import PrihodFilter from '@/components/prihod/PrihodFilter.vue';
 
   const route = useRoute();
   const router = useRouter();
   const familyStore = useFamilyStore();
+  const viewStore = useViewStore();
+  const prihodStore = usePrihodStore();
 
   const loader = ref(false);
   const isModalAction = ref(false);
   const action = ref('');
   const activeFamily = ref(null);
   const search = ref('');
-  const filteredFamilies = ref([]);
 
-  watch( () => route.query, () => {
-    search.value = route.query.search;
-    onFilterFamilies();
+  watch( () => route.query, async () => {
+    // console.log('watch query');
+    loader.value = true;
+    setQueryParameters();
+    await getFamiliesFromAPI();
+    loader.value = false;
   }, { deep: true });
 
-  watch(() => familyStore.families, () => {
-    onFilterFamilies();
-  }, { deep: true })
+  const onChangePrihodFilterMask = (mask) => {0
+    const URL = createURL('prihod', mask, viewStore);
+    console.log('URL ', URL);
+    
+    router.push(URL);
+  };
 
-  const onFilterFamilies = () => {
-    if (search.value) {
-      filteredFamilies.value =  familyStore.families.filter(item => item.name.toLowerCase().indexOf(search.value.toLowerCase()) >= 0 ? true: false)
+  const onChangeSearchFilterMask = () => {
+    const URL = createURL('search', search.value, viewStore);
+    router.push(URL);
+  };
+
+  const onClearSearchFilterMask = () => {
+    search.value = ''
+    const URL = createURL('search', search.value, viewStore);
+    router.push(URL);
+  };
+
+  const setQueryParameters = () => {
+    const query = route.query;
+
+    const prihodID = query._prihod;
+    const isPrihodFilterPresent = prihodStore.prihods.filter(item => item.id == prihodID).length;
+    if (isPrihodFilterPresent) {
+      viewStore.setPrihodFilterMask(prihodID);
     } else {
-      filteredFamilies.value = [...familyStore.families];
+      viewStore.setPrihodFilterMask(null);
+    }
+
+    const searchStr = query._search;
+    if (searchStr) {
+      search.value = searchStr;
+      viewStore.setSearchFilterMask(searchStr);
+    } else {
+      search.value = '';
+      viewStore.setSearchFilterMask(null);
     }
   };
 
-  const openActionModal = (actionValue) => {
-    action.value = actionValue;
-    isModalAction.value = true;
+  const getFamiliesFromAPI = async () => {
+    loader.value = true;
+    await familyStore.getAllFamilies();
+    loader.value = false;
   };
 
   const onEditFamily = (id) => {
@@ -107,13 +153,18 @@
     isModalAction.value = true;
   };
 
+  const onMoveFamily = (id) => {
+    action.value = 'moveFamily';
+    activeFamily.value = id;
+    isModalAction.value = true;
+  };
+
   onBeforeMount(async () => {
     loader.value = true;
-    // console.log(familyStore);
-    await familyStore.getAllFamilies();
     await router.isReady();
-    search.value = route.query.search;
-    onFilterFamilies();
+    await prihodStore.getPrihods();
+    setQueryParameters();
+    await getFamiliesFromAPI();
     loader.value = false;
   });
 

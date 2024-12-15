@@ -22,7 +22,7 @@
       </div>
       <div class="table2x">
         <div v-if ="!loader" class="group-items">
-          <div class="group-item" v-if = "pservices.length" v-for ="service in pservices" >
+          <div class="group-item" v-if = "pservices.length" v-for ="service in pservices" :key = "service.id">
             <div class="group-name">{{ service.ServiceName }}</div>
               <div class="group-delete" @click="onDeleteService(service.service_id)">
                 <DismissIcon/>

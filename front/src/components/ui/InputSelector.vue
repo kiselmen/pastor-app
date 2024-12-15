@@ -8,36 +8,38 @@
       <input 
         v-if="props.data"
         v-model = "selectorInput"
+        :disabled="disabled"
         type="text"
         @click="onStartInput()"
         v-on:keyup="onKeyPress"
         v-on:input="onInput"
         tabindex="1"
       />
-      <div v-if="!selectorOpen"
+      <div v-if="(!selectorOpen && !disabled)"
         @click.stop="onStartInput()"
       >
         <ChrvronDownIcon/>
       </div>
-      <div v-if="selectorOpen"
+      <div v-if="(selectorOpen && !disabled)"
         @click="onCloseDropDown"
         class="chevron_open"
       >
         <ChrvronDownIcon/>
       </div>
-      <div v-if="activeItem !== null || selectedItem !== null"
+      <div v-if="(activeItem !== null || selectedItem !== null) && !disabled"
         @click="onClearChoise"
       >
         <TrashIcon/>
       </div>
     </div>
-    <ul v-if="props.data&&selectorOpen"
+    <ul v-if="props.data&&selectorOpen&&!disabled"
         :class="{ 'scroll menu-drop menu-down' : selectorOpen&&checkDirection, 'scroll menu-drop menu-up' : selectorOpen&&!checkDirection }"
         :style="{ 'maxHeight': checkHeght}"
     >
       <li class="menu-item"
         v-if="selectorOpen"
         v-for="item in filteredItems"
+        :key = "item.id"
         @click="onSelectItem(item)"
         :id = "item.id"
       >
@@ -65,7 +67,7 @@
     limit       : {type: Number, default : 10},
     parentElem  : null,
     message     : {type: String, default : ''},
-    // disabled    : {type: Boolean, default: false},
+    disabled    : {type: Boolean, default: false},
   });
 
   const emits = defineEmits(['selectItem']);
@@ -222,9 +224,14 @@
     limit.value = props.limit;
     if (props.id !== null) {
       // console.log('mount ', props.id, '  ', props.data?.filter(item => item.id == props.id)[0].name);
-      selectorInput.value = props.data.filter(item => item.id == props.id)[0].FullName ? 
-      props.data.filter(item => item.id == props.id)[0].FullName: props.data.filter(item => item.id == props.id)[0].name;
-      // selectorInput.value = props.text;
+      const isPresent = selectorInput.value = props.data.filter(item => item.id == props.id);
+      if (isPresent.length) {
+        selectorInput.value = isPresent[0].FullName ? 
+          props.data.filter(item => item.id == props.id)[0].FullName: 
+          props.data.filter(item => item.id == props.id)[0].name;
+      } else {
+        selectorInput.value = props.text;
+      }
     } else {
       selectorInput.value = props.text;
     }
@@ -249,9 +256,9 @@
       align-items: center;
       width: 100%;
       border: 1px solid var(--bs-gray-500);
-      // &:disabled{
-      //   cursor: default;
-      // }
+      &:disabled{
+        cursor: default;
+      }
       input {
         width: 100%;
         color: var(--bs-gray-600);

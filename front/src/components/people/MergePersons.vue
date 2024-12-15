@@ -541,78 +541,83 @@
   };
 
   const onConfirmAction = async () => {
+    if ( loader.value ) return
     peopleStore.clearErrorsState();
     if (manHasChildrenMore18YearsOld.value || womanHasChildrenMore18YearsOld.value) {
       msgStore.addMessage({name: 'У супругов имеются совершеннолетние дети, выделите их в отдельную семью', icon: 'warning'});
       confirmWindow.value = false;
-    } else if (!isManMissing.value && !isWomanMissing.value) {
+      return;
+    } 
+
+    if (!isManMissing.value || !isWomanMissing.value) {
       const hasOwnFamily = peopleStore.allPeoples.
-        filter(item => item.id === manID.value || item.id === womanID.value).
-        filter(item => item.family?.head_id === item.id);
+      filter(item => item.id === manID.value || item.id === womanID.value).
+      filter(item => item.family?.head_id === item.id);
       if (!hasOwnFamily.length) {
         msgStore.addMessage({name: 'Ни у одного из супругов нет свой семьи выделите одного из них в отдельную семью', icon: 'warning'});
         confirmWindow.value = false;
+        return;
+      }
+    }
+
+    loader.value = true;
+    let formData = new FormData();
+    if (isManMissing.value) {
+      // console.log('Вводим в ручную мужа');
+      formData.append('man_email', form.man_email);
+      formData.append('man_first_name', form.man_first_name);
+      formData.append('man_name', form.man_name);
+      formData.append('man_patronymic', form.man_patronymic);
+      formData.append('man_birthday_date', form.man_birthday_date);
+      formData.append('man_baptism_date', form.man_baptism_date);
+      formData.append('man_death_date', form.man_death_date);
+      formData.append('man_live_addres', form.man_live_addres);
+      formData.append('man_home_phone', form.man_home_phone);
+      formData.append('man_mobile_phone', form.man_mobile_phone);
+      formData.append('man_relation_id', 0);
+      formData.append('man_sex_id', 1);
+      formData.append('man_discription', '');
+      if (manImage.value) {
+        const fileName = manImage.value.name;
+        const fileData = manImage.value;
+        formData.append('man_image', fileData, fileName);
       }
     } else {
-      loader.value = true;
-      let formData = new FormData();
-      if (isManMissing.value) {
-        // console.log('Вводим в ручную мужа');
-        formData.append('man_email', form.man_email);
-        formData.append('man_first_name', form.man_first_name);
-        formData.append('man_name', form.man_name);
-        formData.append('man_patronymic', form.man_patronymic);
-        formData.append('man_birthday_date', form.man_birthday_date);
-        formData.append('man_baptism_date', form.man_baptism_date);
-        formData.append('man_death_date', form.man_death_date);
-        formData.append('man_live_addres', form.man_live_addres);
-        formData.append('man_home_phone', form.man_home_phone);
-        formData.append('man_mobile_phone', form.man_mobile_phone);
-        formData.append('man_relation_id', 0);
-        formData.append('man_sex_id', 1);
-        formData.append('man_discription', '');
-        if (manImage.value) {
-          const fileName = manImage.value.name;
-          const fileData = manImage.value;
-          formData.append('man_image', fileData, fileName);
-        }
-      } else {
-        formData.append('man_id', manID.value);
-      }
-      if (isWomanMissing.value) {
-        // console.log('Вводим в ручную жену');
-        formData.append('woman_email', form.woman_email);
-        formData.append('woman_first_name', form.woman_first_name);
-        formData.append('woman_name', form.woman_name);
-        formData.append('woman_patronymic', form.woman_patronymic);
-        formData.append('woman_birthday_date', form.woman_birthday_date);
-        formData.append('woman_baptism_date', form.woman_baptism_date);
-        formData.append('woman_death_date', form.woman_death_date);
-        formData.append('woman_live_addres', form.woman_live_addres);
-        formData.append('woman_home_phone', form.woman_home_phone);
-        formData.append('woman_mobile_phone', form.woman_mobile_phone);
-        formData.append('woman_relation_id', 1);
-        formData.append('woman_sex_id', 2);
-        formData.append('woman_discription', '');
-        if (womanImage.value) {
-          const fileName = womanImage.value.name;
-          const fileData = womanImage.value;
-          formData.append('woman_image', fileData, fileName);
-        }
-      } else {
-        formData.append('woman_id', womanID.value);
-      }
-      formData.append('man_new_name', form.man_new_name);
-      formData.append('woman_new_name', form.woman_new_name);
-
-      await peopleStore.mergePersons(formData);
-      console.log('totalCountErrors', peopleStore.totalCountErrors);
-      if (!peopleStore.totalCountErrors) {  
-        emits('toggleModal');
-      }
-      confirmWindow.value = false;
-      loader.value = false;
+      formData.append('man_id', manID.value);
     }
+    if (isWomanMissing.value) {
+      // console.log('Вводим в ручную жену');
+      formData.append('woman_email', form.woman_email);
+      formData.append('woman_first_name', form.woman_first_name);
+      formData.append('woman_name', form.woman_name);
+      formData.append('woman_patronymic', form.woman_patronymic);
+      formData.append('woman_birthday_date', form.woman_birthday_date);
+      formData.append('woman_baptism_date', form.woman_baptism_date);
+      formData.append('woman_death_date', form.woman_death_date);
+      formData.append('woman_live_addres', form.woman_live_addres);
+      formData.append('woman_home_phone', form.woman_home_phone);
+      formData.append('woman_mobile_phone', form.woman_mobile_phone);
+      formData.append('woman_relation_id', 1);
+      formData.append('woman_sex_id', 2);
+      formData.append('woman_discription', '');
+      if (womanImage.value) {
+        const fileName = womanImage.value.name;
+        const fileData = womanImage.value;
+        formData.append('woman_image', fileData, fileName);
+      }
+    } else {
+      formData.append('woman_id', womanID.value);
+    }
+    formData.append('man_new_name', form.man_new_name);
+    formData.append('woman_new_name', form.woman_new_name);
+
+    await peopleStore.mergePersons(formData);
+    console.log('totalCountErrors', peopleStore.totalCountErrors);
+    if (!peopleStore.totalCountErrors) {  
+      emits('toggleModal');
+    }
+    confirmWindow.value = false;
+    loader.value = false;
     // console.log('confirm');
   };
 

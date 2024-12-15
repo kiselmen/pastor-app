@@ -4,7 +4,7 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  min-width: 200px;
+  // min-width: 200px;
   min-height: 400px;
   // height: var(--bs-card-height);
   color: var(--bs-gray-600);
@@ -108,6 +108,7 @@
   &-img {
     width: 100%;
     max-width: 300px;
+    // min-width: 200px;
     height: 200px;
     border-radius: 5px;
     background-repeat: no-repeat;
@@ -139,5 +140,23 @@
   &:hover{
     background: var(--bs-info);
   }
+}
+
+.arrow-right {
+  width: 0;
+  height: 0;
+  margin: auto;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-left: 30px solid #3498db; /* Цвет стрелки */
+}
+
+.arrow-top {
+  width: 0;
+  height: 0;
+  margin: auto;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 30px solid #3498db; /* Цвет стрелки */
 }
 

@@ -3,11 +3,13 @@ import { defineStore } from 'pinia';
 import axios from 'axios';
 import { usePeopleStore } from '@/stores/peopleStore';
 import { useMsgStore } from '@/stores/msgStore';
+import { useViewStore } from '@/stores/viewStore';
 
 export const useFamilyStore = defineStore('familyStore', () => {
 
   const peopleStore = usePeopleStore();
   const msgStore = useMsgStore();
+  const viewStore = useViewStore();
 
   const families = ref([]);
   const oneFamily = ref(null);
@@ -19,7 +21,15 @@ export const useFamilyStore = defineStore('familyStore', () => {
   const getAllFamilies = async () => {
     loader.value = true;
     try {
-      const response = await axios.get('api/families');
+      let mask = '';
+      viewStore.allowFilterData.forEach(item => {
+          const storeKey = item.name + 'FilterMask';
+          const storeValue = viewStore[storeKey];
+          // console.log('storeKey ', storeKey, ' storeValue ', storeValue);
+          if (storeValue) mask = mask + '&_' + item.name + '=' + storeValue;
+      });
+      if (mask) mask = '?' + mask.substring(1);
+      const response = await axios.get('api/families' + mask);
       families.value = response.data.sort((a ,b) => a.id - b.id);
     } catch (error) {
       console.log(error);
@@ -87,6 +97,28 @@ export const useFamilyStore = defineStore('familyStore', () => {
     loader.value = false;
   }; // with permitions
 
+  const moveFamily = async (data) => {
+    loader.value = true;
+    try {
+      errors.value = {};
+      const id = Number(data.id);
+      const response = await axios.post('api/movefamily', data);
+      const newFamilies = families.value.filter(item => item.id !== id);
+      families.value = [...newFamilies, response.data].sort((a ,b) => a.id - b.id);
+      msgStore.addMessage({name: 'Семья: "' + response.data.name + '", изменена.', icon: 'done'});
+      peopleStore.getAllPeople();
+    } catch (error) {
+      if (error.response?.status === 422) {
+        errors.value = error.response?.data?.errors;
+      } else if (error.response?.status === 403) {
+        msgStore.addMessage({name: error.response?.data?.message, icon: 'error'});
+      } else {
+        msgStore.addMessage({name: error.message, icon: 'error'});
+      }
+    }
+    loader.value = false;
+  }
+
   const clearErrorsState = () => {
     errors.value = {}
   };
@@ -101,6 +133,7 @@ export const useFamilyStore = defineStore('familyStore', () => {
     getOneFamily,
     addNewFamily,
     editFamily,
+    moveFamily,
     clearErrorsState,
   }
 });

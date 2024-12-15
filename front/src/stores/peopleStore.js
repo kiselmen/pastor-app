@@ -30,9 +30,7 @@ export const usePeopleStore = defineStore('peopleStore', () => {
           if (storeValue) mask = mask + '&_' + item.name + '=' + storeValue;
       });
       if (mask) mask = '?' + mask.substring(1);
-
       // console.log('mask ', mask);
-
       const response = await axios.get('api/peoples' + mask);
       peoples.value = response.data.sort((a ,b) => a.name > b.name ? 1: -1).map(item => {
         item.plevel.sort((a, b) => new Date(a.date) - new Date(b.date));
@@ -70,7 +68,7 @@ export const usePeopleStore = defineStore('peopleStore', () => {
       }
     }
     loader.value = false;
-  };
+  }; //without peritions
 
   const getBornPeople = async (start, end, rip) => {
     loader.value = true;
@@ -230,7 +228,6 @@ export const usePeopleStore = defineStore('peopleStore', () => {
     loader.value = false;
   };
 
-
   const clearPeopleState = () => {
     peoples.value = [];
   };
@@ -238,130 +235,54 @@ export const usePeopleStore = defineStore('peopleStore', () => {
   const updatePersoneServices = async (id, pservices, type) => {
     loader.value = true;
     const persone = type ? peoples.value.filter(item => item.id === id)[0]: onePersone.value;
-    for (let i = 0; i < pservices.length; i++) {
-      let isNotFind = true;
-      for (let j = 0; j < persone.pservice.length; j++) {
-        if(pservices[i].service_id === persone.pservice[j].service_id) isNotFind = false;
-      };
-      if (isNotFind) {
-        try {
-          const response = await axios.post('api/pservices', pservices[i]);
-          msgStore.addMessage({name: 'Вид служения: "' + response.data.ServiceName + '", добавлен.', icon: 'done'});
-          persone.pservice = [...persone.pservice, response.data];
-        } catch (error) {
-          console.log(error);
-          if (error.response?.status === 422) {
-            errors.value = error.response?.data?.errors;
-          } else if (error.response?.status === 403) {
-            msgStore.addMessage({name: error.response?.data?.message, icon: 'error'});
-          } else if (error.response?.status === 401) {
-            // msgStore.addMessage({name: error.response?.data?.message, icon: 'error'});
-          } else {
-            msgStore.addMessage({name: error.message, icon: 'error'});
-          }
-        }
-      }
-    };
-    
-    const oldServices = [];
-    let itemsToDelete = [];
-    for (let i = 0; i < persone.pservice.length; i++) {
-      let isNotFind = true;
-      for (let j = 0; j < pservices.length; j++) {
-        if(persone.pservice[i].service_id === pservices[j].service_id) isNotFind = false;
-      };
-      if (isNotFind) {
-        itemsToDelete.push(persone.pservice[i].id);
-        oldServices.push(persone.pservice[i]);
+    const requestData = {
+      people_id: persone.id,
+      services: pservices,
+    }
+    try {
+      const response = await axios.post('api/mergepservices', requestData);
+      msgStore.addMessage({name: 'Вид служения: "' + response.data.ServiceName + '", добавлен.', icon: 'done'});
+      persone.pservice = [...response.data];
+    } catch (error) {
+      console.log(error);
+      if (error.response?.status === 422) {
+        errors.value = error.response?.data?.errors;
+      } else if (error.response?.status === 403) {
+        msgStore.addMessage({name: error.response?.data?.message, icon: 'error'});
+      } else if (error.response?.status === 401) {
+        // msgStore.addMessage({name: error.response?.data?.message, icon: 'error'});
+      } else {
+        msgStore.addMessage({name: error.message, icon: 'error'});
       }
     }
-    if (itemsToDelete.length) {
-      try {
-        // console.log('delete services ', itemsToDelete);
-        await axios.post('api/pservices/delete', { ids: itemsToDelete });
-        let filteredServices = [...persone.pservice];
-        oldServices.forEach(service => {
-          filteredServices = filteredServices.filter(item => item.service_id !== service.service_id);
-        })
-        persone.pservice = [...filteredServices];
-        msgStore.addMessage({name: 'Виды служения удалены.', icon: 'done'});
-      } catch (error) {
-        console.log(error);
-        if (error.response?.status === 403) {
-          msgStore.addMessage({name: error.response?.data?.message, icon: 'error'});
-        } else if (error.response?.status === 403) {
-          msgStore.addMessage({name: error.response?.data?.message, icon: 'error'});
-        } else if (error.response?.status === 401) {
-          // msgStore.addMessage({name: error.response?.data?.message, icon: 'error'});
-        } else {
-          msgStore.addMessage({name: error.message, icon: 'error'});
-        }
-      }
-    }
-
   }; // with permitions
 
   const updatePersoneTargets = async (id, ptargets, type) => {
     loader.value = true;
     const persone = type ? peoples.value.filter(item => item.id === id)[0]: onePersone.value;
-    for (let i = 0; i < ptargets.length; i++) {
-      let isNotFind = true;
-      for (let j = 0; j < persone.ptarget.length; j++) {
-        if(ptargets[i].target_id === persone.ptarget[j].target_id) isNotFind = false;
-      };
-      if (isNotFind) {
-        try {
-          const response = await axios.post('api/ptargets', ptargets[i]);
-          msgStore.addMessage({name: 'Целевая группа: "' + response.data.TargetName + '", добавлена.', icon: 'done'});
-          persone.ptarget = [...persone.ptarget, response.data];
-        } catch (error) {
-          console.log(error);
-          if (error.response?.status === 422) {
-            errors.value = error.response?.data?.errors;
-          } else if (error.response?.status === 403) {
-            msgStore.addMessage({name: error.response?.data?.message, icon: 'error'});
-          } else if (error.response?.status === 401) {
-            // msgStore.addMessage({name: error.response?.data?.message, icon: 'error'});
-          } else {
-            msgStore.addMessage({name: error.message, icon: 'error'});
-          }
-        }
-      }
-    };
-    
-    const oldTargets = [];
-    let itemsToDelete = [];
-    for (let i = 0; i < persone.ptarget.length; i++) {
-      let isNotFind = true;
-      for (let j = 0; j < ptargets.length; j++) {
-        if(persone.ptarget[i].target_id === ptargets[j].target_id) isNotFind = false;
-      };
-      if (isNotFind) {
-        itemsToDelete.push(persone.ptarget[i].id);
-        oldTargets.push(persone.ptarget[i]);
+    const requestData = {
+      people_id: persone.id,
+      targets: ptargets,
+    }
+    try {
+      const response = await axios.post('api/mergeptargets', requestData);
+      msgStore.addMessage({name: 'Целевые группу обновлены.', icon: 'done'});
+      persone.ptarget = [...response.data];
+    } catch (error) {
+      console.log(error);
+      if (error.response?.status === 422) {
+        errors.value = error.response?.data?.errors;
+      } else if (error.response?.status === 403) {
+        msgStore.addMessage({name: error.response?.data?.message, icon: 'error'});
+      } else if (error.response?.status === 401) {
+        // msgStore.addMessage({name: error.response?.data?.message, icon: 'error'});
+      } else {
+        msgStore.addMessage({name: error.message, icon: 'error'});
       }
     }
-    if (itemsToDelete.length) {
-      try {
-        // console.log('delete targets ', itemsToDelete);
-        await axios.post('api/ptargets/delete', { ids: itemsToDelete });
-        let filteredTargets = [...persone.ptarget];
-        oldTargets.forEach(target => {
-          filteredTargets = filteredTargets.filter(item => item.target_id !== target.target_id);
-        })
-        persone.ptarget = [...filteredTargets];
-        msgStore.addMessage({name: 'Целевые нруппы удалены.', icon: 'done'});
-      } catch (error) {
-        console.log(error);
-        if (error.response?.status === 403) {
-          msgStore.addMessage({name: error.response?.data?.message, icon: 'error'});
-        } else if (error.response?.status === 401) {
-          // msgStore.addMessage({name: error.response?.data?.message, icon: 'error'});
-        } else {
-          msgStore.addMessage({name: error.message, icon: 'error'});
-        }
-      }
-    }
+    loader.value = false;
+
+    return;
   }; // with permitions
 
   const addPersonLevel = async (levelData, type) => {

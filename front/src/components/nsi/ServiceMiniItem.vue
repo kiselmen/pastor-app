@@ -16,7 +16,7 @@
       </div>
     </div>
     <div class="service-items">
-      <div class="service-item" v-for="service in props.services">
+      <div class="service-item" v-for="service in props.services" :key = "service.id">
         {{ service.ServiceName }}
       </div>
     </div>
@@ -32,7 +32,7 @@
 
   const props = defineProps({
     services: { type: Object, default: new Object() },
-    isActionPossible: { type: Boolean, default: true },
+    isActionPossible: { type: Boolean, default: false },
   });
 
   const emits = defineEmits(['editServices']);
@@ -53,9 +53,9 @@
 <style lang="scss" scoped>
   .service {
     &-box {
-      border-radius: 5px;
+      // border-radius: 5px;
       padding: 5px;
-      border: 1px solid var(--bs-gray-300);
+      // border: 1px solid var(--bs-gray-300);
       width: 100%;
       min-height: 100px;      
       position: relative;

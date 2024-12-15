@@ -40,7 +40,7 @@
             </div>
             <div class="table2x">
               <div v-if ="!loader" class="group-items">
-                <div class="group-item" v-if = "childrensToMove.length" v-for ="candidate in childrensToMove" >
+                <div class="group-item" v-if = "childrensToMove.length" v-for ="candidate in childrensToMove" :key = "candidate.id">
                   <div class="group-avatar" :style = "{ backgroundImage : 'url(' + getImgPath(candidate.image_url) +')' }"></div>
                   <div class="group-name">{{ candidate.FullName }}</div>
                     <div class="group-delete" @click="onDeleteCandidate(candidate.id)">

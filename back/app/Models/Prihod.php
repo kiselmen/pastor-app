@@ -11,7 +11,7 @@ class Prihod extends Model
   ];
 
   protected $fillable = [
-      'name' ,'discription', 'number',
+      'name' ,'discription', 'number', 'is_global',
   ];
 
 }

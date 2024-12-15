@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+
+use DB;
 use App\Models\People;
 
 class Family extends Model
@@ -15,7 +17,7 @@ class Family extends Model
   ];
 
   protected $appends = [
-    'HeadName', 'FamilyComposition'
+    'HeadName', 'FamilyComposition', 'Prihod',
   ];
 
   public function head()
@@ -46,4 +48,11 @@ class Family extends Model
     }
   }
   
+  public function getPrihodAttribute(){
+    if ($this->head) {
+      return $prihod = DB::table('prihods')->find($this->head->prihod_id);
+    } else {
+      return null;
+    }
+  }
 }

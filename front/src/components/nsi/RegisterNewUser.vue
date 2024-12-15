@@ -112,7 +112,7 @@
       </div>
       <div v-if="formStep === 1" class="table2x">
         <div v-if ="!loader" class="group-items">
-          <div class="group-item" v-if = "permitions.length" v-for ="permition in permitions" >
+          <div class="group-item" v-if = "permitions.length" v-for ="permition in permitions" :key = "permition.id">
             <div class="group-name">{{ permition.name + ' ' + permition.source_name }}</div>
               <div class="group-delete" @click="onDeletePermition(permition.id, permition.source_id)">
                 <DismissIcon/>

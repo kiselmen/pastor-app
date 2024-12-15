@@ -44,7 +44,7 @@
           <PrihodMiniItem
             :prihod = "props.persone.prihod"
           />
-          <div class="card-target" v-for="target in props.persone?.ptarget">{{target.TargetName }}</div>
+          <div class="card-target" v-for="target in props.persone?.ptarget" :key = "target.id">{{target.TargetName }}</div>
           <FamilyMiniItem
             :family = "props.persone.family"
           />
@@ -113,7 +113,7 @@
         </DateItem>
       </div>
     </div>   
-    <div class="card-row">
+    <div class="card-box">
         <ServiceMiniItem
           :services = "props.persone.pservice"
           :isActionPossible = props.isActionPossible
@@ -306,6 +306,7 @@
     }
   }
   .left {
-    align-items: flex-start
+    align-items: flex-start;
+    flex-basis: 150%;    
   }
 </style>

@@ -51,6 +51,7 @@
           <div class="card-row flex-wrap">
             <PersoneMiniItem
                 v-for="persone in familyStore.oneFamily.people"
+                :key = "persone.id"
                 :persone = "persone"
             />
           </div>

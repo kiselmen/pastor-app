@@ -7,6 +7,8 @@ export const useViewStore = defineStore('viewStore', () => {
   const targetFilterMask = ref(null);
   const searchFilterMask = ref(null);
   const serviceFilterMask = ref(null);
+  const startDate = ref(null);
+  const endDate = ref(null);
 
   const allowFilterData = [
     {name: 'prihod'}, {name: 'target'}, {name: 'service'}, {name: 'search'},
@@ -28,16 +30,24 @@ export const useViewStore = defineStore('viewStore', () => {
     serviceFilterMask.value = mask;
   };
 
+  const setDateParameters = (start, end) => {
+    startDate.value = start;
+    endDate.value = end;
+  }
+
   return {
     prihodFilterMask,
     targetFilterMask,
     searchFilterMask,
     serviceFilterMask,
     allowFilterData,
+    startDate,
+    endDate,    
     setPrihodFilterMask,
     setTargetFilterMask,
     setSearchFilterMask,
     setServiceFilterMask,
+    setDateParameters,
   };
 
 });

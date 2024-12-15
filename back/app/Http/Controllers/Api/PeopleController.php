@@ -12,9 +12,10 @@ use Illuminate\Support\Facades\DB;
 
 use App\Models\People;
 use App\Models\Family;
-use App\Models\Paction;
-use App\Models\Praction;
-use App\Models\Faction;
+use App\Models\Prihod;
+use App\Models\Peopleaction;
+use App\Models\Prihodaction;
+use App\Models\Familyaction;
 use App\Models\Globalaction;
 
 class PeopleController extends BaseController
@@ -128,6 +129,12 @@ class PeopleController extends BaseController
       // 'discription' => ['required'],
       'persone_id' => ['required', 'numeric'],
       'childrens' => ['required'],
+    ]);
+  }
+
+  protected function MoveToNewPrihod(array $data){
+    return Validator::make($data, [
+      'prihod_id' => ['required', 'numeric'],
     ]);
   }
 
@@ -385,6 +392,7 @@ class PeopleController extends BaseController
       $Globalaction = Globalaction::create([
         'user_id' 		          => $User->id,
         'action_id'		      	  => $actionID,
+        'name'                  => $actionName,
         'date'                  => Carbon::now()->toDateString(),
         'discription'           => '',
       ]);
@@ -426,15 +434,12 @@ class PeopleController extends BaseController
           'discription'			=> $request['family_discription'],
           // 'head_id'         => $request['head_id'],
         ]);
-        $CurrentFamilyAction = Faction::create([
+        $CurrentFamilyAction = Familyaction::create([
           'family_id'               => $CurrentFamily->id,
-          'global_id'               => $Globalaction->id,
-          'user_id'                 => $User->id,
-          'action_id'               => $actionID,
-          'name'                    => $actionName,
-          'date'                    => Carbon::now()->toDateString(),
-          'field'                   => null,
-          'value'                   => null,
+          'globalaction_id'         => $Globalaction->id,
+          'field'                   => 'id',
+          'source'                  => null,
+          'target'                  => $CurrentFamily->id,
           ]);
         $CurrentPersone = People::create([
           'first_name' 		        => $request['first_name'],
@@ -459,15 +464,12 @@ class PeopleController extends BaseController
         $CurrentFamily->save(); 
       }
   
-      $CurrentPersoneAction = Paction::create([
+      $CurrentPersoneAction = Peopleaction::create([
         'people_id'               => $CurrentPersone->id,
-        'global_id'               => $Globalaction->id,
-        'user_id'                 => $User->id,
-        'action_id'               => $actionID,
-        'name'                    => $actionName,
-        'date'                    => Carbon::now()->toDateString(),
-        'field'                   => null,
-        'value'                   => null,
+        'globalaction_id'         => $Globalaction->id,
+        'field'                   => 'id',
+        'source'                  => null,
+        'target'                  => $CurrentPersone->id,
       ]);
 
       $Globalaction->discription = $actionName . ' ' . $CurrentPersone->FullName;
@@ -515,17 +517,16 @@ class PeopleController extends BaseController
         $actionName = 'Оформить смерть';
       } else if ($actionID == 6) {
         $actionName = 'Выделить в новую семью';
-      // } else if ($actionID == 7) {
-      //   $actionName = 'Оформить брак';
-      // } else if ($actionID == 8) {
-      //   $actionName = 'Оформить развод';
       } else if ($actionID == 9) {
         $actionName = 'Сменить участок';
+      } else if ($actionID == 14) {
+        $actionName = 'Выбытие в другую церковь';
       }
 
       $Globalaction = Globalaction::create([
         'user_id' 		          => $User->id,
         'action_id'		      	  => $actionID,
+        'name'                  => $actionName,
         'date'                  => Carbon::now()->toDateString(),
         'discription'           => '',
       ]);
@@ -543,60 +544,71 @@ class PeopleController extends BaseController
       
       if ($actionID == 4) {
         if ($CurrentPersone->first_name !== $request['first_name']) {
-          array_push($fields, ['id' => $id, 'key' => 'first_name', 'value' => $CurrentPersone->first_name]);
+          array_push($fields, ['id' => $id, 'key' => 'first_name', 'source' => $CurrentPersone->first_name, 'target' => $request['first_name']]);
           $CurrentPersone->first_name 		  = $request['first_name'];
         }
         if ($CurrentPersone->name !== $request['name']) {
-          array_push($fields, ['id' => $id, 'key' => 'name', 'value' => $CurrentPersone->name]);
+          array_push($fields, ['id' => $id, 'key' => 'name', 'source' => $CurrentPersone->name, 'target' => $request['name']]);
           $CurrentPersone->name 	      	  = $request['name'];
         }
         if ($CurrentPersone->patronymic !== $request['patronymic']) {
-          array_push($fields, ['id' => $id, 'key' => 'patronymic', 'value' => $CurrentPersone->patronymic]);
+          array_push($fields, ['id' => $id, 'key' => 'patronymic', 'source' => $CurrentPersone->patronymic, 'target' => $request['patronymic']]);
           $CurrentPersone->patronymic 		  = $request['patronymic'];
         }
-        if (!is_null($request['birthday_date']) && $request['birthday_date'] !== "null" && $CurrentPersone->birthday_date !== $request['birthday_date']) {
-          array_push($fields, ['id' => $id, 'key' => 'birthday_date', 'value' => $CurrentPersone->birthday_date]);
+        if (!is_null($request['birthday_date']) && $request['birthday_date'] !== 'null' && $CurrentPersone->birthday_date !== $request['birthday_date']) {
+          array_push($fields, ['id' => $id, 'key' => 'birthday_date', 'source' => $CurrentPersone->birthday_date, 'target' => $request['birthday_date']]);
           $CurrentPersone->birthday_date 		= $request['birthday_date'];
         }
-        if (!is_null($request['baptism_date']) && $request['baptism_date'] !== "null" && $CurrentPersone->baptism_date !== $request['baptism_date']) {
-          array_push($fields, ['id' => $id, 'key' => 'baptism_date', 'value' => $CurrentPersone->baptism_date]);
+        if (!is_null($request['baptism_date']) && $request['baptism_date'] !== 'null' && $CurrentPersone->baptism_date !== $request['baptism_date']) {
+          array_push($fields, ['id' => $id, 'key' => 'baptism_date', 'source' => $CurrentPersone->baptism_date, 'target' => $request['baptism_date']]);
           $CurrentPersone->baptism_date 		= $request['baptism_date'];
         }
         if ($CurrentPersone->live_addres !== $request['live_addres']) {
-          array_push($fields, ['id' => $id, 'key' => 'live_addres', 'value' => $CurrentPersone->live_addres]);
+          array_push($fields, ['id' => $id, 'key' => 'live_addres', 'source' => $CurrentPersone->live_addres, 'target' => $request['live_addres']]);
           $CurrentPersone->live_addres 		  = $request['live_addres'];
         }
-        if ($CurrentPersone->home_phone !== $request['home_phone']) {
-          array_push($fields, ['id' => $id, 'key' => 'home_phone', 'value' => $CurrentPersone->home_phone]);
-          $CurrentPersone->home_phone 		  = $request['home_phone'];
+        
+        if (!is_null($request['home_phone']) && $request['home_phone'] != 'null') {
+          $home_phone = $request['home_phone'];
+        } else {
+          $home_phone = null;
         }
-        if ($CurrentPersone->mobile_phone !== $request['mobile_phone']) {
-          array_push($fields, ['id' => $id, 'key' => 'mobile_phone', 'value' => $CurrentPersone->mobile_phone]);
-          $CurrentPersone->mobile_phone 		= $request['mobile_phone'];
+        if ($CurrentPersone->home_phone !== $home_phone) {
+          array_push($fields, ['id' => $id, 'key' => 'home_phone', 'source' => $CurrentPersone->home_phone, 'target' => $home_phone]);
+          $CurrentPersone->home_phone 		  = $home_phone;
+        }
+        if (!is_null($request['mobile_phone']) && $request['mobile_phone'] != 'null') {
+          $mobile_phone = $request['mobile_phone'];
+        } else {
+          $mobile_phone = null;
+        }
+        if ($CurrentPersone->mobile_phone !== $mobile_phone) {
+          array_push($fields, ['id' => $id, 'key' => 'mobile_phone', 'source' => $CurrentPersone->mobile_phone, 'target' => $mobile_phone]);
+          $CurrentPersone->mobile_phone 		= $mobile_phone;
         }
         if (!is_null($request['email']) && $request['email'] !== "null" && $CurrentPersone->email !== $request['email']) {
-          array_push($fields, ['id' => $id, 'key' => 'email', 'value' => $CurrentPersone->email]);
+          array_push($fields, ['id' => $id, 'key' => 'email', 'source' => $CurrentPersone->email, 'target' => $request['email']]);
           $CurrentPersone->email 		        = $request['email'];
         }
         if (!is_null($request['family_id']) && $request['family_id'] !== "null" && $CurrentPersone->family_id !== (int)$request['family_id']) {
-          array_push($fields, ['id' => $id, 'key' => 'family_id', 'value' => $CurrentPersone->family_id]);
+          array_push($fields, ['id' => $id, 'key' => 'family_id', 'source' => $CurrentPersone->family_id, 'target' => $request['family_id']]);
           $CurrentPersone->family_id        = $request['family_id'];
         }
         if ($CurrentPersone->sex_id !== (int)$request['sex_id']) {
-          array_push($fields, ['id' => $id, 'key' => 'sex_id', 'value' => $CurrentPersone->sex_id]);
+          array_push($fields, ['id' => $id, 'key' => 'sex_id', 'source' => $CurrentPersone->sex_id, 'target' => $request['sex_id']]);
           $CurrentPersone->sex_id           = $request['sex_id'];
         }
         if ($file) {
           if ($CurrentPersone->image_url) {
             Storage::disk('public')->delete($CurrentPersone->image_url);
           }
-          array_push($fields, ['id' => $id, 'key' => 'image_url', 'value' => $CurrentPersone->image_url]);
+          array_push($fields, ['id' => $id, 'key' => 'image_url', 'source' => $CurrentPersone->image_url, 'target' => $filePath]);
           $CurrentPersone->image_url 		    = $filePath;
         }
         $CurrentPersone->save();
       } else if ($actionID == 5) {
         if (!is_null($request['death_date']) && $request['death_date'] !== "null" && $CurrentPersone->death_date !== $request['death_date']) {
-          array_push($fields, ['id' => $id, 'key' => 'death_date', 'value' => $CurrentPersone->death_date]);
+          array_push($fields, ['id' => $id, 'key' => 'death_date', 'source' => $CurrentPersone->death_date, 'target' => $request['death_date']]);
           $CurrentPersone->death_date 		= $request['death_date'];
         }
         $CurrentPersone->save();
@@ -609,196 +621,61 @@ class PeopleController extends BaseController
           'head_id'         => $CurrentPersone->id,
         ]);
         
-        array_push($familyFields, ['id' => $CurrentFamily->id, 'key' => null, 'value' => null]);
+        array_push($familyFields, ['id' => $CurrentFamily->id, 'key' => 'id', 'source' => null, 'target' => $CurrentFamily->id]);
 
-        array_push($fields, ['id' => $id, 'key' => 'family_id', 'value' => $CurrentPersone->family_id]);
-        array_push($fields, ['id' => $id, 'key' => 'relation_id', 'value' => $CurrentPersone->relation_id]);
+        array_push($fields, ['id' => $id, 'key' => 'family_id', 'source' => $CurrentPersone->family_id, 'target' => $CurrentFamily->id]);
+        array_push($fields, ['id' => $id, 'key' => 'relation_id', 'source' => $CurrentPersone->relation_id, 'target' => $relation]);
 
         $CurrentPersone->family_id = $CurrentFamily->id;
         $CurrentPersone->relation_id = $relation;
         $CurrentPersone->save(); 
-      // } else if ($actionID == 7) {
-      //   $this->createFamilyValidator($request->all())->validate();
-      //   $this->familyNameActionValidator($request->all())->validate();
+      } else if ($actionID == 9 || $actionID == 14) {
 
-      //   $isPersoneAgeUnder18 = $this->isUnder18($CurrentPersone);
-      //   if ($isPersoneAgeUnder18) return response()->json(['message' => $CurrentPersone->name.' '.$CurrentPersone->first_name.' must be more than 18 yers old'], 403);
+        $this->MoveToNewPrihod($request->all())->validate();
+
+        $Prihod = Prihod::find($request['prihod_id']);
+
+        if ($actionID == 9) {
+          if ($Prihod->is_global) {
+            return response()->json(['message' => 'Используйте выбытие в другоую церковь'], 403);
+          }
+        }
+
+        if ($actionID == 14) {
+          if (!$Prihod->is_global) {
+            return response()->json(['message' => 'Используйте сменить участок'], 403);
+          }
+        }
         
-      //   $PairPersone = People::find($request['pair_id']);
-      //   $isPairPersoneAgeUnder18 = $this->isUnder18($PairPersone);
-      //   if ($isPairPersoneAgeUnder18) return response()->json(['message' => $PairPersone->name.' '.$PairPersone->first_name.' must be more than 18 yers old'], 403);
-        
-      //   $isPersonAloneInFamily = ($CurrentPersone->relation_id === 0 || $CurrentPersone->relation_id === 1);
-      //   $isPairPersonAloneInFamily = ($PairPersone->relation_id === 0 || $PairPersone->relation_id === 1);
-
-      //   $NameAction = $request['familyNameAction_id'];
-
-      //   if ($isPersonAloneInFamily === false && $isPairPersonAloneInFamily === false) {
-      //     // Союз между двух людей, которые пока учитыватся в родительских семьях
-      //     $this->familyValidator($request->all())->validate();
-
-      //     $Head_ID = $CurrentPersone->id;
-      //     if ($PairPersone->sex_id === 1) {
-      //       $Head_ID = $PairPersone->id;
-      //     }  
-
-      //     $CurrentFamily = Family::create([
-      //       'name' 		        => $request['family_name'],
-      //       'discription'			=> $request['family_discription'],
-      //       'head_id'         => $Head_ID,
-      //     ]);
-
-      //     array_push($familyFields, ['id' => $CurrentFamily->id, 'key' => null, 'value' => null]);
-
-      //     array_push($fields, ['id' => $PairPersone->id, 'key' => 'family_id', 'value' => $PairPersone->family_id]);
-      //     array_push($fields, ['id' => $PairPersone->id, 'key' => 'relation_id', 'value' => $PairPersone->relation_id]);
-
-      //     array_push($fields, ['id' => $id, 'key' => 'family_id', 'value' => $CurrentPersone->family_id]);
-      //     array_push($fields, ['id' => $id, 'key' => 'relation_id', 'value' => $CurrentPersone->relation_id]);
-  
-      //     $CurrentPersone->family_id = $CurrentFamily->id;
-      //     $PairPersone->family_id = $CurrentFamily->id;
-      //     if ($CurrentPersone->sex_id === 1) {
-      //       $CurrentPersone->relation_id = 0;
-      //       $PairPersone->relation_id = 1;
-      //     } else {
-      //       $CurrentPersone->relation_id = 1;
-      //       $PairPersone->relation_id = 0;
-      //     }
-      //     $CurrentPersone->save(); 
-      //     $PairPersone->save(); 
-      //   } else {
-      //     // Союз между людьми как минимум один из которых в сомостоятельной семье.
-      //     if ($isPersonAloneInFamily) {
-      //       array_push($fields, ['id' => $PairPersone->id, 'key' => 'family_id', 'value' => $PairPersone->family_id]);
-      //       array_push($fields, ['id' => $PairPersone->id, 'key' => 'relation_id', 'value' => $PairPersone->relation_id]);
-      //       $PairPersone->family_id = $CurrentPersone->family_id;
-      //       if ($PairPersone->sex_id === 1) {
-      //         $PairPersone->relation_id = 0;
-      //       } else {
-      //         $PairPersone->relation_id = 1;
-      //       }
-      //       $PairPersone->save(); 
-      //     } else {
-      //       array_push($fields, ['id' => $id, 'key' => 'family_id', 'value' => $CurrentPersone->family_id]);
-      //       array_push($fields, ['id' => $id, 'key' => 'relation_id', 'value' => $CurrentPersone->relation_id]);
-
-      //       $CurrentPersone->family_id = $PairPersone->family_id;
-      //       if ($CurrentPersone->sex_id === 1) {
-      //         $CurrentPersone->relation_id = 0;
-      //       } else {
-      //         $CurrentPersone->relation_id = 1;
-      //       }
-      //       $CurrentPersone->save(); 
-      //     }
-      //     array_push($familyFields, ['id' => $CurrentPersone->family_id, 'key' => null, 'value' => null]);
-      //   }
-      //   // Устанавливаем фамилию
-      //   if ($NameAction == 0) {
-      //     if ($PairPersone->sex_id === 2) {
-      //       array_push($fields, ['id' => $PairPersone->id, 'key' => 'name', 'value' => $PairPersone->name]);
-      //       $PairPersone->name = $CurrentPersone->name;
-      //     } else {
-      //       array_push($fields, ['id' => $id, 'key' => 'name', 'value' => $CurrentPersone->name]);
-      //       $CurrentPersone->name = $PairPersone->name;
-      //     }
-      //   } else if ($NameAction == 1) {
-      //     if ($PairPersone->sex_id === 1) {
-      //       array_push($fields, ['id' => $PairPersone->id, 'key' => 'name', 'value' => $PairPersone->name]);
-      //       $PairPersone->name = $CurrentPersone->name;
-      //     } else{
-      //       array_push($fields, ['id' => $id, 'key' => 'name', 'value' => $CurrentPersone->name]);
-      //       $CurrentPersone->name = $PairPersone->name;
-      //     }
-      //   }
-      //   $PairPersone->save();
-      //   $CurrentPersone->save();
-      // } else if ($actionID == 8) {
-      //   $this->familyValidator($request->all())->validate();
-      //   $CurrentFamily = $CurrentPersone->family;        
-      //   if ($CurrentFamily) {
-      //     $FamilyPersons = $CurrentFamily->people;
-      //   } else {
-      //     return response()->json(['message' => 'Persone don"t have family'], 403);
-      //   }
-
-      //   $PairPersone = null;
-
-      //   foreach ($FamilyPersons as $FamilyPerson){
-      //     if ($FamilyPerson->id !== $CurrentPersone->id && ($FamilyPerson->relation_id === 0 || $FamilyPerson->relation_id === 1)) {
-      //       $PairPersone = $FamilyPerson;
-      //     }
-      //   }
-
-      //   // return $PairPersone;
-
-      //   if (!$PairPersone) {
-      //     return response()->json(['message' => 'Persone don"t have pair'], 403);
-      //   }
-
-      //   $NewFamily = Family::where('head_id', $PairPersone->id)->first();
-
-      //   if (!$NewFamily) {
-      //     $NewFamily = Family::create([
-      //       'name' 		        => $request['family_name'],
-      //       'discription'			=> $request['family_discription'],
-      //       'head_id'         => $PairPersone->id,
-      //     ]);
-      //   } else {
-      //     $NewFamily->name = $request['family_name'];
-      //     $NewFamily->discription = $request['family_discription'];
-      //   }
-
-      //   array_push($familyFields, ['id' => $NewFamily->id, 'key' => 'family_id', 'value' => $PairPersone->family_id]);
-      //   array_push($fields, ['id' => $PairPersone->id, 'key' => 'family_id', 'value' => $PairPersone->family_id]);
-
-      //   $NewPairName = $request['new_pair_name'];
-      //   if ($NewPairName) {
-      //     array_push($fields, ['id' => $PairPersone->id, 'key' => 'name', 'value' => $PairPersone->name]);
-      //     $PairPersone->name = $NewPairName;
-      //   }
-      //   $PairPersone->family_id = $NewFamily->id;
-      //   $PairPersone->save();
-
-      } else if ($actionID == 9) {
-        $PrihodAction = Praction::create([
-          'global_id'               => $Globalaction->id,
-          'user_id'                 => $User->id,
-          'action_id'               => $actionID,
-          'name'                    => $actionName,
-          'date'                    => Carbon::now()->toDateString(),
+        $PrihodAction = Prihodaction::create([
+          'globalaction_id'         => $Globalaction->id,
+          'people_id'               => $CurrentPersone->id,
           'source_id'               => $CurrentPersone->prihod_id,
           'target_id'               => $request['prihod_id'],
        ]);
-       array_push($fields, ['id' => $id, 'key' => 'prihod_id', 'value' => $CurrentPersone->prihod_id]);
+       array_push($fields, ['id' => $id, 'key' => 'prihod_id', 'source' => $CurrentPersone->prihod_id, 'target' => $request['prihod_id']]);
        $CurrentPersone->prihod_id = $request['prihod_id'];
        $CurrentPersone->save(); 
       }
       if (count($fields)) {
         foreach ($fields as $field){
-          $CurrentPersoneAction = Paction::create([
+          $CurrentPersoneAction = Peopleaction::create([
             'people_id'               => $field['id'],
-            'global_id'               => $Globalaction->id,
-            'user_id'                 => $User->id,
-            'action_id'               => $actionID,
-            'name'                    => $actionName,
-            'date'                    => Carbon::now()->toDateString(),
+            'globalaction_id'         => $Globalaction->id,
             'field'                   => $field['key'],
-            'value'                   => $field['value'],
+            'source'                  => $field['source'],
+            'target'                  => $field['target'],
           ]);
         }
       }  
       if (count($familyFields)) {
         foreach ($familyFields as $field){
-          $CurrentFamilyAction = Faction::create([
+          $CurrentFamilyAction = Familyaction::create([
             'family_id'               => $field['id'],
-            'global_id'               => $Globalaction->id,
-            'user_id'                 => $User->id,
-            'action_id'               => $actionID,
-            'name'                    => $actionName,
-            'date'                    => Carbon::now()->toDateString(),
+            'globalaction_id'         => $Globalaction->id,
             'field'                   => $field['key'],
-            'value'                   => $field['value'],
+            'source'                  => $field['source'],
+            'target'                  => $field['target'],
           ]);
         }
       }
@@ -829,6 +706,7 @@ class PeopleController extends BaseController
     DB::beginTransaction();
     $fields = [];
     $familyFields = [];
+    $prihodFields = [];
     $actionID = 8;
     $actionName = 'Оформить развод';
     $PeopleForReturn = [];
@@ -837,6 +715,7 @@ class PeopleController extends BaseController
       $Globalaction = Globalaction::create([
         'user_id' 		          => $User->id,
         'action_id'		      	  => $actionID,
+        'name'                  => $actionName,
         'date'                  => Carbon::now()->toDateString(),
         'discription'           => '',
       ]);
@@ -860,33 +739,42 @@ class PeopleController extends BaseController
           if (count($Wife->Pair)) return response()->json(['message' => 'Persone ' . $Wife->FullName.' already have pair '], 403);
           if (count($Wife->ChildrenMore18YearsOld)) return response()->json(['message' => 'Persone ' . $Wife->FullName.' have childrens more then 18 years old '], 403);
 
-          array_push($familyFields, ['id' => $Husband->family_id, 'key' => null, 'value' => null]);
-          array_push($familyFields, ['id' => $Wife->family_id, 'key' => 'is_passive', 'value' => 1]);
           $WifeFamily = Family::find($Wife->family_id);
+          // array_push($familyFields, ['id' => $Husband->family_id, 'key' => null, 'value' => null]);
+          array_push($familyFields, ['id' => $Wife->family_id, 'key' => 'is_passive', 'source' => $WifeFamily->is_passive, 'target' => 1, ]);
           $WifeFamily->is_passive = 1;
           $WifeFamily->save();
 
           $this->MergePersonesNamesValidator($request->all())->validate();
           if ($request['man_new_name'] != $Husband->name) {
-            array_push($fields, ['id' => $Husband->id, 'key' => 'name', 'value' => $Husband->name]);
+            array_push($fields, ['id' => $Husband->id, 'key' => 'name', 'source' => $Husband->name, 'target' => $request['man_new_name']]);
             array_push($PeopleForReturn, $Husband->id);
             $Husband->name = $request['man_new_name'];
             $Husband->save();
           }
 
           foreach ($Wife->AllChildrens as $child) {
-            array_push($fields, ['id' => $child->id, 'key' => 'family_id', 'value' => $child->family_id]);
+            array_push($fields, ['id' => $child->id, 'key' => 'family_id', 'source' => $child->family_id, 'target' => $Husband->family_id]);
             array_push($PeopleForReturn, $child->id);
             $CurrChild = People::find($child->id);
             $CurrChild->family_id = $Husband->family_id;
+            //   Разобраться с приходами !!!
+            if ($Husband->prihod_id != $Wife->prihod_id) {
+              array_push($fields, ['id' => $child->id, 'key' => 'prihod_id', 'source' => $child->prihod_id, 'target' => $Husband->prihod_id]);
+              array_push($prihodFields, ['people_id' => $child->id, 'source_id' => $child->prihod_id, 'target_id' => $Husband->prihod_id]);
+            }
             $CurrChild->save();
           }
 
-          array_push($fields, ['id' => $Wife->id, 'key' => 'family_id', 'value' => $Wife->family_id]);
+          array_push($fields, ['id' => $Wife->id, 'key' => 'family_id', 'source' => $Wife->family_id, 'target' => $Husband->family_id]);
           array_push($PeopleForReturn, $Wife->id);
           $Wife->family_id = $Husband->family_id;
+          if ($Husband->prihod_id != $Wife->prihod_id) {
+            array_push($fields, ['id' => $child->id, 'key' => 'prihod_id', 'source' => $Wife->prihod_id, 'target' => $Husband->prihod_id]);
+            array_push($prihodFields, ['people_id' => $Wife->id, 'source_id' => $Wife->prihod_id, 'target_id' => $Husband->prihod_id]);
+          }
           if ($request['woman_new_name'] != $Wife->name) {
-            array_push($fields, ['id' => $Wife->id, 'key' => 'name', 'value' => $Wife->name]);
+            array_push($fields, ['id' => $Wife->id, 'key' => 'name', 'source' => $Wife->name, 'target' => $request['woman_new_name']]);
             array_push($PeopleForReturn, $Wife->id);
             $Wife->name = $request['woman_new_name'];
           }  
@@ -920,17 +808,10 @@ class PeopleController extends BaseController
             'sex_id'                => $request['woman_sex_id'],
             'relation_id'           => $request['woman_relation_id'],
           ]);
-          array_push($fields, ['id' => $Wife->id, 'key' => null, 'value' => null]);
+          array_push($fields, ['id' => $Wife->id, 'key' => 'id', 'source' => null, 'target' => $Wife->id]);
+          array_push($fields, ['id' => $Wife->id, 'key' => 'family_id', 'source' => null, 'target' => $Husband->family_id]);
           array_push($PeopleForReturn, $Wife->id);
-          $PrihodAction = Praction::create([
-            'global_id'               => $Globalaction->id,
-            'user_id'                 => $User->id,
-            'action_id'               => $actionID,
-            'name'                    => $actionName,
-            'date'                    => Carbon::now()->toDateString(),
-            'source_id'               => null,
-            'target_id'               => $Husband->prihod_id,
-           ]);
+          array_push($prihodFields, ['people_id' => $Wife->id, 'source_id' => null, 'target_id' => $Husband->prihod_id]);
         }
       } else {
         $this->MergePersonesWifeIDValidator($request->all())->validate();
@@ -967,28 +848,19 @@ class PeopleController extends BaseController
           'sex_id'                => $request['man_sex_id'],
           'relation_id'           => $request['man_relation_id'],
         ]);
-        array_push($fields, ['id' => $Husband->id, 'key' => null, 'value' => null]);
+        array_push($fields, ['id' => $Husband->id, 'key' => 'id', 'source' => null, 'target' => $Husband->id]);
+        array_push($fields, ['id' => $Husband->id, 'key' => 'family_id', 'source' => null, 'target' => $Wife->family_id]);
         array_push($PeopleForReturn, $Husband->id);
-
-        $PrihodAction = Praction::create([
-          'global_id'               => $Globalaction->id,
-          'user_id'                 => $User->id,
-          'action_id'               => $actionID,
-          'name'                    => $actionName,
-          'date'                    => Carbon::now()->toDateString(),
-          'source_id'               => null,
-          'target_id'               => $Wife->prihod_id,
-         ]);
+        array_push($prihodFields, ['people_id' => $Husband->id, 'source_id' => null, 'target_id' => $Wife->prihod_id]);
 
         if ($request['woman_new_name'] != $Wife->name) {
-          array_push($fields, ['id' => $Wife->id, 'key' => 'name', 'value' => $Wife->name]);
+          array_push($fields, ['id' => $Wife->id, 'key' => 'name', 'source' => $Wife->name, 'target' => $request['woman_new_name']]);
           array_push($PeopleForReturn, $Wife->id);
           $Wife->name = $request['woman_new_name'];
           $Wife->save();
         } 
 
-        array_push($familyFields, ['id' => $Wife->family_id, 'key' => 'head_id', 'value' => $Wife->family->head_id]);
-        // $HusbandFamily = $Husband->family;
+        array_push($familyFields, ['id' => $Wife->family_id, 'key' => 'head_id', 'source' => $Wife->family->head_id, 'target' => $Husband->id]);
         $WifeFamily = Family::find($Wife->family_id);
         $WifeFamily->head_id = $Husband->id;
         $WifeFamily->save();
@@ -996,49 +868,33 @@ class PeopleController extends BaseController
       }
       if (count($fields)) {
         foreach ($fields as $field){
-          if (array_key_exists('actionID', $field)){
-            $action_id = $field['actionID'];
-          } else {
-            $action_id = $actionID;
-          }
-          if (array_key_exists('actionName', $field)){
-            $action_name = $field['actionName'];
-          } else {
-            $action_name = $actionName;
-          }
-          $CurrentPersoneAction = Paction::create([
+          $CurrentPersoneAction = Peopleaction::create([
+            'globalaction_id'         => $Globalaction->id,
             'people_id'               => $field['id'],
-            'user_id'                 => $User->id,
-            'global_id'               => $Globalaction->id,
-            'action_id'               => $action_id,
-            'name'                    => $action_name,
-            'date'                    => Carbon::now()->toDateString(),
             'field'                   => $field['key'],
-            'value'                   => $field['value'],
+            'source'                  => $field['source'],
+            'target'                  => $field['target'],
           ]);
         }
       }  
+      if (count($prihodFields)) {
+        foreach ($prihodFields as $field){
+          $CurrentPrihodAction = Prihodaction::create([
+            'globalaction_id'         => $Globalaction->id,
+            'people_id'               => $field['people_id'],
+            'source_id'               => $field['source_id'],
+            'target_id'               => $field['target_id'],
+          ]);
+        }
+      }
       if (count($familyFields)) {
         foreach ($familyFields as $field){
-          if (array_key_exists('actionID', $field)) {
-            $action_id = $field['actionID'];
-          } else {
-            $action_id = $actionID;
-          }
-          if (array_key_exists('actionName', $field)) {
-            $action_name = $field['actionName'];
-          } else {
-            $action_name = $actionName;
-          }
-          $CurrentFamilyAction = Faction::create([
+          $CurrentFamilyAction = Familyaction::create([
+            'globalaction_id'         => $Globalaction->id,
             'family_id'               => $field['id'],
-            'user_id'                 => $User->id,
-            'global_id'               => $Globalaction->id,
-            'action_id'               => $action_id,
-            'name'                    => $action_name,
-            'date'                    => Carbon::now()->toDateString(),
             'field'                   => $field['key'],
-            'value'                   => $field['value'],
+            'source'                  => $field['source'],
+            'target'                  => $field['target'],
           ]);
         }
       }
@@ -1077,6 +933,7 @@ class PeopleController extends BaseController
       $Globalaction = Globalaction::create([
         'user_id' 		          => $User->id,
         'action_id'		      	  => $actionID,
+        'name'                  => $actionName,
         'date'                  => Carbon::now()->toDateString(),
         'discription'           => '',
       ]);
@@ -1099,65 +956,39 @@ class PeopleController extends BaseController
         'discription'			=> $request['family_discription'],
         'head_id'         => $Persone->id,
       ]);
-      array_push($familyFields, ['id' => $CurrentFamily->id, 'key' => null, 'value' => null]);
+      array_push($familyFields, ['id' => $CurrentFamily->id, 'key' => 'id', 'source' => null, 'target' => $CurrentFamily->id]);
 
-      array_push($fields, ['id' => $PersoneID, 'key' => 'family_id', 'value' => $Persone->family_id]);
+      array_push($fields, ['id' => $PersoneID, 'key' => 'family_id', 'source' => $Persone->family_id, 'target' => $CurrentFamily->id]);
       $Persone->family_id = $CurrentFamily->id;
       $Persone->save();
 
       $Childrens = $request['childrens'];
       foreach ($Childrens as $Child) {
         $currChild = People::find($Child['id']);
-        array_push($fields, ['id' => $currChild->id, 'key' => 'family_id', 'value' => $currChild->family_id]);
+        array_push($fields, ['id' => $currChild->id, 'key' => 'family_id', 'source' => $currChild->family_id, 'target' => $CurrentFamily->id]);
         $currChild->family_id = $CurrentFamily->id;
         $currChild->save();
       }
 
       if (count($fields)) {
         foreach ($fields as $field){
-          if (array_key_exists('actionID', $field)){
-            $action_id = $field['actionID'];
-          } else {
-            $action_id = $actionID;
-          }
-          if (array_key_exists('actionName', $field)){
-            $action_name = $field['actionName'];
-          } else {
-            $action_name = $actionName;
-          }
-          $CurrentPersoneAction = Paction::create([
+          $CurrentPersoneAction = Peopleaction::create([
+            'globalaction_id'         => $Globalaction->id,
             'people_id'               => $field['id'],
-            'user_id'                 => $User->id,
-            'global_id'               => $Globalaction->id,
-            'action_id'               => $action_id,
-            'name'                    => $action_name,
-            'date'                    => Carbon::now()->toDateString(),
             'field'                   => $field['key'],
-            'value'                   => $field['value'],
+            'source'                  => $field['source'],
+            'target'                  => $field['target'],
           ]);
         }
       }  
       if (count($familyFields)) {
         foreach ($familyFields as $field){
-          if (array_key_exists('actionID', $field)) {
-            $action_id = $field['actionID'];
-          } else {
-            $action_id = $actionID;
-          }
-          if (array_key_exists('actionName', $field)) {
-            $action_name = $field['actionName'];
-          } else {
-            $action_name = $actionName;
-          }
-          $CurrentFamilyAction = Faction::create([
+          $CurrentFamilyAction = Familyaction::create([
+            'globalaction_id'         => $Globalaction->id,
             'family_id'               => $field['id'],
-            'user_id'                 => $User->id,
-            'global_id'               => $Globalaction->id,
-            'action_id'               => $action_id,
-            'name'                    => $action_name,
-            'date'                    => Carbon::now()->toDateString(),
             'field'                   => $field['key'],
-            'value'                   => $field['value'],
+            'source'                  => $field['source'],
+            'target'                  => $field['target'],
           ]);
         }
       }

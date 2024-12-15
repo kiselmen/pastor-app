@@ -14,7 +14,10 @@ use App\Models\Family;
 use App\Models\Pservice;
 use App\Models\Plevel;
 use App\Models\Ptarget;
-use App\Models\Paction;
+use App\Models\Peopleaction;
+use App\Models\Prihodaction;
+use App\Models\Serviceaction;
+use App\Models\Targetaction;
 
 class People extends Model
 {
@@ -97,9 +100,24 @@ class People extends Model
 		return $this->belongsTo(Family::class);
   }
 
-  public function paction()
+  public function peopleaction()
   {
-		return $this->hasMany(Paction::class);
+		return $this->hasMany(Peopleaction::class);
+  }
+
+  public function Prihodaction()
+  {
+		return $this->hasMany(Prihodaction::class);
+  }
+
+  public function serviceaction()
+  {
+		return $this->hasMany(Serviceaction::class);
+  }
+
+  public function targetaction()
+  {
+		return $this->hasMany(Targetaction::class);
   }
 
   public function getFullNameAttribute(){

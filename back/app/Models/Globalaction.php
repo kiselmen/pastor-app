@@ -3,8 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Paction;
-use App\Models\Faction;
+use App\Models\Peopleaction;
+use App\Models\Familyaction;
+use App\Models\Prihodaction;
+use App\Models\Serviceaction;
+use App\Models\Targetaction;
 use App\Models\User;
 
 class Globalaction extends Model
@@ -13,7 +16,7 @@ class Globalaction extends Model
   ];
 
   protected $fillable = [
-    'user_id' ,'action_id', 'discription', 'date',
+    'user_id' ,'action_id', 'name', 'discription', 'date',
   ];
 
   public $timestamps = false;
@@ -26,12 +29,24 @@ class Globalaction extends Model
 		return $this->belongsTo(User::class);
 	}
 
-  public function paction() {
-		return $this->hasMany(Paction::class);
+  public function peopleaction() {
+		return $this->hasMany(Peopleaction::class);
 	}
 
-  public function faction() {
-		return $this->hasMany(Faction::class);
+  public function familyaction() {
+		return $this->hasMany(Familyaction::class);
+	}
+
+  public function prihodaction() {
+		return $this->hasMany(Prihodaction::class);
+	}
+
+  public function serviceaction() {
+		return $this->hasMany(Serviceaction::class);
+	}
+
+  public function targetaction() {
+		return $this->hasMany(Targetaction::class);
 	}
 
   public function getUserNameAttribute()
