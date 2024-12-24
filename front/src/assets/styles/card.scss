@@ -86,12 +86,12 @@
     font-weight: bold;
   }
   &-row {
-    padding: 10px;
+    padding: 10px 0 0 10px;
     font-size: 14px;
     font-weight: bold;
     display: flex;
     @media (max-width: 1440px) {
-      padding: 5px;
+      padding: 5px 0 0 5px;
     }
   }
   &-column {
@@ -103,7 +103,7 @@
   }
   &-info {
     padding: 2px;
-    font-size: 8px;
+    font-size: 9px;
   }
   &-img {
     width: 100%;

@@ -5,7 +5,7 @@ namespace App\Models;
 use DB;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\People;
-use App\MOdels\Target;
+use App\Models\Target;
 use App\Models\Globalaction;
 
 class Targetaction extends Model

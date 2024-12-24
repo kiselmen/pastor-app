@@ -35,6 +35,7 @@
     }
     &-title {
       margin: 0 auto;
+      text-align: center;
     }
     &-number {
       display: flex;

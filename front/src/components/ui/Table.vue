@@ -105,7 +105,7 @@
 
   const createRowColorClass = (id) => {
     const isPresent = props.activeRows.filter(item => {
-      console.log(item);
+      // console.log(item);
       return item == id;
     }).length;
     return isPresent ? 'active-row': '';

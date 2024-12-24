@@ -1,9 +1,10 @@
 <template>
   <RouterLink :to="'/family/' + props.family?.id">
     <div v-if="props.family" class="family-container">
-      <div class="family-img" :style = "{ backgroundImage : 'url(' + getImgPath(props.family.head?.image_url) +')' }"></div>
+      <div class="family-img" :style = "{ backgroundImage : 'url(' + getImgPath(props.family.head?.image_url) +')' }">
+        <div class="family-number">{{ props.family?.FamilyComposition }}</div>
+      </div>
       <span class="family-title">{{ props.family?.name }}</span>
-      <div class="family-number">{{ props.family?.FamilyComposition }}</div>
     </div>
   </RouterLink>  
 </template>
@@ -22,7 +23,6 @@
 <style lang="scss" scoped>
   .family {
     &-container {
-      position: relative;
       display: flex;
       flex-direction: column;
       justify-content: flex-start;
@@ -33,6 +33,7 @@
     &-title {
       margin: 0 auto;
       color: var(--bs-success);
+      text-align: center;
     }
     &-number {
       display: flex;
@@ -51,6 +52,7 @@
       font-size: 16px;
     }
     &-img {
+      position: relative;
       border-radius: 50%;
       width: 50px;
       height: 50px;

@@ -50,50 +50,6 @@
                 @clearImage="onManImageCleared"
               />
           </div>
-      </div>
-      <div v-if="formStep === 0 && isManMissing" class = "table2x">
-          <div class="form-group">
-              <label class="input-label">Имя</label>
-              <input 
-                  type="text"
-                  autocomplete = "off"
-                  class="input-box"
-                  :class="{ 'is-invalid': peopleStore.errors?.man_first_name }"
-                  v-model="form.man_first_name" 
-                  id="man_first_name"
-              >
-              <div class="input-error" v-if="peopleStore.errors?.man_first_name">
-                {{ peopleStore.errors?.man_first_name[0] }}
-              </div>
-          </div>
-          <div class="form-group">
-              <label class="input-label">Фамилия</label>
-              <input 
-                  type="text"
-                  autocomplete = "off"
-                  class="input-box"
-                  :class="{ 'is-invalid': peopleStore.errors?.man_name }"
-                  v-model="form.man_name" 
-                  id="man_name"
-              >
-              <div class="input-error" v-if="peopleStore.errors?.man_name">
-                {{ peopleStore.errors?.man_name[0] }}
-              </div>
-          </div>
-          <div class="form-group">
-              <label class="input-label">Отчество</label>
-              <input 
-                  type="text"
-                  autocomplete = "off"
-                  class="input-box"
-                  :class="{ 'is-invalid': peopleStore.errors?.man_patronymic }"
-                  v-model="form.man_patronymic" 
-                  id="man_patronymic"
-              >
-              <div class="input-error" v-if="peopleStore.errors?.man_patronymic">
-                {{ peopleStore.errors?.man_patronymic[0] }}
-              </div>
-          </div>
           <div class="form-row">
             <div class="form-group">
               <label class="input-label">Дата рождения</label>
@@ -124,19 +80,123 @@
               </div>
             </div>
           </div>            
+      </div>
+      <div v-if="formStep === 0 && isManMissing" class = "table2x">
           <div class="form-group">
-              <label class="input-label">Адрес</label>
+              <label class="input-label">Фамилия</label>
               <input 
                   type="text"
                   autocomplete = "off"
                   class="input-box"
-                  :class="{ 'is-invalid': peopleStore.errors?.man_live_addres }"
-                  v-model="form.man_live_addres" 
-                  id="man_live_addres"
+                  :class="{ 'is-invalid': peopleStore.errors?.man_name }"
+                  v-model="form.man_name" 
+                  id="man_name"
               >
-              <div class="input-error" v-if="peopleStore.errors?.man_live_addres">
-                {{ peopleStore.errors?.man_live_addres[0] }}
+              <div class="input-error" v-if="peopleStore.errors?.man_name">
+                {{ peopleStore.errors?.man_name[0] }}
               </div>
+          </div>
+          <div class="form-group">
+              <label class="input-label">Имя</label>
+              <input 
+                  type="text"
+                  autocomplete = "off"
+                  class="input-box"
+                  :class="{ 'is-invalid': peopleStore.errors?.man_first_name }"
+                  v-model="form.man_first_name" 
+                  id="man_first_name"
+              >
+              <div class="input-error" v-if="peopleStore.errors?.man_first_name">
+                {{ peopleStore.errors?.man_first_name[0] }}
+              </div>
+          </div>
+          <div class="form-group">
+              <label class="input-label">Отчество</label>
+              <input 
+                  type="text"
+                  autocomplete = "off"
+                  class="input-box"
+                  :class="{ 'is-invalid': peopleStore.errors?.man_patronymic }"
+                  v-model="form.man_patronymic" 
+                  id="man_patronymic"
+              >
+              <div class="input-error" v-if="peopleStore.errors?.man_patronymic">
+                {{ peopleStore.errors?.man_patronymic[0] }}
+              </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+                <label class="input-label">Индекс</label>
+                <input 
+                    type="text"
+                    autocomplete = "off"
+                    class="input-box"
+                    :class="{ 'is-invalid': peopleStore.errors?.man_live_index }"
+                    v-model="form.man_live_index" 
+                    id="man_live_index"
+                >
+                <div class="input-error" v-if="peopleStore.errors?.man_live_index">
+                  {{ peopleStore.errors?.man_live_index[0] }}
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="input-label">Город</label>
+                <input 
+                    type="text"
+                    autocomplete = "off"
+                    class="input-box"
+                    :class="{ 'is-invalid': peopleStore.errors?.man_live_town }"
+                    v-model="form.man_live_town" 
+                    id="man_live_town"
+                >
+                <div class="input-error" v-if="peopleStore.errors?.man_live_town">
+                  {{ peopleStore.errors?.man_live_town[0] }}
+                </div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+                <label class="input-label">Улица</label>
+                <input 
+                    type="text"
+                    autocomplete = "off"
+                    class="input-box"
+                    :class="{ 'is-invalid': peopleStore.errors?.man_live_street }"
+                    v-model="form.man_live_street" 
+                    id="man_live_street"
+                >
+                <div class="input-error" v-if="peopleStore.errors?.man_live_street">
+                  {{ peopleStore.errors?.man_live_street[0] }}
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="input-label">Дом</label>
+                <input 
+                    type="text"
+                    autocomplete = "off"
+                    class="input-box"
+                    :class="{ 'is-invalid': peopleStore.errors?.man_live_house }"
+                    v-model="form.man_live_house" 
+                    id="man_live_house"
+                >
+                <div class="input-error" v-if="peopleStore.errors?.man_live_house">
+                  {{ peopleStore.errors?.man_live_house[0] }}
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="input-label">Квартира</label>
+                <input 
+                    type="text"
+                    autocomplete = "off"
+                    class="input-box"
+                    :class="{ 'is-invalid': peopleStore.errors?.man_live_flat }"
+                    v-model="form.man_live_flat" 
+                    id="man_live_flat"
+                >
+                <div class="input-error" v-if="peopleStore.errors?.man_live_flat">
+                  {{ peopleStore.errors?.man_live_flat[0] }}
+                </div>
+            </div>
           </div>
           <div class="form-row">
             <div class="form-group">
@@ -168,6 +228,22 @@
               </div>
             </div>
           </div>
+      </div>
+      <div v-if="formStep === 0 && isManMissing" class = "table1x">
+        <div class="form-group">
+          <label class="input-label">Описание</label>
+            <input 
+                type="text"
+                autocomplete = "off"
+                class="input-box"
+                :class="{ 'is-invalid': peopleStore.errors?.man_discription }"
+                v-model="form.man_discription" 
+                id="man_discription"
+            >
+            <div class="input-error" v-if="peopleStore.errors?.man_discription">
+              {{ peopleStore.errors?.man_discription[0] }}
+            </div>
+        </div>            
       </div>
     </div>      
     <div  v-if="!loader&&!confirmWindow&&formStep === 1" class="form-container section-container form-middle">
@@ -214,50 +290,6 @@
                 @clearImage="onWomanImageCleared"
               />
           </div>
-      </div>
-      <div v-if="formStep === 1 && isWomanMissing" class = "table2x">
-          <div class="form-group">
-              <label class="input-label">Имя</label>
-              <input 
-                  type="text"
-                  autocomplete = "off"
-                  class="input-box"
-                  :class="{ 'is-invalid': peopleStore.errors?.woman_first_name }"
-                  v-model="form.woman_first_name" 
-                  id="woman_first_name"
-              >
-              <div class="input-error" v-if="peopleStore.errors?.woman_first_name">
-                {{ peopleStore.errors?.woman_first_name[0] }}
-              </div>
-          </div>
-          <div class="form-group">
-              <label class="input-label">Фамилия</label>
-              <input 
-                  type="text"
-                  autocomplete = "off"
-                  class="input-box"
-                  :class="{ 'is-invalid': peopleStore.errors?.woman_name }"
-                  v-model="form.woman_name" 
-                  id="woman_name"
-              >
-              <div class="input-error" v-if="peopleStore.errors?.woman_name">
-                {{ peopleStore.errors?.woman_name[0] }}
-              </div>
-          </div>
-          <div class="form-group">
-              <label class="input-label">Отчество</label>
-              <input 
-                  type="text"
-                  autocomplete = "off"
-                  class="input-box"
-                  :class="{ 'is-invalid': peopleStore.errors?.woman_patronymic }"
-                  v-model="form.woman_patronymic" 
-                  id="woman_patronymic"
-              >
-              <div class="input-error" v-if="peopleStore.errors?.woman_patronymic">
-                {{ peopleStore.errors?.woman_patronymic[0] }}
-              </div>
-          </div>
           <div class="form-row">
             <div class="form-group">
               <label class="input-label">Дата рождения</label>
@@ -288,19 +320,123 @@
               </div>
             </div>
           </div>            
+      </div>
+      <div v-if="formStep === 1 && isWomanMissing" class = "table2x">
           <div class="form-group">
-              <label class="input-label">Адрес</label>
+              <label class="input-label">Фамилия</label>
               <input 
                   type="text"
                   autocomplete = "off"
                   class="input-box"
-                  :class="{ 'is-invalid': peopleStore.errors?.woman_live_addres }"
-                  v-model="form.woman_live_addres" 
-                  id="woman_live_addres"
+                  :class="{ 'is-invalid': peopleStore.errors?.woman_name }"
+                  v-model="form.woman_name" 
+                  id="woman_name"
               >
-              <div class="input-error" v-if="peopleStore.errors?.woman_live_addres">
-                {{ peopleStore.errors?.woman_live_addres[0] }}
+              <div class="input-error" v-if="peopleStore.errors?.woman_name">
+                {{ peopleStore.errors?.woman_name[0] }}
               </div>
+          </div>
+          <div class="form-group">
+              <label class="input-label">Имя</label>
+              <input 
+                  type="text"
+                  autocomplete = "off"
+                  class="input-box"
+                  :class="{ 'is-invalid': peopleStore.errors?.woman_first_name }"
+                  v-model="form.woman_first_name" 
+                  id="woman_first_name"
+              >
+              <div class="input-error" v-if="peopleStore.errors?.woman_first_name">
+                {{ peopleStore.errors?.woman_first_name[0] }}
+              </div>
+          </div>
+          <div class="form-group">
+              <label class="input-label">Отчество</label>
+              <input 
+                  type="text"
+                  autocomplete = "off"
+                  class="input-box"
+                  :class="{ 'is-invalid': peopleStore.errors?.woman_patronymic }"
+                  v-model="form.woman_patronymic" 
+                  id="woman_patronymic"
+              >
+              <div class="input-error" v-if="peopleStore.errors?.woman_patronymic">
+                {{ peopleStore.errors?.woman_patronymic[0] }}
+              </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+                <label class="input-label">Индекс</label>
+                <input 
+                    type="text"
+                    autocomplete = "off"
+                    class="input-box"
+                    :class="{ 'is-invalid': peopleStore.errors?.woman_live_index }"
+                    v-model="form.woman_live_index" 
+                    id="woman_live_index"
+                >
+                <div class="input-error" v-if="peopleStore.errors?.woman_live_index">
+                  {{ peopleStore.errors?.woman_live_index[0] }}
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="input-label">Город</label>
+                <input 
+                    type="text"
+                    autocomplete = "off"
+                    class="input-box"
+                    :class="{ 'is-invalid': peopleStore.errors?.woman_live_town }"
+                    v-model="form.woman_live_town" 
+                    id="woman_live_town"
+                >
+                <div class="input-error" v-if="peopleStore.errors?.woman_live_town">
+                  {{ peopleStore.errors?.woman_live_town[0] }}
+                </div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+                <label class="input-label">Улица</label>
+                <input 
+                    type="text"
+                    autocomplete = "off"
+                    class="input-box"
+                    :class="{ 'is-invalid': peopleStore.errors?.woman_live_street }"
+                    v-model="form.woman_live_street" 
+                    id="woman_live_street"
+                >
+                <div class="input-error" v-if="peopleStore.errors?.woman_live_street">
+                  {{ peopleStore.errors?.woman_live_street[0] }}
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="input-label">Дом</label>
+                <input 
+                    type="text"
+                    autocomplete = "off"
+                    class="input-box"
+                    :class="{ 'is-invalid': peopleStore.errors?.woman_live_house }"
+                    v-model="form.woman_live_house" 
+                    id="woman_live_house"
+                >
+                <div class="input-error" v-if="peopleStore.errors?.woman_live_house">
+                  {{ peopleStore.errors?.woman_live_house[0] }}
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="input-label">Квартира</label>
+                <input 
+                    type="text"
+                    autocomplete = "off"
+                    class="input-box"
+                    :class="{ 'is-invalid': peopleStore.errors?.woman_live_flat }"
+                    v-model="form.woman_live_flat" 
+                    id="woman_live_flat"
+                >
+                <div class="input-error" v-if="peopleStore.errors?.woman_live_flat">
+                  {{ peopleStore.errors?.woman_live_flat[0] }}
+                </div>
+            </div>
           </div>
           <div class="form-row">
             <div class="form-group">
@@ -332,6 +468,22 @@
               </div>
             </div>
           </div>
+      </div>
+      <div v-if="formStep === 1 && isWomanMissing" class = "table1x">
+        <div class="form-group">
+          <label class="input-label">Описание</label>
+            <input 
+                type="text"
+                autocomplete = "off"
+                class="input-box"
+                :class="{ 'is-invalid': peopleStore.errors?.woman_discription }"
+                v-model="form.woman_discription" 
+                id="woman_discription"
+            >
+            <div class="input-error" v-if="peopleStore.errors?.woman_discription">
+              {{ peopleStore.errors?.woman_discription[0] }}
+            </div>
+        </div>            
       </div>
     </div>
     <div  v-if="!loader&&!confirmWindow&&formStep === 2" class="form-container section-container form-middle">
@@ -419,9 +571,14 @@
     man_baptism_date: '',
     man_death_date: '',
     man_image_url: null,
-    man_live_addres: '',
+    man_live_index: '',
+    man_live_town: '',
+    man_live_street: '',
+    man_live_house: '',
+    man_live_flat: '',
     man_home_phone: '',
     man_mobile_phone: '',
+    man_discription: '',
     man_sex: 'Муж',
     man_sex_id: 1,
 
@@ -433,9 +590,14 @@
     woman_baptism_date: '',
     woman_death_date: '',
     woman_image_url: null,
-    woman_live_addres: '',
+    woman_live_index: '',
+    woman_live_town: '',
+    woman_live_street: '',
+    woman_live_house: '',
+    woman_live_flat: '',
     woman_home_phone: '',
     woman_mobile_phone: '',
+    woman_discription: '',
     woman_sex: 'Жен',
     woman_sex_id: 2,
 
@@ -571,9 +733,14 @@
       formData.append('man_birthday_date', form.man_birthday_date);
       formData.append('man_baptism_date', form.man_baptism_date);
       formData.append('man_death_date', form.man_death_date);
-      formData.append('man_live_addres', form.man_live_addres);
+      formData.append('man_live_index', form.man_live_index);
+      formData.append('man_live_town', form.man_live_town);
+      formData.append('man_live_street', form.man_live_street);
+      formData.append('man_live_house', form.man_live_house);
+      formData.append('man_live_flat', form.man_live_flat);
       formData.append('man_home_phone', form.man_home_phone);
       formData.append('man_mobile_phone', form.man_mobile_phone);
+      formData.append('man_discription', form.man_discription);
       formData.append('man_relation_id', 0);
       formData.append('man_sex_id', 1);
       formData.append('man_discription', '');
@@ -594,9 +761,14 @@
       formData.append('woman_birthday_date', form.woman_birthday_date);
       formData.append('woman_baptism_date', form.woman_baptism_date);
       formData.append('woman_death_date', form.woman_death_date);
-      formData.append('woman_live_addres', form.woman_live_addres);
+      formData.append('woman_live_index', form.woman_live_index);
+      formData.append('woman_live_town', form.woman_live_town);
+      formData.append('woman_live_street', form.woman_live_street);
+      formData.append('woman_live_house', form.woman_live_house);
+      formData.append('woman_live_flat', form.woman_live_flat);
       formData.append('woman_home_phone', form.woman_home_phone);
       formData.append('woman_mobile_phone', form.woman_mobile_phone);
+      formData.append('woman_discription', form.woman_discription);
       formData.append('woman_relation_id', 1);
       formData.append('woman_sex_id', 2);
       formData.append('woman_discription', '');

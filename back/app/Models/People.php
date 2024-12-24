@@ -25,12 +25,12 @@ class People extends Model
   ];
 
   protected $fillable = [
-      'first_name' ,'name', 'patronymic', 'birthday_date', 'baptism_date', 'death_date', 'image_url', 'live_addres', 'home_phone', 'mobile_phone', 
-      'email', 'prihod_id', 'family_id', 'sex_id', 'relation_id', 'created_at', 'updated_at'
+      'first_name' ,'name', 'patronymic', 'birthday_date', 'baptism_date', 'death_date', 'image_url', 'live_index', 'live_town', 'live_street', 'live_house',
+      'live_flat', 'discription', 'home_phone', 'mobile_phone', 'email', 'prihod_id', 'family_id', 'sex_id', 'relation_id', 'created_at', 'updated_at'
   ];
 
   protected $appends = [
-    'FullName', 'PrihodName', 'SexName', 'RelationName', 'Pair', 'Under18', 'ChildrenMore18YearsOld', 'AllChildrens',
+    'FullName', 'FullAddress', 'PrihodName', 'SexName', 'RelationName', 'Pair', 'Under18', 'ChildrenMore18YearsOld', 'AllChildrens',
   ];
 
   /**
@@ -124,8 +124,11 @@ class People extends Model
     return $this->name. ' ' . $this->first_name. ' ' . $this->patronymic; 
   }
 
-  public function getPairAttribute()
-  {
+  public function getFullAddressAttribute(){
+    return $this->live_index. ' ' . $this->live_town. ' ' . $this->live_street. ' ' . $this->live_house. ' ' . $this->live_flat ; 
+  }
+
+  public function getPairAttribute() {
     if ($this->relation_id > 1) return [];
     $family = DB::table('families')->find($this->family_id);
     if (!$family) return [];
@@ -176,8 +179,7 @@ class People extends Model
     return $childrens;
   }
 
-  public function getPrihodNameAttribute()
-  {
+  public function getPrihodNameAttribute(){
     if ($this->prihod){
       return $this->prihod->name;
     } else {
@@ -185,8 +187,7 @@ class People extends Model
     }
   }
 
-  public function getRelationNameAttribute()
-  {
+  public function getRelationNameAttribute(){
     if ($this->relation){
       return $this->relation->name;
     } else {
@@ -194,8 +195,7 @@ class People extends Model
     }
   }
 
-  public function getSexNameAttribute()
-  {
+  public function getSexNameAttribute(){
     if ($this->sex){
       return $this->sex->name;
     } else {

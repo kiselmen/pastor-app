@@ -72,7 +72,7 @@
                   <AdressIcon />
                 </template>
                 <template #heading>
-                  {{ peopleStore.onePersone.live_addres }}
+                  {{ peopleStore.onePersone.FullAddress }}
                 </template>
               </DateItem>
               <DateItem>
@@ -188,6 +188,11 @@
     :is-modal-active="isModalAction"
     @close-modal="isModalAction = false"
   >
+    <AddPersone v-if="actionName === 'copyPersone'"
+        @toggle-modal="isModalAction = false"
+        :id="activePersone"
+        :isCopyProccess="true"
+    />
     <EditPersone v-if="actionName === 'editPersone'"
         @toggle-modal="isModalAction = false"
         :id="activePersone"
@@ -236,6 +241,7 @@
   import Table from '@/components/ui/Table.vue';
   import ActionMenu from '@/components/ui/ActionMenu.vue';
   import ModalWrapper from '@/components/ui/ModalWrapper.vue';
+  import AddPersone  from '@/components/people/AddPersone.vue';
   import EditPersone  from '@/components/people/EditPersone.vue';
   import EditPersoneServices from '@/components/nsi/EditPersoneServices.vue';
   import EditPersoneTargets from '@/components/nsi/EditPersoneTargets.vue';
@@ -348,10 +354,10 @@
       if (isUserPresent) {
         commonActions.value = [
           { id: 0, name: 'Изменить', emit: 'editPersone' },
-          // { id: 1, name: 'Дисциплина', emit: 'editPersoneLevels' },
           { id: 1, name: 'Сменить пароль', emit: 'changeUserPass' },
           { id: 2, name: 'Права доступа', emit: 'changeUserPermitions' },
-        ];
+          { id: 3, name: 'Копировать', emit: 'copyPersone' },
+          ];
         levelActions.value = [
           { id: 0, name: 'Изменить', emit: 'editPersoneLevels' },
         ];
@@ -363,6 +369,7 @@
           { id: 0, name: 'Изменить', emit: 'editPersone' },
           // { id: 1, name: 'Дисциплина', emit: 'editPersoneLevels' },
           { id: 1, name: 'Регистрация', emit: 'registerNewUser' },
+          { id: 2, name: 'Копировать', emit: 'copyPersone' },
         ];
         levelActions.value = [
           { id: 0, name: 'Изменить', emit: 'editPersoneLevels' },
@@ -377,6 +384,7 @@
         commonActions.value = [
           { id: 0, name: 'Изменить', emit: 'editPersone' },
           { id: 1, name: 'Целевые группы', emit: 'editPersoneTargets' },
+          { id: 2, name: 'Копировать', emit: 'copyPersone' },
         ];
         levelActions.value = [
           { id: 0, name: 'Изменить', emit: 'editPersoneLevels' },

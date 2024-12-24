@@ -114,6 +114,7 @@ const removePhoto = () => {
       justify-content: center;
       align-items: center;
       border: 1px solid var(--bs-gray-500);
+      border-radius: 10px;
       width: 200px;
       height: 200px;
 

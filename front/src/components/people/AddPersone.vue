@@ -84,51 +84,6 @@
               @clearImage="onImageCleared"
             />
         </div>
-      </div>
-      <div v-if="formStep === 0" class="table2x">
-
-        <div class="form-group" v-if="curAction !== null">
-            <label class="input-label">Имя</label>
-            <input 
-                type="text"
-                autocomplete = "off"
-                class="input-box"
-                :class="{ 'is-invalid': peopleStore.errors?.first_name }"
-                v-model="form.first_name" 
-                id="first_name"
-            >
-            <div class="input-error" v-if="peopleStore.errors?.first_name">
-              {{ peopleStore.errors?.first_name[0] }}
-            </div>
-        </div>
-        <div class="form-group" v-if="curAction !== null">
-            <label class="input-label">Фамилия</label>
-            <input 
-                type="text"
-                autocomplete = "off"
-                class="input-box"
-                :class="{ 'is-invalid': peopleStore.errors?.name }"
-                v-model="form.name" 
-                id="name"
-            >
-            <div class="input-error" v-if="peopleStore.errors?.name">
-              {{ peopleStore.errors?.name[0] }}
-            </div>
-        </div>
-        <div class="form-group" v-if="curAction !== null">
-            <label class="input-label">Отчество</label>
-            <input 
-                type="text"
-                autocomplete = "off"
-                class="input-box"
-                :class="{ 'is-invalid': peopleStore.errors?.patronymic }"
-                v-model="form.patronymic" 
-                id="patronymic"
-            >
-            <div class="input-error" v-if="peopleStore.errors?.patronymic">
-              {{ peopleStore.errors?.patronymic[0] }}
-            </div>
-        </div>
         <div class="form-row" v-if="curAction !== null">
           <div class="form-group">
             <label class="input-label">Дата рождения</label>
@@ -172,20 +127,125 @@
               {{ peopleStore.errors?.death_date[0] }}
             </div>
           </div>
-        </div>            
+        </div>
+      </div>
+      <div v-if="formStep === 0" class="table2x">
+
         <div class="form-group" v-if="curAction !== null">
-            <label class="input-label">Адрес</label>
+            <label class="input-label">Фамилия</label>
             <input 
                 type="text"
                 autocomplete = "off"
                 class="input-box"
-                :class="{ 'is-invalid': peopleStore.errors?.live_addres }"
-                v-model="form.live_addres" 
-                id="live_addres"
+                :class="{ 'is-invalid': peopleStore.errors?.name }"
+                v-model="form.name" 
+                id="name"
             >
-            <div class="input-error" v-if="peopleStore.errors?.live_addres">
-              {{ peopleStore.errors?.live_addres[0] }}
+            <div class="input-error" v-if="peopleStore.errors?.name">
+              {{ peopleStore.errors?.name[0] }}
             </div>
+        </div>
+        <div class="form-group" v-if="curAction !== null">
+            <label class="input-label">Имя</label>
+            <input 
+                type="text"
+                autocomplete = "off"
+                class="input-box"
+                :class="{ 'is-invalid': peopleStore.errors?.first_name }"
+                v-model="form.first_name" 
+                id="first_name"
+            >
+            <div class="input-error" v-if="peopleStore.errors?.first_name">
+              {{ peopleStore.errors?.first_name[0] }}
+            </div>
+        </div>
+        <div class="form-group" v-if="curAction !== null">
+            <label class="input-label">Отчество</label>
+            <input 
+                type="text"
+                autocomplete = "off"
+                class="input-box"
+                :class="{ 'is-invalid': peopleStore.errors?.patronymic }"
+                v-model="form.patronymic" 
+                id="patronymic"
+            >
+            <div class="input-error" v-if="peopleStore.errors?.patronymic">
+              {{ peopleStore.errors?.patronymic[0] }}
+            </div>
+        </div>
+        <div class="form-row" v-if="curAction !== null">
+          <div class="form-group">
+              <label class="input-label">Индекс</label>
+              <input 
+                  type="text"
+                  autocomplete = "off"
+                  class="input-box"
+                  :class="{ 'is-invalid': peopleStore.errors?.live_index }"
+                  v-model="form.live_index" 
+                  id="live_index"
+              >
+              <div class="input-error" v-if="peopleStore.errors?.live_index">
+                {{ peopleStore.errors?.live_index[0] }}
+              </div>
+          </div>
+          <div class="form-group">
+              <label class="input-label">Город</label>
+              <input 
+                  type="text"
+                  autocomplete = "off"
+                  class="input-box"
+                  :class="{ 'is-invalid': peopleStore.errors?.live_town }"
+                  v-model="form.live_town" 
+                  id="live_town"
+              >
+              <div class="input-error" v-if="peopleStore.errors?.live_town">
+                {{ peopleStore.errors?.live_town[0] }}
+              </div>
+          </div>
+        </div>
+        <div class="form-row" v-if="curAction !== null">
+          <div class="form-group">
+              <label class="input-label">Улица</label>
+              <input 
+                  type="text"
+                  autocomplete = "off"
+                  class="input-box"
+                  :class="{ 'is-invalid': peopleStore.errors?.live_street }"
+                  v-model="form.live_street" 
+                  id="live_street"
+              >
+              <div class="input-error" v-if="peopleStore.errors?.live_street">
+                {{ peopleStore.errors?.live_street[0] }}
+              </div>
+          </div>
+          <div class="form-group">
+              <label class="input-label">Дом</label>
+              <input 
+                  type="text"
+                  autocomplete = "off"
+                  class="input-box"
+                  :class="{ 'is-invalid': peopleStore.errors?.live_house }"
+                  v-model="form.live_house" 
+                  id="live_house"
+              >
+              <div class="input-error" v-if="peopleStore.errors?.live_house">
+                {{ peopleStore.errors?.live_house[0] }}
+              </div>
+          </div>
+          <div class="form-group">
+              <label class="input-label">Квартира</label>
+              <input 
+                  type="text"
+                  autocomplete = "off"
+                  class="input-box"
+                  :class="{ 'is-invalid': peopleStore.errors?.live_flat }"
+                  v-model="form.live_flat" 
+                  id="live_flat"
+              >
+              <div class="input-error" v-if="peopleStore.errors?.live_flat">
+                {{ peopleStore.errors?.live_flat[0] }}
+              </div>
+          </div>
         </div>
         <div class="form-row" v-if="curAction !== null">
           <div class="form-group">
@@ -217,6 +277,22 @@
             </div>
           </div>
         </div>
+      </div>
+      <div v-if="formStep === 0" class="table1x">
+        <div class="form-group" v-if="curAction !== null">
+          <label class="input-label">Описание</label>
+            <input 
+                type="text"
+                autocomplete = "off"
+                class="input-box"
+                :class="{ 'is-invalid': peopleStore.errors?.discription }"
+                v-model="form.discription" 
+                id="discription"
+            >
+            <div class="input-error" v-if="peopleStore.errors?.discription">
+              {{ peopleStore.errors?.discription[0] }}
+            </div>
+        </div>            
       </div>
       <div v-if="formStep === 1" class="table1x">
           <div>
@@ -314,6 +390,11 @@
   import FileUpload from '@/components/ui/FileUpload.vue';
   import InputSelector from '@/components/ui/InputSelector.vue';
 
+  const props = defineProps({
+    id: { type: Number, default: null },
+    isCopyProccess: { type: Boolean, default: false },
+  });
+
   const peopleStore = usePeopleStore();
   const prihodStore = usePrihodStore();
   const nsiStore = useNsiStore();
@@ -328,9 +409,14 @@
     birthday_date: '',
     baptism_date: '',
     death_date: '',
-    live_addres: '',
+    live_index: '',
+    live_town: '',
+    live_street: '',
+    live_house: '',
+    live_flat: '',
     home_phone: null,
     mobile_phone: null,
+    discription: '',
     prihod: '',
     prihod_id: null,
     family_id: null,
@@ -343,7 +429,6 @@
     family_discription: null,
     family_head_id: null,
     family_candidates: [],
-    discription: null,
   });
 
   const formElem = ref(null);
@@ -463,9 +548,14 @@
     formData.append('birthday_date', form.birthday_date);
     formData.append('baptism_date', form.baptism_date);
     formData.append('death_date', form.death_date);
-    formData.append('live_addres', form.live_addres);
+    formData.append('live_index', form.live_index);
+    formData.append('live_town', form.live_town);
+    formData.append('live_street', form.live_street);
+    formData.append('live_house', form.live_house);
+    formData.append('live_flat', form.live_flat);
     formData.append('home_phone', form.home_phone);
     formData.append('mobile_phone', form.mobile_phone);
+    formData.append('discription', form.discription);
     formData.append('prihod_id', form.prihod_id);
     formData.append('action_id', form.action_id);
     formData.append('family_id', form.family_id);
@@ -499,8 +589,38 @@
     loader.value = true;
     peopleStore.clearErrorsState();0
     await prihodStore.getPrihods();
-    // await nsiStore.getTargets();
     await familyStore.getAllFamilies();
+    if (props.isCopyProccess) {
+      let persone = null; 
+      if (props.id) {
+        persone = peopleStore.peoples.filter(item => item.id === props.id)[0];
+      } else {
+        persone = peopleStore.onePersone;
+      }
+      form.email = persone.email;
+      form.first_name = persone.first_name;
+      form.name = persone.name;
+      form.patronymic = persone.patronymic;
+      form.birthday_date = persone.birthday_date;
+      form.baptism_date = persone.baptism_date ? persone.baptism_date: '';
+      form.death_date = persone.death_date ? persone.death_date: '';
+      // form.image_url = persone.image_url;
+      form.live_index = persone.live_index;
+      form.live_town = persone.live_town;
+      form.live_street = persone.live_street;
+      form.live_house = persone.live_house;
+      form.live_flat = persone.live_flat;
+      form.home_phone = persone.home_phone;
+      form.mobile_phone = persone.mobile_phone;
+      form.discription = persone.discription;
+      form.prihod = persone.PrihodName;
+      form.prihod_id = persone.prihod_id;
+      // form.target = persone.TargetName;
+      // form.target_id = persone.target_id;
+      form.sex = persone.SexName;
+      form.sex_id = persone.sex_id;
+      form.family_id = persone.family_id;
+    }
     loader.value = false;
   })
 

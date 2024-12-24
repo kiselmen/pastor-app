@@ -5,7 +5,7 @@ namespace App\Models;
 use DB;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\People;
-use App\MOdels\Service;
+use App\Models\Service;
 use App\Models\Globalaction;
 
 class Serviceaction extends Model

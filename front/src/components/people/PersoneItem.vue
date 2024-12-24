@@ -50,6 +50,11 @@
           />
         </div>
       </div>
+      <div class="card-row">
+        <div class="card-info">
+          {{ props.persone.discription }}
+        </div>
+      </div>
     </div>  
     <div class="card-box">
       <div class="card-row">
@@ -88,7 +93,7 @@
             <AdressIcon />
           </template>
           <template #heading>
-            {{ props.persone.live_addres }}
+            {{ props.persone.FullAddress }}
           </template>
         </DateItem>
       </div>
@@ -150,7 +155,16 @@
 
   const userStore = useUserStore();
 
-  const emits = defineEmits(['editPersone', 'editPersoneLevels', 'editPersoneTargets', 'editPersoneServices', 'registerNewUser', 'changeUserPass', 'changeUserPermitions']);
+  const emits = defineEmits([
+    'editPersone', 
+    'editPersoneLevels', 
+    'editPersoneTargets', 
+    'editPersoneServices', 
+    'registerNewUser', 
+    'changeUserPass', 
+    'changeUserPermitions',
+    'copyPersone', 
+  ]);
 
   const actions = ref([]);
   const cardElem = ref(null);
@@ -238,6 +252,7 @@
           { id: 2, name: 'Целевые группы', emit: 'editPersoneTargets' },
           { id: 3, name: 'Сменить пароль', emit: 'changeUserPass' },
           { id: 4, name: 'Права доступа', emit: 'changeUserPermitions' },
+          { id: 5, name: 'Копировать', emit: 'copyPersone' },
         ]
       } else {
         actions.value = [
@@ -245,6 +260,7 @@
           { id: 1, name: 'Дисциплина', emit: 'editPersoneLevels' },
           { id: 2, name: 'Целевые группы', emit: 'editPersoneTargets' },
           { id: 3, name: 'Регистрация', emit: 'registerNewUser' },
+          { id: 4, name: 'Копировать', emit: 'copyPersone' },
         ]
       }
     } else {
@@ -254,6 +270,7 @@
           { id: 0, name: 'Изменить', emit: 'editPersone' },
           { id: 1, name: 'Дисциплина', emit: 'editPersoneLevels' },
           { id: 2, name: 'Целевые группы', emit: 'editPersoneTargets' },
+          { id: 3, name: 'Копировать', emit: 'copyPersone' },
         ]
       } else {
         const isServiceAdmin = serviceIDs.filter(item => props.persone.pservice.filter(service => service.service_id == item).length).length;

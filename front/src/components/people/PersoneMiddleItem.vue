@@ -63,14 +63,21 @@
       </div>
       <div class="card-box">
         <div class="card-row">
-          <DateItem :class="{ marked: isPresentField('live_addres')}">
-            <template #icon>
-              <AdressIcon />
-            </template>
-            <template #heading>
-              {{ persone.live_addres }}
-            </template>
-          </DateItem>
+          <div class="info" :class="{ marked: isPresentField('live_index')}">
+            {{ persone.live_index }}  &nbsp
+          </div>
+          <div class="info" :class="{ marked: isPresentField('live_town')}">
+            {{ persone.live_town }}  &nbsp
+          </div>
+          <div class="info" :class="{ marked: isPresentField('live_street')}">
+            {{ persone.live_street }}  &nbsp
+          </div>
+          <div class="info" :class="{ marked: isPresentField('live_house')}">
+            {{ persone.live_house }}  &nbsp
+          </div>
+          <div class="info" :class="{ marked: isPresentField('live_flat')}">
+            {{ persone.live_flat }} 
+          </div>
         </div>
         <div class="card-row">
           <DateItem :class="{ marked: isPresentField('mobile_phone')}">
@@ -191,6 +198,7 @@
   };
 
   const ServiceName = (id) => {
+    console.log('id ', id);
     const res = props.services.filter(item => item.id === id)[0].name;
     return res;
   };
@@ -223,6 +231,10 @@
 
   .marked {
     border: 1px solid var(--bs-danger);
+    padding: 5px; 
+  }
+
+  .info {
     padding: 5px; 
   }
 

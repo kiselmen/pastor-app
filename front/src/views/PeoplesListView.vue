@@ -56,6 +56,7 @@
         @registerNewUser = "onRegisterNewUser"
         @changeUserPass = "onChangePersonePass"
         @changeUserPermitions = "onChangePersonePermitions"
+        @copyPersone = "onCopyPersone"
         :key = persone.Id
         :persone = persone
       />
@@ -63,48 +64,50 @@
   </div>
   <ModalWrapper
       :is-modal-active="isModalAction"
-      @close-modal="isModalAction = false"
+      @close-modal="onCloseModalWindow"
     >
       <SelectAction v-if="action === 'selectAction'"
-          @cancelSelect="isModalAction = false"
+          @cancelSelect="onCloseModalWindow"
           @acceptSelect="onAcceptAction"
           :actions="personeActions"
       />
       <AddPersone v-if="action === 'addPersone'"
-          @toggle-modal="isModalAction = false"
+          @toggle-modal="onCloseModalWindow"
+          :id="activePersone"
+          :isCopyProccess = "Boolean(activePersone)"
       />
       <EditPersone v-if="action === 'editPersone'"
-          @toggle-modal="isModalAction = false"
+          @toggle-modal="onCloseModalWindow"
           :id="activePersone"
       />
       <MergePersons v-if="action === 'mergePersons'"
-          @toggle-modal="isModalAction = false"
+          @toggle-modal="onCloseModalWindow"
       />
       <SplitPersons v-if="action === 'splitPersons'"
-          @toggle-modal="isModalAction = false"
+          @toggle-modal="onCloseModalWindow"
       />
       <EditPersoneLevels v-if="action === 'editPersoneLevels'"
-          @toggle-modal="isModalAction = false"
+          @toggle-modal="onCloseModalWindow"
           :id="activePersone"
       />
       <EditPersoneServices v-if="action === 'editPersoneServices'"
-          @toggle-modal="isModalAction = false"
+          @toggle-modal="onCloseModalWindow"
           :id="activePersone"
       />
       <EditPersoneTargets v-if="action === 'editPersoneTargets'"
-          @toggle-modal="isModalAction = false"
+          @toggle-modal="onCloseModalWindow"
           :id="activePersone"
       />
       <RegisterNewUser v-if="action === 'registerNewUser'"
-          @toggle-modal="isModalAction = false"
+          @toggle-modal="onCloseModalWindow"
           :id="activePersone"
       />
       <ChangeUserPass v-if="action === 'changeUserPass'"
-          @toggle-modal="isModalAction = false"
+          @toggle-modal="onCloseModalWindow"
           :id="activeUser"
       />
       <ChangeUserPermitions v-if="action === 'changeUserPermitions'"
-          @toggle-modal="isModalAction = false"
+          @toggle-modal="onCloseModalWindow"
           :id="activeUser"
       />
   </ModalWrapper>
@@ -172,7 +175,7 @@
       actions = [...addAction];
     }
     return actions;
-  })
+  });
 
   const activeUser = computed(() => {
     if (activePersone.value) {
@@ -188,6 +191,11 @@
     await getPeoplesFromAPI();
     loader.value = false;
   }, { deep: true });
+
+  const onCloseModalWindow = () => {
+    activePersone.value = null;
+    isModalAction.value = false;
+  };
 
   const onAcceptAction = (action) => {
     openActionModal(action);
@@ -272,6 +280,12 @@
     activePersone.value = id;
     isModalAction.value = true;
   };
+
+  const onCopyPersone = (id) => {
+    action.value = 'addPersone';
+    activePersone.value = id;
+    isModalAction.value = true;
+  }
 
   const onEditPersonServices = (id) => {
     action.value = 'editPersoneServices';

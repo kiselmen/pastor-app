@@ -48,6 +48,19 @@
               {{ prihodStore.errors?.number[0] }}
             </div>
         </div>
+        <div class="form-group">
+          <label class="input-label">Тип участка</label>
+          <InputSelector
+              text = "Тип"
+              :id   = form.is_global
+              :data ="prihodTypes"
+              :parentElem = "formElem"
+              @selectItem="onTypeSelect"
+            />
+          <div class="input-error" v-if="prihodStore.errors?.is_global">
+            {{ prihodStore.errors?.is_global[0] }}
+          </div>
+        </div>
       </div>
     </div>
     <div v-if="!loader&&confirmWindow" class="form-container section-container form-middle">
@@ -70,6 +83,8 @@
   import { usePrihodStore } from '@/stores/prihodStore';
   import { reactive, onBeforeMount, ref } from 'vue';
 
+  import InputSelector from '@/components/ui/InputSelector.vue';
+
   const props = defineProps({
     id: { type: Number, default: null },
   })
@@ -82,12 +97,23 @@
     name: '',
     discription: '',
     number: 0,
+    is_global: 0,
   });
 
   const prihod = ref(null);
   const loader = ref(false);
   const confirmWindow = ref(false);
   const formElem = ref(null);
+
+  const prihodTypes = [
+    { id: 0, name: 'Локальная церковь' },
+    { id: 1, name: 'Другие церкви' },
+  ];
+
+  const onTypeSelect = (id) => {
+    form.is_global = id;
+  };
+
 
   const onEditPrihod = () => {
     confirmWindow.value = true;
@@ -103,6 +129,7 @@
     formData.append('name', form.name);
     formData.append('number', form.number);
     formData.append('discription', form.discription);
+    formData.append('is_global', form.is_global);
     formData.append('id', props.id);
     await prihodStore.editPrihod(formData);
     if (!prihodStore.totalCountErrors) {
@@ -121,6 +148,7 @@
     form.name = prihod.value.name;
     form.number = prihod.value.number;
     form.discription = prihod.value.discription;
+    form.is_global = prihod.value.is_global ? prihod.value.is_global: 0;
     loader.value = false;
   })
 

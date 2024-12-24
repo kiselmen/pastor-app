@@ -39,7 +39,10 @@ class PeopleController extends BaseController
       'patronymic' => ['required'], 
       'birthday_date' => ['required'], 
       // 'baptism_date' => ['required'],
-      'live_addres' => ['required'], 
+      // 'live_index' => ['required'], 
+      'live_town' => ['required'], 
+      'live_street' => ['required'], 
+      'live_house' => ['required'], 
       // 'home_phone' => ['required'], 
       // 'mobile_phone' => ['required'], 
       // 'email' => ['required'],
@@ -58,7 +61,10 @@ class PeopleController extends BaseController
       'patronymic' => ['required'], 
       'birthday_date' => ['required'], 
       // 'baptism_date' => ['required'],
-      'live_addres' => ['required'], 
+      // 'live_index' => ['required'], 
+      'live_town' => ['required'], 
+      'live_street' => ['required'], 
+      'live_house' => ['required'], 
       // 'home_phone' => ['required'], 
       // 'mobile_phone' => ['required'], 
       'email' => ['required'],
@@ -93,7 +99,10 @@ class PeopleController extends BaseController
       'man_name' => ['required'], 
       'man_patronymic' => ['required'], 
       'man_birthday_date' => ['required'], 
-      'man_live_addres' => ['required'], 
+      // 'man_live_index' => ['required'], 
+      'man_live_town' => ['required'], 
+      'man_live_street' => ['required'], 
+      'man_live_house' => ['required'], 
       'man_sex_id' => ['required', 'numeric'],
       'man_relation_id' => ['required', 'numeric'],
     ]);
@@ -111,7 +120,10 @@ class PeopleController extends BaseController
       'woman_name' => ['required'], 
       'woman_patronymic' => ['required'], 
       'woman_birthday_date' => ['required'], 
-      'woman_live_addres' => ['required'], 
+      // 'woman_live_index' => ['required'], 
+      'woman_live_town' => ['required'], 
+      'woman_live_street' => ['required'], 
+      'woman_live_house' => ['required'], 
       'woman_sex_id' => ['required', 'numeric'],
       'woman_relation_id' => ['required', 'numeric'],
     ]);
@@ -407,9 +419,14 @@ class PeopleController extends BaseController
           'baptism_date'		      => $request['baptism_date'],
           'death_date'            => $request['death_date'],
           'image_url'             => $request['image_url'],
-          'live_addres'           => $request['live_addres'],
+          'live_index'            => $request['live_index'],
+          'live_town'             => $request['live_town'],
+          'live_street'           => $request['live_street'],
+          'live_house'            => $request['live_house'],
+          'live_flat'             => $request['live_flat'],
           'home_phone'            => $request['home_phone'],
           'mobile_phone'          => $request['mobile_phone'],
+          'discription'           => $request['discription'],
           'email'                 => $request['email'],
           'image_url'             => $filePath,
           'prihod_id'             => $request['prihod_id'],
@@ -449,9 +466,14 @@ class PeopleController extends BaseController
           'baptism_date'		      => $request['baptism_date'],
           'death_date'            => $request['death_date'],
           'image_url'             => $request['image_url'],
-          'live_addres'           => $request['live_addres'],
+          'live_index'            => $request['live_index'],
+          'live_town'             => $request['live_town'],
+          'live_street'           => $request['live_street'],
+          'live_house'            => $request['live_house'],
+          'live_flat'             => $request['live_flat'],
           'home_phone'            => $request['home_phone'],
           'mobile_phone'          => $request['mobile_phone'],
+          'discription'           => $request['discription'],
           'email'                 => $request['email'],
           'image_url'             => $filePath,
           'prihod_id'             => $request['prihod_id'],
@@ -563,11 +585,26 @@ class PeopleController extends BaseController
           array_push($fields, ['id' => $id, 'key' => 'baptism_date', 'source' => $CurrentPersone->baptism_date, 'target' => $request['baptism_date']]);
           $CurrentPersone->baptism_date 		= $request['baptism_date'];
         }
-        if ($CurrentPersone->live_addres !== $request['live_addres']) {
-          array_push($fields, ['id' => $id, 'key' => 'live_addres', 'source' => $CurrentPersone->live_addres, 'target' => $request['live_addres']]);
-          $CurrentPersone->live_addres 		  = $request['live_addres'];
+        if ($CurrentPersone->live_index !== $request['live_index']) {
+          array_push($fields, ['id' => $id, 'key' => 'live_index', 'source' => $CurrentPersone->live_index, 'target' => $request['live_index']]);
+          $CurrentPersone->live_index 		  = $request['live_index'];
         }
-        
+        if ($CurrentPersone->live_town !== $request['live_town']) {
+          array_push($fields, ['id' => $id, 'key' => 'live_town', 'source' => $CurrentPersone->live_town, 'target' => $request['live_town']]);
+          $CurrentPersone->live_town 		  = $request['live_town'];
+        }
+        if ($CurrentPersone->live_street !== $request['live_street']) {
+          array_push($fields, ['id' => $id, 'key' => 'live_street', 'source' => $CurrentPersone->live_street, 'target' => $request['live_street']]);
+          $CurrentPersone->live_street 		  = $request['live_street'];
+        }
+        if ($CurrentPersone->live_house !== $request['live_house']) {
+          array_push($fields, ['id' => $id, 'key' => 'live_house', 'source' => $CurrentPersone->live_house, 'target' => $request['live_house']]);
+          $CurrentPersone->live_house 		  = $request['live_house'];
+        }
+        if ($CurrentPersone->live_flat !== $request['live_flat']) {
+          array_push($fields, ['id' => $id, 'key' => 'live_flat', 'source' => $CurrentPersone->live_flat, 'target' => $request['live_flat']]);
+          $CurrentPersone->live_flat 		  = $request['live_flat'];
+        }
         if (!is_null($request['home_phone']) && $request['home_phone'] != 'null') {
           $home_phone = $request['home_phone'];
         } else {
@@ -585,6 +622,10 @@ class PeopleController extends BaseController
         if ($CurrentPersone->mobile_phone !== $mobile_phone) {
           array_push($fields, ['id' => $id, 'key' => 'mobile_phone', 'source' => $CurrentPersone->mobile_phone, 'target' => $mobile_phone]);
           $CurrentPersone->mobile_phone 		= $mobile_phone;
+        }
+        if ($CurrentPersone->discription !== $request['discription']) {
+          array_push($fields, ['id' => $id, 'key' => 'discription', 'source' => $CurrentPersone->discription, 'target' => $request['discription']]);
+          $CurrentPersone->discription 		  = $request['discription'];
         }
         if (!is_null($request['email']) && $request['email'] !== "null" && $CurrentPersone->email !== $request['email']) {
           array_push($fields, ['id' => $id, 'key' => 'email', 'source' => $CurrentPersone->email, 'target' => $request['email']]);
@@ -798,9 +839,14 @@ class PeopleController extends BaseController
             'baptism_date'		      => $request['woman_baptism_date'],
             'death_date'            => $request['woman_death_date'],
             'image_url'             => $request['woman_image_url'],
-            'live_addres'           => $request['woman_live_addres'],
+            'live_index'            => $request['woman_live_index'],
+            'live_town'             => $request['woman_live_town'],
+            'live_street'           => $request['woman_live_street'],
+            'live_house'            => $request['woman_live_house'],
+            'live_flat'             => $request['woman_live_flat'],
             'home_phone'            => $request['woman_home_phone'],
             'mobile_phone'          => $request['woman_mobile_phone'],
+            'discription'           => $request['woman_discription'],
             'email'                 => $request['woman_email'],
             'image_url'             => $womanFilePath,
             'prihod_id'             => $Husband->prihod_id,
@@ -838,9 +884,14 @@ class PeopleController extends BaseController
           'baptism_date'		      => $request['man_baptism_date'],
           'death_date'            => $request['man_death_date'],
           'image_url'             => $request['man_image_url'],
-          'live_addres'           => $request['man_live_addres'],
+          'live_index'            => $request['man_live_index'],
+          'live_town'             => $request['man_live_town'],
+          'live_street'           => $request['man_live_street'],
+          'live_house'            => $request['man_live_house'],
+          'live_flat'             => $request['man_live_flat'],
           'home_phone'            => $request['man_home_phone'],
           'mobile_phone'          => $request['man_mobile_phone'],
+          'discription'           => $request['man_discription'],
           'email'                 => $request['man_email'],
           'image_url'             => $manFilePath,
           'prihod_id'             => $Wife->prihod_id,
